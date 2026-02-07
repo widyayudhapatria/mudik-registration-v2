@@ -1,0 +1,47 @@
+<?php
+
+use App\Http\Controllers\CMS\DashboardController;
+use App\Http\Controllers\CMS\ScannerController;
+use Illuminate\Http\Request;
+use Illuminate\Support\Facades\Route;
+
+Route::prefix('cms')->name('cms.api.')->middleware(['auth:admin'])->group(function () {
+
+    Route::prefix('scan')->name('scan.')->middleware(['scanner.permission'])->group(function () {
+        Route::get('/validate', [ScannerController::class, 'validateQrCode'])->name('validate');
+        Route::post('/consume', [ScannerController::class, 'consumeQrCode'])->name('consume');
+    });
+    
+    Route::get('/statistics', [DashboardController::class, 'statistics'])->name('statistics');
+});
+
+Route::get('/health', function () {
+    return response()->json([
+        'status' => 'ok',
+        'timestamp' => now()->toISOString(),
+        'service' => 'Mudik Lebaran 2026 API',
+    ]);
+})->name('health');
+
+Route::get('/version', function () {
+    return response()->json([
+        'version' => '1.0.0',
+        'api_version' => 'v1',
+        'app_name' => 'Mudik Lebaran 2026',
+        'environment' => app()->environment(),
+    ]);
+})->name('version');
+
+Route::middleware('auth:admin')->get('/me', function (Request $request) {
+    return response()->json([
+        'success' => true,
+        'data' => [
+            'id' => $request->user('admin')->id,
+            'name' => $request->user('admin')->name,
+            'email' => $request->user('admin')->email,
+            'role' => $request->user('admin')->role,
+            'can_scan' => $request->user('admin')->can_scan,
+            'is_active' => $request->user('admin')->is_active,
+        ],
+    ]);
+})->name('me');

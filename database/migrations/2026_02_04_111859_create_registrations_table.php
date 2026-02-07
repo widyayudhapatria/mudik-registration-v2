@@ -17,12 +17,12 @@ return new class extends Migration
             
             // Data Perwakilan
             $table->string('representative_name');
-            $table->string('representative_nik', 16);
+            $table->string('representative_nik', 16)->unique(); 
             $table->date('representative_birth_date');
             
             // Data Keluarga
             $table->unsignedInteger('family_count');
-            $table->string('kk_number', 16);
+            $table->string('kk_number', 16)->unique();
             $table->string('kk_document_path', 500);
             $table->boolean('has_child_under_4')->default(false);
             
@@ -36,9 +36,6 @@ return new class extends Migration
             
             $table->timestamps();
 
-            $table->unique('form_link_id');
-            $table->unique('kk_number');
-            $table->unique('representative_nik');
             $table->index('created_at');
         });
     }

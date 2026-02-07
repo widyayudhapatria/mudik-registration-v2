@@ -6,8 +6,8 @@ return [
     | Form Link Configuration
     |--------------------------------------------------------------------------
     */
-    'form_link_expiry_days' => env('FORM_LINK_EXPIRY_DAYS', 3),
-    'form_link_max_resend' => env('FORM_LINK_MAX_RESEND', 5),
+    'form_link_expiry_days' => (int)env('FORM_LINK_EXPIRY_DAYS', 3),
+    'form_link_max_resend' => (int) env('FORM_LINK_MAX_RESEND', 5),
 
     /*
     |--------------------------------------------------------------------------

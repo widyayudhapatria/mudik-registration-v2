@@ -14,6 +14,8 @@ class DatabaseSeeder extends Seeder
         $this->call([
             AdminSeeder::class,
             DailyQuotaSeeder::class,
+            MudikRolesAndPermissionsSeeder::class,
+            AssignAdminRolesSeeder::class,
         ]);
     }
 }
