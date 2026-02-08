@@ -12,7 +12,7 @@ class DashboardPolicy
      */
     public function view(Admin $admin): bool
     {
-        return $admin->can(MudikPermissions::ViewDashboard->value);
+        return $admin->hasPermission(MudikPermissions::ViewDashboard);
     }
 
     /**
@@ -20,6 +20,6 @@ class DashboardPolicy
      */
     public function viewStatistics(Admin $admin): bool
     {
-        return $admin->can(MudikPermissions::ViewStatistics->value);
+        return $admin->hasPermission(MudikPermissions::ViewStatistics);
     }
 }

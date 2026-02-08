@@ -12,7 +12,7 @@ class AdminPolicy
      */
     public function viewAny(Admin $admin): bool
     {
-        return $admin->can(MudikPermissions::ViewAdmins->value);
+        return $admin->hasPermission(MudikPermissions::ViewAdmins);
     }
 
     /**
@@ -20,7 +20,7 @@ class AdminPolicy
      */
     public function view(Admin $admin, Admin $targetAdmin): bool
     {
-        return $admin->can(MudikPermissions::ViewAdmins->value);
+        return $admin->hasPermission(MudikPermissions::ViewAdmins);
     }
 
     /**
@@ -28,6 +28,6 @@ class AdminPolicy
      */
     public function modify(Admin $admin): bool
     {
-        return $admin->can(MudikPermissions::ModifyAdmins->value);
+        return $admin->hasPermission(MudikPermissions::ModifyAdmins);
     }
 }

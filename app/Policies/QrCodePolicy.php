@@ -13,7 +13,7 @@ class QrCodePolicy
      */
     public function scan(Admin $admin): bool
     {
-        return $admin->can(MudikPermissions::ScanQR->value) 
+        return $admin->hasPermission(MudikPermissions::ScanQR) 
             && $admin->canScanQr()
             && $admin->is_active; 
     }
@@ -23,6 +23,6 @@ class QrCodePolicy
      */
     public function viewScanLogs(Admin $admin): bool
     {
-        return $admin->can(MudikPermissions::ViewScanLogs->value);
+        return $admin->hasPermission(MudikPermissions::ViewScanLogs);
     }
 }

@@ -6,6 +6,7 @@ use App\Enums\ErrorCode;
 use App\Http\Controllers\Controller;
 use App\Models\QrCode;
 use Illuminate\Http\Request;
+use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
 
 class QrViewController extends Controller
@@ -20,7 +21,8 @@ class QrViewController extends Controller
         $token = $request->query('t');
 
         if ($token) {
-            return $this->view($token);
+            // Redirect ke view route
+            return redirect()->route('scan.view', ['token' => $token]);
         }
 
         return view('public.qr.entry');
@@ -31,7 +33,7 @@ class QrViewController extends Controller
      *
      * GET /scan/{token}
      */
-    public function view(string $token): View
+    public function view(string $token): View|RedirectResponse
     {
         $qrCode = QrCode::where('token_qr', $token)
             ->with(['registration.participants', 'registration.formLink'])
@@ -41,11 +43,8 @@ class QrViewController extends Controller
             abort(404, ErrorCode::InvalidQR->getMessage());
         }
 
-        // Check user role
-        $userRole = $this->determineUserRole($qrCode);
-
-        if ($userRole === 'admin') {
-            // Redirect to scanner CMS
+        // Redirect admin to scanner CMS
+        if (auth('admin')->check()) {
             return redirect()->route('cms.scanner.scan', ['token' => $token]);
         }
 
@@ -55,18 +54,5 @@ class QrViewController extends Controller
             'registration' => $qrCode->registration,
             'participants' => $qrCode->registration->participants,
         ]);
-    }
-
-    /**
-     * Determine user role based on authentication.
-     */
-    protected function determineUserRole(QrCode $qrCode): string
-    {
-        // Check if admin is authenticated
-        if (auth('admin')->check()) {
-            return 'admin';
-        }
-
-        return 'public';
     }
 }

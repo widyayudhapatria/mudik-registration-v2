@@ -13,7 +13,7 @@ class RegistrationPolicy
      */
     public function viewAny(Admin $admin): bool
     {
-        return $admin->can(MudikPermissions::ViewRegistrations->value);
+        return $admin->hasPermission(MudikPermissions::ViewRegistrations);
     }
 
     /**
@@ -21,7 +21,7 @@ class RegistrationPolicy
      */
     public function view(Admin $admin, Registration $registration): bool
     {
-        return $admin->can(MudikPermissions::ViewRegistrations->value);
+        return $admin->hasPermission(MudikPermissions::ViewRegistrations);
     }
 
     /**
@@ -29,7 +29,7 @@ class RegistrationPolicy
      */
     public function approve(Admin $admin, Registration $registration): bool
     {
-        return $admin->can(MudikPermissions::ApproveRegistration->value)
+        return $admin->hasPermission(MudikPermissions::ApproveRegistration)
             && $registration->isPending();
     }
 
@@ -38,7 +38,7 @@ class RegistrationPolicy
      */
     public function reject(Admin $admin, Registration $registration): bool
     {
-        return $admin->can(MudikPermissions::RejectRegistration->value)
+        return $admin->hasPermission(MudikPermissions::RejectRegistration)
             && $registration->isPending();
     }
 }

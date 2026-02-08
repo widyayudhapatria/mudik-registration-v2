@@ -70,7 +70,14 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
         })->name('index');
         
         Route::get('/scan/{token}', function ($token) {
-            return view('cms.scanner.scan', compact('token'));
+            $qrCode = \App\Models\QrCode::where('token_qr', $token)
+                ->with(['registration.participants', 'registration.formLink', 'scannedBy'])
+                ->firstOrFail();
+            
+            return view('cms.scanner.scan', [
+                'token' => $token,
+                'qrCode' => $qrCode,
+            ]);
         })->name('scan');
     });
 });
