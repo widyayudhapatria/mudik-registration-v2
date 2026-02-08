@@ -2,19 +2,17 @@
 
 namespace App\Models;
 
+use App\Enums\Permissions\MudikPermissions;
+use App\Enums\Permissions\MudikRoleList;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Foundation\Auth\User as Authenticatable;
 use Illuminate\Notifications\Notifiable;
-// use Spatie\Permission\Traits\HasRoles;
+use Illuminate\Support\Facades\Cache;
 
 class Admin extends Authenticatable
 {
     use HasFactory, Notifiable;
-
-    // use HasRoles;
-
-    // protected $guard_name = 'admin';
 
     /**
      * The attributes that are mass assignable.
@@ -52,6 +50,68 @@ class Admin extends Authenticatable
         'last_login_at' => 'datetime',
         'password' => 'hashed',
     ];
+
+    public function can($abilities, $arguments = []): bool
+    {
+        // If this is a policy check (not a string), use parent implementation
+        if (is_array($abilities) || (!is_string($abilities) && !($abilities instanceof MudikPermissions))) {
+            return parent::can($abilities, $arguments);
+        }
+
+        // Convert MudikPermissions enum to string if needed
+        if ($abilities instanceof MudikPermissions) {
+            $abilities = $abilities->value;
+        }
+
+        // Get all permissions for this admin's role
+        $permissions = $this->getAllPermissions();
+
+        // Check if permission exists in admin's permissions
+        return in_array($abilities, $permissions);
+    }
+
+    public function getAllPermissions(): array
+    {
+        // Cache permissions for 1 hour to improve performance
+        return Cache::remember(
+            "admin.{$this->id}.permissions",
+            now()->addHour(),
+            function () {
+                // Get permissions from role mapping
+                try {
+                    return MudikRoleList::from($this->role)->permissions();
+                } catch (\ValueError $e) {
+                    // If role doesn't exist in enum, return empty array
+                    return [];
+                }
+            }
+        );
+    }
+
+    public function hasAllPermissions(array $permissions): bool
+    {
+        foreach ($permissions as $permission) {
+            if (!$this->can($permission)) {
+                return false;
+            }
+        }
+        return true;
+    }
+
+    public function hasAnyPermission(array $permissions): bool
+    {
+        foreach ($permissions as $permission) {
+            if ($this->can($permission)) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+    public function clearPermissionCache(): void
+    {
+        Cache::forget("admin.{$this->id}.permissions");
+    }
 
     /**
      * Get the registrations approved by this admin.
@@ -123,5 +183,25 @@ class Admin extends Authenticatable
     public function canScanQr(): bool
     {
         return $this->can_scan || $this->isSuperAdmin();
+    }
+
+    protected static function booted()
+    {
+        // Clear permission cache when admin role is updated
+        static::updated(function ($admin) {
+            if ($admin->wasChanged('role')) {
+                $admin->clearPermissionCache();
+            }
+        });
+
+        // Clear permission cache when admin is deleted
+        static::deleted(function ($admin) {
+            $admin->clearPermissionCache();
+        });
+
+        // Update last_login_at on successful authentication
+        static::retrieved(function ($admin) {
+            // This is handled by AuthController login method
+        });
     }
 }
