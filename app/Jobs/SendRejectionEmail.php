@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Enums\EmailType;
+use App\Mail\RejectionMail;
 use App\Models\EmailLog;
 use App\Models\Registration;
 use Illuminate\Bus\Queueable;
@@ -42,18 +42,8 @@ class SendRejectionEmail implements ShouldQueue
         );
 
         try {
-            // required data for the email view
-            $data = [
-                'registration' => $this->registration,
-                'rejectionReason' => $this->registration->rejection_reason ?? 'Tidak ada alasan yang diberikan.',
-                'websiteUrl' => config('app.url', 'http://localhost:8000'),
-            ];
-
-            // Send email
-            Mail::send('emails.rejection', $data, function ($message) use ($subject) {
-                $message->to($this->registration->formLink->email)
-                    ->subject($subject);
-            });
+            Mail::to($this->registration->formLink->email)
+                ->send(new RejectionMail($this->registration));
 
             // Mark as sent
             $emailLog->markAsSent();
