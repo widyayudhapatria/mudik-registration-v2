@@ -15,19 +15,15 @@ class SetQuotaAction
 
     public function handle(SetQuotaData $data): DailyQuota
     {
-        DB::beginTransaction();
-
-        try {
+        return DB::transaction(function () use ($data) {
             $dateString = $data->date->format('Y-m-d');
 
-            // Check if quota exists for this date
-            $quota = DailyQuota::where('date', $dateString)
-                ->lockForUpdate()
-                ->first();
+            $quota = DailyQuota::whereDate('date', $data->date)->first();
 
             if ($quota) {
-                // Update existing quota
+                // Update existing quota - preserve 'used' value
                 $quota->updateQuota($data->quota);
+                $action = 'updated';
             } else {
                 // Create new quota
                 $quota = DailyQuota::create([
@@ -36,28 +32,19 @@ class SetQuotaAction
                     'used' => 0,
                     'remaining' => $data->quota,
                 ]);
+                $action = 'created';
             }
 
             // Clear cache
             Cache::forget('quota:' . $dateString);
 
-            DB::commit();
-
             Log::info('Quota set successfully', [
                 'date' => $dateString,
                 'quota' => $data->quota,
+                'action' => $action,
             ]);
 
-            return $quota;
-
-        } catch (\Throwable $e) {
-            DB::rollBack();
-            Log::error('Failed to set quota', [
-                'date' => $data->date->format('Y-m-d'),
-                'quota' => $data->quota,
-                'error' => $e->getMessage(),
-            ]);
-            throw $e;
-        }
+            return $quota->fresh();
+        });
     }
 }

@@ -17,11 +17,18 @@ class GetQuotaAction
         $dateString = $date->format('Y-m-d');
         $cacheKey = 'quota:' . $dateString;
 
-        // Cache until end of day
-        $ttl = $date->copy()->endOfDay();
+        $currentTime = Carbon::now();
+        $endOfDay = $date->copy()->endOfDay();
+        
+        // Calculate TTL in seconds until end of day
+        $ttl = $currentTime->diffInSeconds($endOfDay, false);
+        
+        if ($ttl <= 0) {
+            $ttl = 60; // Fallback to 1 minute if calculation fails
+        }
 
-        return Cache::remember($cacheKey, $ttl, function () use ($dateString) {
-            return DailyQuota::where('date', $dateString)->first();
+        return Cache::remember($cacheKey, $ttl, function () use ($date) {
+            return DailyQuota::whereDate('date', $date)->first();
         });
     }
 

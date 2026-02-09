@@ -10,11 +10,6 @@ class DailyQuota extends Model
 {
     use HasFactory;
 
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'date',
         'quota',
@@ -22,21 +17,13 @@ class DailyQuota extends Model
         'remaining',
     ];
 
-    /**
-     * The attributes that should be cast.
-     *
-     * @var array<string, string>
-     */
     protected $casts = [
-        'date' => 'date',
+        'date' => 'date:Y-m-d', // Force Y-m-d format
         'quota' => 'integer',
         'used' => 'integer',
         'remaining' => 'integer',
     ];
 
-    /**
-     * Boot the model.
-     */
     protected static function boot()
     {
         parent::boot();
