@@ -13,7 +13,7 @@ class QuotaPolicy
      */
     public function viewAny(Admin $admin): bool
     {
-        return $admin->can(MudikPermissions::ViewQuota->value);
+        return $admin->hasPermission(MudikPermissions::ViewQuota);
     }
 
     /**
@@ -21,7 +21,7 @@ class QuotaPolicy
      */
     public function view(Admin $admin, DailyQuota $quota): bool
     {
-        return $admin->can(MudikPermissions::ViewQuota->value);
+        return $admin->hasPermission(MudikPermissions::ViewQuota);
     }
 
     /**
@@ -29,6 +29,6 @@ class QuotaPolicy
      */
     public function modify(Admin $admin): bool
     {
-        return $admin->can(MudikPermissions::ModifyQuota->value);
+        return $admin->hasPermission(MudikPermissions::ModifyQuota);
     }
 }

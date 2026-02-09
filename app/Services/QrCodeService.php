@@ -59,13 +59,20 @@ class QrCodeService
         $size = config('mudik.qr_code.size', 300);
         $margin = config('mudik.qr_code.margin', 2);
 
-        // Generate QR code with token as base64
-        $qrCodeImage = QrCodeFacade::size($size)
-            ->margin($margin)
-            ->format('png')
+        // // Generate QR code with token as base64
+        // $qrCodeImage = QrCodeFacade::size($size)
+        //     ->margin($margin)
+        //     ->format('png')
+        //     ->generate($qrCode->token_qr);
+
+        // return 'data:image/png;base64,' . base64_encode($qrCodeImage);
+
+        // Use SVG format - no image library required
+        $qrCodeSvg = QrCodeFacade::size($size)
+            ->format('svg')
             ->generate($qrCode->token_qr);
 
-        return 'data:image/png;base64,' . base64_encode($qrCodeImage);
+        return 'data:image/svg+xml;base64,' . base64_encode($qrCodeSvg);
     }
 
     public function validateToken(string $token): array
