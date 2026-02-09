@@ -42,11 +42,15 @@ class SendRejectionEmail implements ShouldQueue
         );
 
         try {
-            // Send email
-            Mail::send('emails.rejection', [
+            // required data for the email view
+            $data = [
                 'registration' => $this->registration,
-                'reason' => $this->registration->rejection_reason,
-            ], function ($message) use ($subject) {
+                'rejectionReason' => $this->registration->rejection_reason ?? 'Tidak ada alasan yang diberikan.',
+                'websiteUrl' => config('app.url', 'http://localhost:8000'),
+            ];
+
+            // Send email
+            Mail::send('emails.rejection', $data, function ($message) use ($subject) {
                 $message->to($this->registration->formLink->email)
                     ->subject($subject);
             });

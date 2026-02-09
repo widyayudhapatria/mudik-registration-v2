@@ -238,7 +238,7 @@
         <div class="email-body">
             <p class="greeting">
                 Kepada Yth.<br>
-                <strong>{{ $representativeName }}</strong>
+                <strong>{{ $registration->representative_name }}</strong>
             </p>
             
             <p class="message">

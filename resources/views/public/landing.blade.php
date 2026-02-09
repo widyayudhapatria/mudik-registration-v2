@@ -4,6 +4,7 @@
 
 @push('styles')
 <style>
+    /* ... keep all existing styles ... */
     .hero-section {
         min-height: 100vh;
         background: linear-gradient(135deg, #1B5E20 0%, #2E7D32 50%, #4CAF50 100%);
@@ -638,6 +639,8 @@
                 <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
             </div>
             <div class="modal-body p-4">
+                <div id="alert-container"></div>
+                
                 <p class="text-muted mb-4">Masukkan email aktif Anda untuk menerima link formulir pendaftaran</p>
                 
                 <form id="emailForm">
@@ -702,11 +705,36 @@
 
 @push('scripts')
 <script>
-document.addEventListener('DOMContentLoaded', function() {
-    const emailForm = document.getElementById('emailForm');
-    const emailModal = new bootstrap.Modal(document.getElementById('emailModal'));
-    const successModal = new bootstrap.Modal(document.getElementById('successModal'));
+(function() {
+    'use strict';
     
+    const emailForm = document.getElementById('emailForm');
+    const emailModalEl = document.getElementById('emailModal');
+    const successModalEl = document.getElementById('successModal');
+    
+    if (!emailForm || !emailModalEl || !successModalEl) {
+        console.error('Required elements not found');
+        return;
+    }
+    
+    const emailModal = new bootstrap.Modal(emailModalEl);
+    const successModal = new bootstrap.Modal(successModalEl);
+    
+    // Show error function
+    const showError = (message) => {
+        const alertContainer = document.getElementById('alert-container');
+        if (!alertContainer) return;
+        
+        alertContainer.innerHTML = `
+            <div class="alert alert-danger alert-dismissible fade show" role="alert">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Error!</strong> ${message}
+                <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+            </div>
+        `;
+    };
+    
+    // Form submit handler
     emailForm.addEventListener('submit', async function(e) {
         e.preventDefault();
         
@@ -714,6 +742,15 @@ document.addEventListener('DOMContentLoaded', function() {
         const btnText = submitBtn.querySelector('.btn-text');
         const btnLoading = submitBtn.querySelector('.btn-loading');
         const emailInput = this.querySelector('#email');
+        const alertContainer = document.getElementById('alert-container');
+        
+        if (!submitBtn || !btnText || !btnLoading || !emailInput) {
+            console.error('Form elements not found');
+            return;
+        }
+        
+        // Clear previous errors
+        if (alertContainer) alertContainer.innerHTML = '';
         
         // Disable button
         submitBtn.disabled = true;
@@ -721,29 +758,40 @@ document.addEventListener('DOMContentLoaded', function() {
         btnLoading.classList.remove('d-none');
         
         try {
-            const response = await axios.post('{{ route("public.submit-email") }}', {
+            const response = await axios.post('/public/submit-email', {
                 email: emailInput.value
             });
             
-            if (response.data.success) {
+            if (response.data && response.data.success) {
                 // Close email modal
                 emailModal.hide();
                 
                 // Show success modal
-                document.getElementById('successEmail').textContent = emailInput.value;
+                const successEmailEl = document.getElementById('successEmail');
+                if (successEmailEl) {
+                    successEmailEl.textContent = emailInput.value;
+                }
                 successModal.show();
                 
                 // Reset form
                 emailForm.reset();
             }
         } catch (error) {
+            console.error('Submit error:', error);
+            
             let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
             
-            if (error.response && error.response.data) {
-                errorMessage = error.response.data.message || errorMessage;
+            if (error.response) {
+                if (error.response.status === 419) {
+                    errorMessage = 'Session telah kadaluarsa. Silakan refresh halaman dan coba lagi.';
+                } else if (error.response.data && error.response.data.message) {
+                    errorMessage = error.response.data.message;
+                }
+            } else if (error.request) {
+                errorMessage = 'Tidak dapat menghubungi server. Periksa koneksi internet Anda.';
             }
             
-            alert(errorMessage);
+            showError(errorMessage);
         } finally {
             // Enable button
             submitBtn.disabled = false;
@@ -753,9 +801,11 @@ document.addEventListener('DOMContentLoaded', function() {
     });
     
     // Reset form when modal is hidden
-    document.getElementById('emailModal').addEventListener('hidden.bs.modal', function() {
+    emailModalEl.addEventListener('hidden.bs.modal', function() {
         emailForm.reset();
+        const alertContainer = document.getElementById('alert-container');
+        if (alertContainer) alertContainer.innerHTML = '';
     });
-});
+})();
 </script>
 @endpush

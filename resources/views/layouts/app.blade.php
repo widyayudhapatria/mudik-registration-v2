@@ -159,12 +159,40 @@
     <!-- Axios -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     
-    <!-- Base Script -->
+    <!-- CSRF Token Setup - MUST RUN FIRST -->
     <script>
-        // Setup Axios defaults
-        axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
-        axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').getAttribute('content');
-        
+        // Setup Axios with CSRF token - runs immediately when script loads
+        (function() {
+            const csrfToken = document.querySelector('meta[name="csrf-token"]');
+            
+            if (!csrfToken) {
+                console.error('CSRF token meta tag not found');
+                return;
+            }
+            
+            // Set default headers for all axios requests
+            axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
+            axios.defaults.headers.common['X-CSRF-TOKEN'] = csrfToken.getAttribute('content');
+            
+            // Intercept responses to handle CSRF token expiration
+            axios.interceptors.response.use(
+                response => response,
+                error => {
+                    if (error.response && error.response.status === 419) {
+                        console.error('CSRF token mismatch - session may have expired');
+                        alert('Session telah kadaluarsa. Halaman akan di-refresh.');
+                        window.location.reload();
+                    }
+                    return Promise.reject(error);
+                }
+            );
+            
+            console.log('Axios configured with CSRF token');
+        })();
+    </script>
+    
+    <!-- Global Helper Functions -->
+    <script>
         // Global error handler
         window.showError = function(message) {
             const alertHtml = `
@@ -179,6 +207,8 @@
             if (container) {
                 container.insertAdjacentHTML('afterbegin', alertHtml);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                alert(message);
             }
         };
         
@@ -196,6 +226,8 @@
             if (container) {
                 container.insertAdjacentHTML('afterbegin', alertHtml);
                 window.scrollTo({ top: 0, behavior: 'smooth' });
+            } else {
+                alert(message);
             }
         };
     </script>
