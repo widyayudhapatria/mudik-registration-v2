@@ -457,14 +457,12 @@ function handleFileSelect() {
     const filePreview = document.getElementById('filePreview');
     
     if (file) {
-        // Validate file size (2MB)
         if (file.size > 2048 * 1024) {
             alert('Ukuran file terlalu besar. Maksimal 2MB.');
             document.getElementById('kk_document').value = '';
             return;
         }
         
-        // Validate file type
         const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
         if (!allowedTypes.includes(file.type)) {
             alert('Format file tidak didukung. Gunakan JPG, PNG, atau PDF.');
@@ -472,7 +470,6 @@ function handleFileSelect() {
             return;
         }
         
-        // Show preview
         document.getElementById('fileName').textContent = file.name;
         document.getElementById('fileSize').textContent = formatFileSize(file.size);
         filePreview.classList.remove('d-none');
@@ -520,7 +517,7 @@ function addParticipant(name = '', nikKia = '', birthDate = '') {
                     <input 
                         type="text" 
                         class="form-control participant-name" 
-                        name="participants[${participantCount}][full_name]"
+                        name="participants[${participantCount - 1}][full_name]"
                         placeholder="Nama lengkap"
                         value="${name}"
                         required
@@ -534,8 +531,9 @@ function addParticipant(name = '', nikKia = '', birthDate = '') {
                     <input 
                         type="text" 
                         class="form-control participant-nik" 
-                        name="participants[${participantCount}][nik_kia]"
+                        name="participants[${participantCount - 1}][nik_kia]"
                         placeholder="Nomor KTP/KIA"
+                        maxlength="16"
                         value="${nikKia}"
                         required
                     >
@@ -548,7 +546,7 @@ function addParticipant(name = '', nikKia = '', birthDate = '') {
                     <input 
                         type="date" 
                         class="form-control participant-birth-date" 
-                        name="participants[${participantCount}][birth_date]"
+                        name="participants[${participantCount - 1}][birth_date]"
                         value="${birthDate}"
                         required
                     >
@@ -576,6 +574,14 @@ function renumberParticipants() {
         const number = index + 1;
         card.querySelector('.participant-number').textContent = `Peserta ${number}`;
         card.setAttribute('data-participant', number);
+        
+        card.querySelectorAll('input').forEach(input => {
+            const name = input.getAttribute('name');
+            if (name && name.includes('participants[')) {
+                const fieldName = name.match(/\[([^\]]+)\]$/)[1];
+                input.setAttribute('name', `participants[${index}][${fieldName}]`);
+            }
+        });
     });
 }
 
@@ -592,7 +598,7 @@ async function handleSubmit(e) {
     
     // Validate participants count
     if (participantCount === 0) {
-        window.showError('Minimal harus ada 1 peserta mudik');
+        alert('Minimal harus ada 1 peserta mudik');
         return;
     }
     
@@ -608,7 +614,7 @@ async function handleSubmit(e) {
         formData.set('has_child_under_4', hasChildUnder4 ? '1' : '0');
         
         const response = await axios.post(
-            '{{ route("public.registration.submit", ["token" => $token]) }}',
+            '{{ $submitUrl }}',
             formData,
             {
                 headers: {
@@ -618,7 +624,6 @@ async function handleSubmit(e) {
         );
         
         if (response.data.success) {
-            // Show success message
             const successHtml = `
                 <div class="modal fade" id="successModal" tabindex="-1">
                     <div class="modal-dialog modal-dialog-centered">
@@ -651,16 +656,14 @@ async function handleSubmit(e) {
         if (error.response && error.response.data) {
             errorMessage = error.response.data.message || errorMessage;
             
-            // Handle validation errors
             if (error.response.data.errors) {
                 const errors = error.response.data.errors;
                 errorMessage = Object.values(errors).flat().join('<br>');
             }
         }
         
-        window.showError(errorMessage);
+        alert(errorMessage);
     } finally {
-        // Enable button
         submitBtn.disabled = false;
         btnText.classList.remove('d-none');
         btnLoading.classList.add('d-none');

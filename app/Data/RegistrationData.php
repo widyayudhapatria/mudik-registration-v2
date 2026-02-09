@@ -6,7 +6,6 @@ use Carbon\Carbon;
 use Illuminate\Http\UploadedFile;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
-use Spatie\LaravelData\Attributes\Validation\Date;
 use Spatie\LaravelData\Attributes\Validation\File;
 use Spatie\LaravelData\Attributes\Validation\Integer;
 use Spatie\LaravelData\Attributes\Validation\Max;
@@ -23,7 +22,7 @@ class RegistrationData extends Data
         #[Required, StringType, Max(255)]
         public string $representative_name,
         
-        #[Required, StringType, Size(16), Min(16)]
+        #[Required, StringType, Size(16)]
         public string $representative_nik,
         
         #[Required, StringType]
@@ -32,32 +31,26 @@ class RegistrationData extends Data
         #[Required, Integer, Min(1), Max(6)]
         public int $family_count,
         
-        #[Required, StringType, Size(16), Min(16)]
+        #[Required, StringType, Size(16)]
         public string $kk_number,
         
-        #[Required, File, Max(2048)] // Max 2MB
+        #[Required, File, Max(2048)]
         public UploadedFile $kk_document,
         
         #[Required, BooleanType]
         public bool $has_child_under_4 = false,
         
         #[Required, ArrayType]
-        /** @var ParticipantData[] */
+        /** @var DataCollection<ParticipantData> */
         public DataCollection $participants,
-    ) {
-        if (is_string($this->representative_birth_date)) {
-            $this->representative_birth_date = Carbon::parse($this->representative_birth_date);
-        }
-    }
+    ) {}
 
     public function toModelArray(): array
     {
         return [
             'representative_name' => $this->representative_name,
             'representative_nik' => $this->representative_nik,
-            'representative_birth_date' => $this->representative_birth_date instanceof Carbon 
-                ? $this->representative_birth_date->format('Y-m-d') 
-                : $this->representative_birth_date,
+            'representative_birth_date' => Carbon::parse($this->representative_birth_date)->format('Y-m-d'),
             'family_count' => $this->family_count,
             'kk_number' => $this->kk_number,
             'has_child_under_4' => $this->has_child_under_4,

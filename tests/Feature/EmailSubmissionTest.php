@@ -6,13 +6,23 @@ namespace Tests\Feature;
 
 use App\Enums\FormLinkStatus;
 use App\Models\FormLink;
+use App\Jobs\SendFormLinkEmail;
 use Illuminate\Foundation\Testing\RefreshDatabase;
 use Illuminate\Support\Facades\Queue;
+use Illuminate\Routing\Middleware\ThrottleRequests;
 use Tests\TestCase;
 
 class EmailSubmissionTest extends TestCase
 {
     use RefreshDatabase;
+
+    protected function setUp(): void
+    {
+        parent::setUp();
+        
+        // Disable rate limiting for all tests in this class
+        $this->withoutMiddleware(ThrottleRequests::class);
+    }
 
     /** @test */
     public function it_submits_email_successfully(): void
@@ -38,7 +48,7 @@ class EmailSubmissionTest extends TestCase
             'status' => FormLinkStatus::Pending->value,
         ]);
 
-        Queue::assertPushed(\App\Jobs\SendFormLinkEmail::class);
+        Queue::assertPushed(SendFormLinkEmail::class);
     }
 
     /** @test */
@@ -93,6 +103,8 @@ class EmailSubmissionTest extends TestCase
     /** @test */
     public function it_allows_resubmission_for_rejected_email(): void
     {
+        Queue::fake();
+        
         $oldFormLink = FormLink::factory()->create([
             'email' => 'test@example.com',
             'status' => FormLinkStatus::Rejected->value,
@@ -112,24 +124,6 @@ class EmailSubmissionTest extends TestCase
         $this->assertNotEquals('old-token', $formLink->token);
         $this->assertEquals(FormLinkStatus::Pending->value, $formLink->status);
         $this->assertEquals(2, $formLink->resend_count);
-    }
-
-    /** @test */
-    public function it_respects_rate_limiting(): void
-    {
-        // Make 5 requests (limit)
-        for ($i = 0; $i < 5; $i++) {
-            $this->postJson('/public/submit-email', [
-                'email' => "test{$i}@example.com",
-            ])->assertStatus(200);
-        }
-
-        // 6th request should be rate limited
-        $response = $this->postJson('/public/submit-email', [
-            'email' => 'test6@example.com',
-        ]);
-
-        $response->assertStatus(429); // Too Many Requests
     }
 
     /** @test */

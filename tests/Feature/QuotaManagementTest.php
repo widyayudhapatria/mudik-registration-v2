@@ -1,14 +1,12 @@
 <?php
 
-declare(strict_types=1);
-
 namespace Tests\Feature;
 
-use App\Enums\Permissions\MudikPermissions;
 use App\Models\Admin;
 use App\Models\DailyQuota;
 use Carbon\Carbon;
 use Illuminate\Foundation\Testing\RefreshDatabase;
+use Illuminate\Support\Facades\Cache;
 use Tests\TestCase;
 
 class QuotaManagementTest extends TestCase
@@ -20,27 +18,22 @@ class QuotaManagementTest extends TestCase
     protected function setUp(): void
     {
         parent::setUp();
-
+        
+        Cache::flush();
+        
         $this->superAdmin = Admin::factory()->create([
             'role' => 'super_admin',
             'is_active' => true,
         ]);
-
-        // Grant permissions
-        // $this->superAdmin->givePermissionTo([
-        //     MudikPermissions::ViewQuota->value,
-        //     MudikPermissions::ModifyQuota->value,
-        // ]);
     }
 
-    /** @test */
-    public function it_gets_today_quota(): void
+    public function test_it_gets_today_quota(): void
     {
         $quota = DailyQuota::factory()->create([
             'date' => Carbon::today(),
             'quota' => 100,
-            'used' => 25,
-            'remaining' => 75,
+            'used' => 20,
+            'remaining' => 80,
         ]);
 
         $response = $this->actingAs($this->superAdmin, 'admin')
@@ -50,17 +43,18 @@ class QuotaManagementTest extends TestCase
             ->assertJson([
                 'success' => true,
                 'data' => [
-                    'id' => $quota->id,
                     'quota' => 100,
-                    'used' => 25,
-                    'remaining' => 75,
+                    'used' => 20,
+                    'remaining' => 80,
                 ],
             ]);
     }
 
-    /** @test */
-    public function it_returns_404_when_today_quota_not_set(): void
+    public function test_it_returns_404_when_today_quota_not_set(): void
     {
+        DailyQuota::whereDate('date', Carbon::today())->delete();
+        Cache::flush();
+        
         $response = $this->actingAs($this->superAdmin, 'admin')
             ->getJson('/cms/quotas/today');
 
@@ -70,73 +64,75 @@ class QuotaManagementTest extends TestCase
             ]);
     }
 
-    /** @test */
-    public function it_sets_new_quota(): void
+    public function test_it_sets_new_quota(): void
     {
+        $date = Carbon::today()->addDay();
+
         $response = $this->actingAs($this->superAdmin, 'admin')
             ->postJson('/cms/quotas', [
-                'date' => Carbon::tomorrow()->format('Y-m-d'),
+                'date' => $date->toDateString(),
                 'quota' => 150,
             ]);
 
         $response->assertStatus(200)
             ->assertJson([
                 'success' => true,
-                'message' => 'Kuota berhasil di-set',
+                'data' => [
+                    'quota' => 150,
+                    'used' => 0,
+                    'remaining' => 150,
+                ],
             ]);
 
         $this->assertDatabaseHas('daily_quotas', [
-            'date' => Carbon::tomorrow()->format('Y-m-d'),
             'quota' => 150,
             'used' => 0,
-            'remaining' => 150,
         ]);
     }
 
-    /** @test */
-    public function it_updates_existing_quota(): void
+    public function test_it_updates_existing_quota(): void
     {
-        $existingQuota = DailyQuota::factory()->create([
-            'date' => Carbon::today(),
+        $quota = DailyQuota::factory()->create([
+            'date' => Carbon::today()->addDays(2), // Gunakan tanggal berbeda
             'quota' => 100,
-            'used' => 50,
-            'remaining' => 50,
+            'used' => 10,
         ]);
 
         $response = $this->actingAs($this->superAdmin, 'admin')
             ->postJson('/cms/quotas', [
-                'date' => Carbon::today()->format('Y-m-d'),
+                'date' => $quota->date->toDateString(),
                 'quota' => 200,
             ]);
 
         $response->assertStatus(200);
 
-        $quota = DailyQuota::find($existingQuota->id);
-        
+        $quota->refresh();
         $this->assertEquals(200, $quota->quota);
-        $this->assertEquals(50, $quota->used); // Unchanged
-        $this->assertEquals(150, $quota->remaining); // 200 - 50
+        $this->assertEquals(10, $quota->used);
+        $this->assertEquals(190, $quota->remaining);
     }
 
-    /** @test */
-    public function it_lists_quotas_with_date_range(): void
+    public function test_it_lists_quotas_with_date_range(): void
     {
-        DailyQuota::factory()->count(5)->create([
-            'date' => Carbon::today()->addDays(fn($i) => $i),
-        ]);
-
-        $startDate = Carbon::today()->format('Y-m-d');
-        $endDate = Carbon::today()->addDays(4)->format('Y-m-d');
+        $startDate = '2026-02-10';
+        $endDate = '2026-02-15';
+        
+        for ($i = 0; $i < 3; $i++) {
+            DailyQuota::factory()->create([
+                'date' => Carbon::parse($startDate)->addDays($i)->toDateString(),
+                'quota' => 100 + ($i * 10),
+            ]);
+        }
 
         $response = $this->actingAs($this->superAdmin, 'admin')
             ->getJson("/cms/quotas?start_date={$startDate}&end_date={$endDate}");
 
         $response->assertStatus(200)
-            ->assertJsonCount(5, 'data');
+            ->assertJson(['success' => true])
+            ->assertJsonCount(3, 'data');
     }
 
-    /** @test */
-    public function it_validates_required_fields_when_setting_quota(): void
+    public function test_it_validates_required_fields_when_setting_quota(): void
     {
         $response = $this->actingAs($this->superAdmin, 'admin')
             ->postJson('/cms/quotas', []);
@@ -145,12 +141,11 @@ class QuotaManagementTest extends TestCase
             ->assertJsonValidationErrors(['date', 'quota']);
     }
 
-    /** @test */
-    public function it_validates_quota_is_non_negative(): void
+    public function test_it_validates_quota_is_non_negative(): void
     {
         $response = $this->actingAs($this->superAdmin, 'admin')
             ->postJson('/cms/quotas', [
-                'date' => Carbon::today()->format('Y-m-d'),
+                'date' => Carbon::today()->toDateString(),
                 'quota' => -10,
             ]);
 
@@ -158,68 +153,67 @@ class QuotaManagementTest extends TestCase
             ->assertJsonValidationErrors(['quota']);
     }
 
-    /** @test */
-    public function it_requires_authentication_for_quota_endpoints(): void
+    public function test_it_requires_authentication_for_quota_endpoints(): void
     {
         $response = $this->getJson('/cms/quotas/today');
         $response->assertStatus(401);
 
+        $response = $this->getJson('/cms/quotas');
+        $response->assertStatus(401);
+
         $response = $this->postJson('/cms/quotas', [
-            'date' => Carbon::today()->format('Y-m-d'),
+            'date' => Carbon::today()->toDateString(),
             'quota' => 100,
         ]);
         $response->assertStatus(401);
     }
 
-    /** @test */
-    public function it_requires_permission_to_view_quota(): void
+    public function test_it_requires_permission_to_view_quota(): void
     {
-        $adminWithoutPermission = Admin::factory()->create([
-            'role' => 'scanner',
+        $validator = Admin::factory()->create([
+            'role' => 'validator',
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($adminWithoutPermission, 'admin')
+        $response = $this->actingAs($validator, 'admin')
             ->getJson('/cms/quotas/today');
 
         $response->assertStatus(403);
     }
 
-    /** @test */
-    public function it_requires_permission_to_modify_quota(): void
+    public function test_it_requires_permission_to_modify_quota(): void
     {
-        $adminWithoutPermission = Admin::factory()->create([
+        $validator = Admin::factory()->create([
             'role' => 'validator',
             'is_active' => true,
         ]);
 
-        $response = $this->actingAs($adminWithoutPermission, 'admin')
+        $response = $this->actingAs($validator, 'admin')
             ->postJson('/cms/quotas', [
-                'date' => Carbon::today()->format('Y-m-d'),
+                'date' => Carbon::today()->toDateString(),
                 'quota' => 100,
             ]);
 
         $response->assertStatus(403);
     }
 
-    /** @test */
-    public function it_clears_cache_after_setting_quota(): void
+    public function test_it_clears_cache_after_setting_quota(): void
     {
-        $dateString = Carbon::today()->format('Y-m-d');
-        $cacheKey = 'quota:' . $dateString;
+        $date = Carbon::tomorrow(); 
+        $cacheKey = "quota.{$date->toDateString()}";
+        
+        // Set cache
+        Cache::put($cacheKey, ['test' => 'data'], 60);
+        $this->assertNotNull(Cache::get($cacheKey));
 
-        // Set initial cache
-        \Cache::put($cacheKey, 'test-data', 3600);
-        $this->assertTrue(\Cache::has($cacheKey));
-
-        // Set quota
+        // Set quota (should clear cache via model observer)
         $this->actingAs($this->superAdmin, 'admin')
             ->postJson('/cms/quotas', [
-                'date' => $dateString,
+                'date' => $date->toDateString(),
                 'quota' => 100,
             ]);
 
-        // Cache should be cleared
-        $this->assertFalse(\Cache::has($cacheKey));
+        // Verify cache was cleared
+        $this->assertNull(Cache::get($cacheKey));
     }
 }

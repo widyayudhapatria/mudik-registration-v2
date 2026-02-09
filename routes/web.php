@@ -3,7 +3,6 @@
 use App\Http\Controllers\CMS\DashboardController;
 use App\Http\Controllers\CMS\QuotaManagementController;
 use App\Http\Controllers\CMS\RegistrationManagementController;
-use App\Http\Controllers\CMS\ScannerController;
 use App\Http\Controllers\Public\EmailSubmissionController;
 use App\Http\Controllers\Public\QrViewController;
 use App\Http\Controllers\Public\RegistrationController;
@@ -16,12 +15,10 @@ Route::prefix('public')->name('public.')->group(function () {
         return view('public.landing');
     })->name('landing');
 
-    // Email submission
     Route::post('/submit-email', [EmailSubmissionController::class, 'submit'])
         ->middleware('throttle:5,10')
         ->name('submit-email');
 
-    // Registration form
     Route::get('/register/{token}', [RegistrationController::class, 'show'])
         ->middleware(['signed', 'form.link.valid', 'quota.available'])
         ->name('registration.form');
@@ -29,14 +26,6 @@ Route::prefix('public')->name('public.')->group(function () {
     Route::post('/register/{token}', [RegistrationController::class, 'submit'])
         ->middleware(['form.link.valid', 'quota.available'])
         ->name('registration.submit');
-        
-    // Route::middleware(['signed', 'form.link.valid', 'quota.available'])->group(function () {
-    //     Route::get('/register/{token}', [RegistrationController::class, 'show'])
-    //         ->name('registration.form');
-        
-    //     Route::post('/register/{token}', [RegistrationController::class, 'submit'])
-    //         ->name('registration.submit');
-    // });
 });
 
 Route::prefix('scan')->name('scan.')->group(function () {
@@ -48,7 +37,6 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
     
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     
-    // Registration Management
     Route::prefix('registrations')->name('registrations.')->group(function () {
         Route::get('/', [RegistrationManagementController::class, 'index'])->name('index');
         Route::get('/{registration}', [RegistrationManagementController::class, 'show'])->name('show');
@@ -56,14 +44,12 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
         Route::post('/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('reject');
     });
     
-    // Quota Management
     Route::prefix('quotas')->name('quotas.')->group(function () {
         Route::get('/', [QuotaManagementController::class, 'index'])->name('index');
         Route::get('/today', [QuotaManagementController::class, 'today'])->name('today');
         Route::post('/', [QuotaManagementController::class, 'store'])->name('store');
     });
     
-    // Scanner 
     Route::prefix('scanner')->name('scanner.')->middleware(['scanner.permission'])->group(function () {
         Route::get('/', function () {
             return view('cms.scanner.index');

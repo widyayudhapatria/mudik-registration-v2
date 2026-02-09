@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Enums\EmailType;
+use App\Mail\QrCodeMail;
 use App\Models\EmailLog;
 use App\Models\Registration;
 use App\Services\QrCodeService;
@@ -43,19 +43,8 @@ class SendQrCodeEmail implements ShouldQueue
         );
 
         try {
-            // Generate QR code image
-            $qrCode = $this->registration->qrCode;
-            $qrCodeImage = $qrCodeService->generateBase64Image($qrCode);
-
-            // Send email
-            Mail::send('emails.qr-code', [
-                'registration' => $this->registration,
-                'qrCode' => $qrCode,
-                'qrCodeImage' => $qrCodeImage,
-            ], function ($message) use ($subject) {
-                $message->to($this->registration->formLink->email)
-                    ->subject($subject);
-            });
+            Mail::to($this->registration->formLink->email)
+                ->send(new QrCodeMail($this->registration, $qrCodeService));
 
             // Mark as sent
             $emailLog->markAsSent();

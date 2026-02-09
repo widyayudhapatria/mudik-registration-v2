@@ -8,38 +8,38 @@ use App\Exceptions\MudikException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\URL;
 use Illuminate\View\View;
 
 class RegistrationController extends Controller
 {
     /**
      * Show registration form.
-     * 
-     * Middleware sudah handle: signed, form.link.valid, quota.available
      */
     public function show(Request $request, string $token): View
     {
-        // FormLink sudah divalidasi oleh middleware
         $formLink = $request->formLink;
+
+        $submitUrl = URL::temporarySignedRoute(
+            'public.registration.submit',
+            $formLink->expired_at,
+            ['token' => $token]
+        );
 
         return view('public.registration.form', [
             'formLink' => $formLink,
             'token' => $token,
+            'submitUrl' => $submitUrl,
         ]);
     }
 
     /**
      * Submit registration form.
-     * 
-     * Middleware sudah handle: signed, form.link.valid, quota.available
      */
     public function submit(Request $request, string $token, RegistrationData $data): JsonResponse
     {
         try {
-            // FormLink sudah divalidasi oleh middleware
             $formLink = $request->formLink;
-
-            // Submit registration
             $registration = SubmitRegistrationAction::run($formLink, $data);
 
             return $this->responseSuccess(

@@ -5,6 +5,7 @@ namespace App\Models;
 use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
+use Illuminate\Support\Facades\Cache;
 
 class DailyQuota extends Model
 {
@@ -18,7 +19,7 @@ class DailyQuota extends Model
     ];
 
     protected $casts = [
-        'date' => 'date:Y-m-d', // Force Y-m-d format
+        'date' => 'date:Y-m-d',
         'quota' => 'integer',
         'used' => 'integer',
         'remaining' => 'integer',
@@ -31,19 +32,23 @@ class DailyQuota extends Model
         static::saving(function ($model) {
             $model->remaining = $model->quota - $model->used;
         });
+
+        static::saved(function ($model) {
+            $cacheKey = "quota.{$model->date->toDateString()}";
+            Cache::forget($cacheKey);
+        });
+
+        static::deleted(function ($model) {
+            $cacheKey = "quota.{$model->date->toDateString()}";
+            Cache::forget($cacheKey);
+        });
     }
 
-    /**
-     * Get quota for specific date.
-     */
     public static function getQuotaForDate(Carbon $date): ?self
     {
         return self::whereDate('date', $date)->first();
     }
 
-    /**
-     * Get or create quota for specific date.
-     */
     public static function getOrCreateQuotaForDate(Carbon $date, int $defaultQuota = 0): self
     {
         return self::firstOrCreate(
@@ -56,17 +61,11 @@ class DailyQuota extends Model
         );
     }
 
-    /**
-     * Check if quota is available.
-     */
     public function hasAvailableQuota(): bool
     {
         return $this->remaining > 0;
     }
 
-    /**
-     * Increment used quota.
-     */
     public function incrementUsed(int $amount = 1): bool
     {
         if ($this->remaining < $amount) {
@@ -79,9 +78,6 @@ class DailyQuota extends Model
         return $this->save();
     }
 
-    /**
-     * Decrement used quota.
-     */
     public function decrementUsed(int $amount = 1): bool
     {
         if ($this->used < $amount) {
@@ -94,9 +90,6 @@ class DailyQuota extends Model
         return $this->save();
     }
 
-    /**
-     * Update quota amount.
-     */
     public function updateQuota(int $newQuota): bool
     {
         $this->quota = $newQuota;
@@ -105,17 +98,11 @@ class DailyQuota extends Model
         return $this->save();
     }
 
-    /**
-     * Get today's quota.
-     */
     public static function getTodayQuota(): ?self
     {
         return self::getQuotaForDate(Carbon::today());
     }
 
-    /**
-     * Check if today has available quota.
-     */
     public static function todayHasAvailableQuota(): bool
     {
         $quota = self::getTodayQuota();
