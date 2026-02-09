@@ -2,7 +2,7 @@
 
 namespace App\Jobs;
 
-use App\Enums\EmailType;
+use App\Mail\FormLinkMail;
 use App\Models\EmailLog;
 use App\Models\FormLink;
 use Illuminate\Bus\Queueable;
@@ -12,7 +12,6 @@ use Illuminate\Queue\InteractsWithQueue;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Mail;
-use Illuminate\Support\Facades\URL;
 
 class SendFormLinkEmail implements ShouldQueue
 {
@@ -43,28 +42,8 @@ class SendFormLinkEmail implements ShouldQueue
         );
 
         try {
-            // Generate signed URL
-            $formUrl = URL::temporarySignedRoute(
-                'public.registration.form',
-                $this->formLink->expired_at,
-                ['token' => $this->formLink->token]
-            );
-
-            // Fortmat expired date
-            $expiredDate = $this->formLink->expired_at->locale('id')->isoFormat('dddd, D MMMM YYYY [pukul] HH:mm [WIB]');
-
-            // Make sure URL not escaped in email view
-            $formUrlUnescaped = html_entity_decode($formUrl);
-
-            // Send email
-            Mail::send('emails.form-link', [
-                'formLink' => $this->formLink,
-                'formUrl' => $formUrlUnescaped,
-                'expiredDate' => $expiredDate,
-            ], function ($message) use ($subject) {
-                $message->to($this->formLink->email)
-                    ->subject($subject);
-            });
+            Mail::to($this->formLink->email)
+                ->send(new FormLinkMail($this->formLink));
 
             // Mark as sent
             $emailLog->markAsSent();

@@ -3,6 +3,7 @@
 namespace Tests\Unit\Jobs;
 
 use App\Jobs\SendFormLinkEmail;
+use App\Mail\FormLinkMail;
 use App\Models\EmailLog;
 use App\Models\FormLink;
 use Illuminate\Foundation\Testing\RefreshDatabase;
@@ -23,9 +24,10 @@ class SendFormLinkEmailTest extends TestCase
         $job = new SendFormLinkEmail($formLink);
         $job->handle();
 
-        // Assert email was sent
-        Mail::assertSent(function ($mail) use ($formLink) {
-            return $mail->hasTo($formLink->email);
+        // Assert with type-hinted closure
+        Mail::assertSent(FormLinkMail::class, function (FormLinkMail $mail) use ($formLink) {
+            return $mail->hasTo($formLink->email)
+                && $mail->formLink->id === $formLink->id;
         });
 
         // Assert email log was created and marked as sent
@@ -39,7 +41,10 @@ class SendFormLinkEmailTest extends TestCase
     /** @test */
     public function it_logs_failure_on_error(): void
     {
-        Mail::shouldReceive('send')->andThrow(new \Exception('SMTP Error'));
+        Mail::shouldReceive('to')
+            ->andReturnSelf()
+            ->shouldReceive('send')
+            ->andThrow(new \Exception('SMTP Error'));
 
         $formLink = FormLink::factory()->create();
 
