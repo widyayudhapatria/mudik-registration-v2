@@ -396,9 +396,15 @@
 @push('scripts')
 <script>
 let participantCount = 0;
+let representativeParticipantAdded = false;
 
 document.addEventListener('DOMContentLoaded', function() {
-    // File upload handling
+    initializeFileUpload();
+    initializeParticipantHandlers();
+    initializeFormSubmission();
+});
+
+function initializeFileUpload() {
     const fileUploadArea = document.getElementById('fileUploadArea');
     const fileInput = document.getElementById('kk_document');
     const filePreview = document.getElementById('filePreview');
@@ -432,48 +438,32 @@ document.addEventListener('DOMContentLoaded', function() {
         fileInput.value = '';
         filePreview.classList.add('d-none');
     });
-    
-    // Add participant
-    document.getElementById('addParticipantBtn').addEventListener('click', addParticipant);
-    
-    // Check if representative should be added as participant
-    document.getElementById('addToParticipants').addEventListener('change', function() {
-        if (this.checked && participantCount === 0) {
-            addParticipantFromRepresentative();
-        }
-    });
-    
-    // Initialize with representative
-    if (document.getElementById('addToParticipants').checked) {
-        addParticipantFromRepresentative();
-    }
-    
-    // Form submission
-    document.getElementById('registrationForm').addEventListener('submit', handleSubmit);
-});
+}
 
 function handleFileSelect() {
     const file = document.getElementById('kk_document').files[0];
     const filePreview = document.getElementById('filePreview');
     
-    if (file) {
-        if (file.size > 2048 * 1024) {
-            alert('Ukuran file terlalu besar. Maksimal 2MB.');
-            document.getElementById('kk_document').value = '';
-            return;
-        }
-        
-        const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
-        if (!allowedTypes.includes(file.type)) {
-            alert('Format file tidak didukung. Gunakan JPG, PNG, atau PDF.');
-            document.getElementById('kk_document').value = '';
-            return;
-        }
-        
-        document.getElementById('fileName').textContent = file.name;
-        document.getElementById('fileSize').textContent = formatFileSize(file.size);
-        filePreview.classList.remove('d-none');
+    if (!file) return;
+    
+    // Validate file size
+    if (file.size > 2048 * 1024) {
+        alert('Ukuran file terlalu besar. Maksimal 2MB.');
+        document.getElementById('kk_document').value = '';
+        return;
     }
+    
+    // Validate file type
+    const allowedTypes = ['image/jpeg', 'image/jpg', 'image/png', 'application/pdf'];
+    if (!allowedTypes.includes(file.type)) {
+        alert('Format file tidak didukung. Gunakan JPG, PNG, atau PDF.');
+        document.getElementById('kk_document').value = '';
+        return;
+    }
+    
+    document.getElementById('fileName').textContent = file.name;
+    document.getElementById('fileSize').textContent = formatFileSize(file.size);
+    filePreview.classList.remove('d-none');
 }
 
 function formatFileSize(bytes) {
@@ -484,14 +474,68 @@ function formatFileSize(bytes) {
     return Math.round(bytes / Math.pow(k, i) * 100) / 100 + ' ' + sizes[i];
 }
 
+function initializeParticipantHandlers() {
+    const addParticipantBtn = document.getElementById('addParticipantBtn');
+    const addToParticipantsCheckbox = document.getElementById('addToParticipants');
+    
+    // Representative input change listeners
+    const repNameInput = document.getElementById('representative_name');
+    const repNikInput = document.getElementById('representative_nik');
+    const repBirthDateInput = document.getElementById('representative_birth_date');
+    
+    // Auto-sync representative data to first participant
+    const syncRepresentativeData = () => {
+        if (addToParticipantsCheckbox.checked && participantCount > 0) {
+            updateFirstParticipantFromRepresentative();
+        }
+    };
+    
+    repNameInput.addEventListener('input', syncRepresentativeData);
+    repNikInput.addEventListener('input', syncRepresentativeData);
+    repBirthDateInput.addEventListener('change', syncRepresentativeData);
+    
+    // Handle checkbox change
+    addToParticipantsCheckbox.addEventListener('change', function() {
+        if (this.checked) {
+            if (participantCount === 0) {
+                // Add new participant with representative data
+                addParticipantFromRepresentative();
+            } else {
+                // Update existing first participant
+                updateFirstParticipantFromRepresentative();
+            }
+        }
+    });
+    
+    // Add participant button
+    addParticipantBtn.addEventListener('click', () => addParticipant());
+    
+    // Initialize with representative if checkbox is checked
+    if (addToParticipantsCheckbox.checked) {
+        addParticipantFromRepresentative();
+    }
+}
+
 function addParticipantFromRepresentative() {
-    const name = document.getElementById('representative_name').value;
-    const nik = document.getElementById('representative_nik').value;
+    const name = document.getElementById('representative_name').value.trim();
+    const nik = document.getElementById('representative_nik').value.trim();
     const birthDate = document.getElementById('representative_birth_date').value;
     
-    if (name && nik && birthDate) {
-        addParticipant(name, nik, birthDate);
-    }
+    addParticipant(name, nik, birthDate);
+    representativeParticipantAdded = true;
+}
+
+function updateFirstParticipantFromRepresentative() {
+    const firstCard = document.querySelector('.participant-card[data-participant="1"]');
+    if (!firstCard) return;
+    
+    const name = document.getElementById('representative_name').value.trim();
+    const nik = document.getElementById('representative_nik').value.trim();
+    const birthDate = document.getElementById('representative_birth_date').value;
+    
+    firstCard.querySelector('.participant-name').value = name;
+    firstCard.querySelector('.participant-nik').value = nik;
+    firstCard.querySelector('.participant-birth-date').value = birthDate;
 }
 
 function addParticipant(name = '', nikKia = '', birthDate = '') {
@@ -560,11 +604,16 @@ function addParticipant(name = '', nikKia = '', birthDate = '') {
 
 function removeParticipant(id) {
     const card = document.querySelector(`[data-participant="${id}"]`);
-    if (card) {
-        card.remove();
-        participantCount--;
-        updateFamilyCount();
-        renumberParticipants();
+    if (!card) return;
+    
+    card.remove();
+    participantCount--;
+    updateFamilyCount();
+    renumberParticipants();
+    
+    // Reset flag if removing first participant
+    if (id === 1) {
+        representativeParticipantAdded = false;
     }
 }
 
@@ -575,6 +624,13 @@ function renumberParticipants() {
         card.querySelector('.participant-number').textContent = `Peserta ${number}`;
         card.setAttribute('data-participant', number);
         
+        // Update remove button onclick
+        const removeBtn = card.querySelector('.remove-participant');
+        if (removeBtn) {
+            removeBtn.setAttribute('onclick', `removeParticipant(${number})`);
+        }
+        
+        // Update input names
         card.querySelectorAll('input').forEach(input => {
             const name = input.getAttribute('name');
             if (name && name.includes('participants[')) {
@@ -587,6 +643,10 @@ function renumberParticipants() {
 
 function updateFamilyCount() {
     document.getElementById('family_count').value = participantCount;
+}
+
+function initializeFormSubmission() {
+    document.getElementById('registrationForm').addEventListener('submit', handleSubmit);
 }
 
 async function handleSubmit(e) {
@@ -609,7 +669,6 @@ async function handleSubmit(e) {
     
     try {
         const formData = new FormData(this);
-
         const hasChildUnder4 = document.getElementById('has_child_under_4').checked;
         formData.set('has_child_under_4', hasChildUnder4 ? '1' : '0');
         
@@ -624,50 +683,58 @@ async function handleSubmit(e) {
         );
         
         if (response.data.success) {
-            const successHtml = `
-                <div class="modal fade" id="successModal" tabindex="-1">
-                    <div class="modal-dialog modal-dialog-centered">
-                        <div class="modal-content" style="border-radius: 20px; border: none;">
-                            <div class="modal-body p-5 text-center">
-                                <div class="mb-4">
-                                    <div class="mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
-                                        <i class="bi bi-check-lg text-white" style="font-size: 3rem;"></i>
-                                    </div>
-                                </div>
-                                <h4 class="fw-bold mb-3">✅ PENDAFTARAN BERHASIL</h4>
-                                <p class="mb-4">${response.data.message}</p>
-                                <p class="small text-muted mb-4">Notifikasi akan dikirim ke email<br><strong>${response.data.data.email}</strong></p>
-                                <a href="{{ route('public.landing') }}" class="btn btn-primary px-5" style="border-radius: 12px;">
-                                    Ke Beranda
-                                </a>
-                            </div>
-                        </div>
-                    </div>
-                </div>
-            `;
-            
-            document.body.insertAdjacentHTML('beforeend', successHtml);
-            const modal = new bootstrap.Modal(document.getElementById('successModal'));
-            modal.show();
+            showSuccessModal(response.data.message, response.data.data.email);
         }
     } catch (error) {
-        let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
-        
-        if (error.response && error.response.data) {
-            errorMessage = error.response.data.message || errorMessage;
-            
-            if (error.response.data.errors) {
-                const errors = error.response.data.errors;
-                errorMessage = Object.values(errors).flat().join('<br>');
-            }
-        }
-        
-        alert(errorMessage);
+        showErrorMessage(error);
     } finally {
         submitBtn.disabled = false;
         btnText.classList.remove('d-none');
         btnLoading.classList.add('d-none');
     }
+}
+
+function showSuccessModal(message, email) {
+    const successHtml = `
+        <div class="modal fade" id="successModal" tabindex="-1">
+            <div class="modal-dialog modal-dialog-centered">
+                <div class="modal-content" style="border-radius: 20px; border: none;">
+                    <div class="modal-body p-5 text-center">
+                        <div class="mb-4">
+                            <div class="mx-auto" style="width: 80px; height: 80px; background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%); border-radius: 50%; display: flex; align-items: center; justify-content: center;">
+                                <i class="bi bi-check-lg text-white" style="font-size: 3rem;"></i>
+                            </div>
+                        </div>
+                        <h4 class="fw-bold mb-3">✅ PENDAFTARAN BERHASIL</h4>
+                        <p class="mb-4">${message}</p>
+                        <p class="small text-muted mb-4">Notifikasi akan dikirim ke email<br><strong>${email}</strong></p>
+                        <a href="{{ route('public.landing') }}" class="btn btn-primary px-5" style="border-radius: 12px;">
+                            Ke Beranda
+                        </a>
+                    </div>
+                </div>
+            </div>
+        </div>
+    `;
+    
+    document.body.insertAdjacentHTML('beforeend', successHtml);
+    const modal = new bootstrap.Modal(document.getElementById('successModal'));
+    modal.show();
+}
+
+function showErrorMessage(error) {
+    let errorMessage = 'Terjadi kesalahan. Silakan coba lagi.';
+    
+    if (error.response?.data) {
+        errorMessage = error.response.data.message || errorMessage;
+        
+        if (error.response.data.errors) {
+            const errors = Object.values(error.response.data.errors).flat();
+            errorMessage = errors.join('\n');
+        }
+    }
+    
+    alert(errorMessage);
 }
 </script>
 @endpush
