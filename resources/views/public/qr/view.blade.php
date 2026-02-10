@@ -143,6 +143,97 @@
             padding: 20px;
         }
     }
+
+    @media (max-width: 768px) {
+        .qr-header {
+            padding: 30px 16px;
+        }
+        
+        .qr-card {
+            padding: 25px 20px;
+            margin: -40px 15px 30px;
+        }
+        
+        .qr-code-container {
+            padding: 20px;
+        }
+        
+        .qr-code-img {
+            max-width: 250px;
+        }
+        
+        .status-badge {
+            font-size: 0.95rem;
+            padding: 10px 20px;
+        }
+        
+        .info-section {
+            padding: 20px;
+        }
+        
+        .info-title {
+            font-size: 1.1rem;
+        }
+        
+        .info-item {
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 5px;
+            padding: 10px 0;
+        }
+        
+        .info-value {
+            text-align: left;
+        }
+        
+        .participant-item {
+            padding: 12px;
+        }
+        
+        .important-note {
+            padding: 16px;
+        }
+        
+        .note-title {
+            font-size: 1rem;
+        }
+        
+        .important-note ul {
+            font-size: 0.9rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .qr-header h1 {
+            font-size: 1.75rem;
+        }
+        
+        .qr-card {
+            padding: 20px 16px;
+        }
+        
+        .qr-code-img {
+            max-width: 220px;
+        }
+        
+        .status-badge {
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+        
+        .info-section {
+            padding: 16px;
+        }
+        
+        .participant-item .fw-semibold {
+            font-size: 0.95rem;
+        }
+        
+        .participant-item .small {
+            font-size: 0.8rem;
+        }
+    }
+
 </style>
 @endpush
 

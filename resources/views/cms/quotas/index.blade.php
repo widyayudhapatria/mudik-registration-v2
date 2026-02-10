@@ -150,6 +150,112 @@
             align-items: stretch;
         }
     }
+    @media (max-width: 992px) {
+        .calendar-header {
+            padding: 20px;
+        }
+        
+        .quota-grid {
+            grid-template-columns: repeat(auto-fill, minmax(250px, 1fr));
+        }
+        
+        .summary-card {
+            padding: 25px 20px;
+        }
+        
+        .summary-grid {
+            grid-template-columns: repeat(2, 1fr);
+            gap: 15px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .calendar-header {
+            padding: 16px;
+        }
+        
+        .calendar-header h5 {
+            font-size: 1.1rem;
+        }
+        
+        .date-selector {
+            flex-direction: column;
+            align-items: stretch;
+        }
+        
+        .date-selector > div {
+            width: 100%;
+        }
+        
+        .date-selector > div:last-child {
+            margin-top: 0 !important;
+        }
+        
+        .date-selector .btn {
+            width: 48%;
+            display: inline-block;
+        }
+        
+        .quota-grid {
+            grid-template-columns: 1fr;
+        }
+        
+        .quota-card {
+            padding: 20px;
+        }
+        
+        .quota-day {
+            font-size: 20px;
+        }
+        
+        .summary-card {
+            padding: 20px 16px;
+        }
+        
+        .summary-card h5 {
+            font-size: 1rem;
+        }
+        
+        .summary-grid {
+            grid-template-columns: 1fr;
+            gap: 12px;
+        }
+        
+        .summary-item {
+            padding: 16px;
+        }
+        
+        .summary-value {
+            font-size: 24px;
+        }
+        
+        .summary-label {
+            font-size: 0.85rem;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .quota-card {
+            padding: 16px;
+        }
+        
+        .quota-day {
+            font-size: 18px;
+        }
+        
+        .quota-day span {
+            font-size: 14px;
+        }
+        
+        .quota-total {
+            font-size: 16px;
+        }
+        
+        .edit-quota-btn {
+            padding: 8px;
+            font-size: 0.9rem;
+        }
+    }
 </style>
 @endpush
 

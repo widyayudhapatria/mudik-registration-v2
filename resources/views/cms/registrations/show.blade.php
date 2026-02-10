@@ -36,6 +36,77 @@
         border-radius: 12px;
         box-shadow: 0 4px 16px rgba(0,0,0,0.1);
     }
+
+    @media (max-width: 992px) {
+        .detail-card {
+            padding: 25px;
+        }
+        
+        .participant-card {
+            padding: 16px;
+        }
+    }
+
+    @media (max-width: 768px) {
+        .detail-card {
+            padding: 20px;
+            margin-bottom: 16px;
+        }
+        
+        .detail-section {
+            margin-bottom: 20px;
+        }
+        
+        .detail-section-title {
+            font-size: 1.1rem;
+        }
+        
+        .detail-label {
+            font-size: 0.85rem;
+        }
+        
+        .detail-value {
+            font-size: 0.95rem;
+        }
+        
+        .participant-card {
+            padding: 16px;
+            margin-bottom: 12px;
+        }
+        
+        .participant-card h6 {
+            font-size: 0.95rem;
+        }
+        
+        .document-preview {
+            max-width: 100%;
+        }
+        
+        /* Stack sidebar on mobile */
+        .col-lg-8,
+        .col-lg-4 {
+            width: 100%;
+        }
+    }
+
+    @media (max-width: 576px) {
+        .detail-card {
+            padding: 16px;
+        }
+        
+        .detail-card h5 {
+            font-size: 1rem;
+        }
+        
+        .detail-card h6 {
+            font-size: 0.9rem;
+        }
+        
+        .btn {
+            font-size: 0.9rem;
+            padding: 8px 16px;
+        }
+    }
 </style>
 @endpush
 

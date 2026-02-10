@@ -48,18 +48,79 @@
         display: flex;
         justify-content: space-between;
         align-items: center;
+        gap: 15px;
     }
     .scan-item:last-child {
         border-bottom: none;
     }
-    @keyframes slideIn {
-        from {
-            opacity: 0;
-            transform: translateY(-10px);
+    .scan-info {
+        flex: 1;
+        min-width: 0;
+    }
+    .scan-status {
+        flex-shrink: 0;
+    }
+    
+    /* Mobile Responsive */
+    @media (max-width: 768px) {
+        .stat-card {
+            padding: 20px;
         }
-        to {
-            opacity: 1;
-            transform: translateY(0);
+        
+        .stat-icon {
+            width: 50px;
+            height: 50px;
+            font-size: 1.5rem;
+            margin-bottom: 12px;
+        }
+        
+        .stat-value {
+            font-size: 1.75rem;
+        }
+        
+        .stat-label {
+            font-size: 0.85rem;
+        }
+        
+        .recent-scans {
+            padding: 20px;
+        }
+        
+        .recent-scans h5 {
+            font-size: 1.1rem;
+        }
+        
+        .scan-item {
+            padding: 12px;
+            flex-direction: column;
+            align-items: flex-start;
+            gap: 10px;
+        }
+        
+        .scan-status {
+            width: 100%;
+            display: flex;
+            justify-content: flex-end;
+        }
+        
+        .scan-info .fw-semibold {
+            font-size: 0.95rem;
+        }
+        
+        .scan-info .small {
+            font-size: 0.8rem;
+        }
+    }
+    
+    @media (max-width: 576px) {
+        .stat-value {
+            font-size: 1.5rem;
+        }
+        
+        .stat-icon {
+            width: 45px;
+            height: 45px;
+            font-size: 1.3rem;
         }
     }
 </style>
@@ -124,7 +185,7 @@
     <div id="recentScans">
         @forelse($statistics['recent_scans'] as $scan)
         <div class="scan-item">
-            <div>
+            <div class="scan-info">
                 <div class="fw-semibold">{{ $scan['representative_name'] }}</div>
                 <div class="small text-muted">
                     <i class="bi bi-person me-1"></i>{{ $scan['admin_name'] }}
@@ -132,7 +193,7 @@
                     <i class="bi bi-clock me-1"></i>{{ \Carbon\Carbon::parse($scan['scanned_at'])->diffForHumans() }}
                 </div>
             </div>
-            <div>
+            <div class="scan-status">
                 @if($scan['scan_result'] === 'success')
                 <span class="badge bg-success">Success</span>
                 @else
@@ -142,6 +203,7 @@
         </div>
         @empty
         <div class="text-center text-muted py-5">
+            <i class="bi bi-inbox fs-1 d-block mb-3"></i>
             <p>Belum ada scan terbaru</p>
         </div>
         @endforelse
