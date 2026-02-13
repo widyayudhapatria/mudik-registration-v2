@@ -120,7 +120,7 @@
         {{-- QR Code --}}
         <div class="qr-container">
             <h2>QR CODE PENUKARAN TIKET</h2>
-            <img src="{{ $qrCodeImage }}" alt="QR Code Tiket Mudik" class="qr-code">
+            <img src="{{ $message->embed($qrCodePath) }}" alt="QR Code Tiket Mudik" class="qr-code">
             <p class="qr-notice">⚠️ Simpan QR Code ini dengan baik!</p>
             <p class="qr-subnotice">QR Code berlaku untuk 1x scan</p>
             <a href="{{ route('scan.view', ['token' => $qrCode->token_qr]) }}" class="cta-button">

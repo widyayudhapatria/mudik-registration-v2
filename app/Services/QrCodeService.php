@@ -6,20 +6,21 @@ use App\Models\QrCode;
 use App\Models\Registration;
 use Carbon\Carbon;
 use Illuminate\Support\Str;
-use SimpleSoftwareIO\QrCode\Facades\QrCode as QrCodeFacade;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Facades\Log;
+use Endroid\QrCode\QrCode as EndroidQrCode;
+use Endroid\QrCode\Writer\PngWriter;
+use Endroid\QrCode\Writer\SvgWriter;
+use Endroid\QrCode\ErrorCorrectionLevel;
 
 class QrCodeService
 {
     public function generateForRegistration(Registration $registration): QrCode
     {
-        // Generate unique token
         $token = $this->generateUniqueToken();
-
-        // Set validity period (H day from approval)
         $validFrom = Carbon::now()->startOfDay();
         $validUntil = Carbon::now()->endOfDay();
 
-        // Create QR code record
         $qrCode = QrCode::create([
             'registration_id' => $registration->id,
             'token_qr' => $token,
@@ -41,38 +42,132 @@ class QrCodeService
 
     public function generateImage(QrCode $qrCode): string
     {
+        return $this->generateSvgImage($qrCode->token_qr);
+    }
+
+    public function saveQrCodeAsPng(QrCode $qrCode): ?string
+    {
         $size = config('mudik.qr_code.size', 300);
-        $margin = config('mudik.qr_code.margin', 2);
-        $format = config('mudik.qr_code.format', 'png');
-
-        // Generate QR code with token
-        $qrCodeImage = QrCodeFacade::size($size)
-            ->margin($margin)
-            ->format($format)
-            ->generate($qrCode->token_qr);
-
-        return $qrCodeImage;
+        $filename = "qr-codes/{$qrCode->id}.png";
+        
+        try {
+            if (!Storage::exists('qr-codes')) {
+                Storage::makeDirectory('qr-codes');
+            }
+            
+            $qr = EndroidQrCode::create($qrCode->token_qr)
+                ->setSize($size)
+                ->setMargin(10)
+                ->setErrorCorrectionLevel(ErrorCorrectionLevel::High);
+            
+            // Generate PNG
+            $writer = new PngWriter();
+            $result = $writer->write($qr);
+            
+            // Get PNG binary data
+            $pngData = $result->getString();
+            
+            // Verify it's a valid PNG
+            if (substr($pngData, 0, 4) !== "\x89PNG") {
+                Log::error('Generated data is not a valid PNG');
+                return null;
+            }
+            
+            // Save to storage
+            Storage::put($filename, $pngData);
+            
+            // Verify file exists
+            if (!Storage::exists($filename)) {
+                Log::error('File not saved to storage', ['filename' => $filename]);
+                return null;
+            }
+            
+            $fileSize = Storage::size($filename);
+            Log::info('QR code saved as PNG file', [
+                'path' => $filename,
+                'size' => $fileSize,
+                'qr_code_id' => $qrCode->id
+            ]);
+            
+            return $filename;
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to save QR code as PNG', [
+                'error' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'qr_code_id' => $qrCode->id
+            ]);
+            return null;
+        }
     }
 
     public function generateBase64Image(QrCode $qrCode): string
     {
+        // Try to use saved file first
+        $filename = "qr-codes/{$qrCode->id}.png";
+        
+        if (Storage::exists($filename)) {
+            $pngData = Storage::get($filename);
+            return 'data:image/png;base64,' . base64_encode($pngData);
+        }
+        
+        // Try to create and save
+        $savedPath = $this->saveQrCodeAsPng($qrCode);
+        
+        if ($savedPath && Storage::exists($savedPath)) {
+            $pngData = Storage::get($savedPath);
+            return 'data:image/png;base64,' . base64_encode($pngData);
+        }
+        
+        // Direct generation as fallback
+        try {
+            $size = config('mudik.qr_code.size', 300);
+            
+            $qr = EndroidQrCode::create($qrCode->token_qr)
+                ->setSize($size)
+                ->setMargin(10)
+                ->setErrorCorrectionLevel(ErrorCorrectionLevel::High);
+            
+            $writer = new PngWriter();
+            $result = $writer->write($qr);
+            $pngData = $result->getString();
+            
+            return 'data:image/png;base64,' . base64_encode($pngData);
+            
+        } catch (\Exception $e) {
+            Log::warning('Could not generate PNG, using SVG', [
+                'error' => $e->getMessage()
+            ]);
+            return $this->generateBase64Svg($qrCode);
+        }
+    }
+
+    protected function generateSvgImage(string $data): string
+    {
         $size = config('mudik.qr_code.size', 300);
-        $margin = config('mudik.qr_code.margin', 2);
+        
+        try {
+            // Use Endroid for SVG too
+            $qr = EndroidQrCode::create($data)
+                ->setSize($size)
+                ->setMargin(10)
+                ->setErrorCorrectionLevel(ErrorCorrectionLevel::High);
+            
+            $writer = new SvgWriter();
+            $result = $writer->write($qr);
+            
+            return $result->getString();
+            
+        } catch (\Exception $e) {
+            Log::error('Failed to generate SVG', ['error' => $e->getMessage()]);
+            return '<svg></svg>';
+        }
+    }
 
-        // // Generate QR code with token as base64
-        // $qrCodeImage = QrCodeFacade::size($size)
-        //     ->margin($margin)
-        //     ->format('png')
-        //     ->generate($qrCode->token_qr);
-
-        // return 'data:image/png;base64,' . base64_encode($qrCodeImage);
-
-        // Use SVG format - no image library required
-        $qrCodeSvg = QrCodeFacade::size($size)
-            ->format('svg')
-            ->generate($qrCode->token_qr);
-
-        return 'data:image/svg+xml;base64,' . base64_encode($qrCodeSvg);
+    public function generateBase64Svg(QrCode $qrCode): string
+    {
+        $svgData = $this->generateSvgImage($qrCode->token_qr);
+        return 'data:image/svg+xml;base64,' . base64_encode($svgData);
     }
 
     public function validateToken(string $token): array
@@ -82,39 +177,22 @@ class QrCodeService
             ->first();
 
         if (!$qrCode) {
-            return [
-                'valid' => false,
-                'message' => 'QR Code tidak ditemukan',
-                'qr_code' => null,
-            ];
+            return ['valid' => false, 'message' => 'QR Code tidak ditemukan', 'qr_code' => null];
         }
 
         if (!$qrCode->canBeScanned()) {
-            return [
-                'valid' => false,
-                'message' => $qrCode->getValidationMessage(),
-                'qr_code' => $qrCode,
-            ];
+            return ['valid' => false, 'message' => $qrCode->getValidationMessage(), 'qr_code' => $qrCode];
         }
 
-        return [
-            'valid' => true,
-            'message' => 'QR Code valid',
-            'qr_code' => $qrCode,
-        ];
+        return ['valid' => true, 'message' => 'QR Code valid', 'qr_code' => $qrCode];
     }
 
     public function scan(string $token, int $adminId): array
     {
         $validation = $this->validateToken($token);
-
-        if (!$validation['valid']) {
-            return $validation;
-        }
+        if (!$validation['valid']) return $validation;
 
         $qrCode = $validation['qr_code'];
-
-        // Mark as scanned
         $qrCode->markAsScanned($adminId);
 
         return [

@@ -3,60 +3,69 @@
 namespace App\Mail;
 
 use App\Models\Registration;
+use App\Models\QrCode;
 use App\Services\QrCodeService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Storage;
 
 class QrCodeMail extends Mailable
 {
     use Queueable, SerializesModels;
 
-    public string $qrCodeImage;
     public string $validDate;
+    public Registration $registration;
+    public QrCode $qrCode;
+    public string $qrCodePath;
 
     public function __construct(
-        public Registration $registration,
+        Registration $registration,
         QrCodeService $qrCodeService
     ) {
-        // Validasi QR code exists 
-        if (!$this->registration->qrCode) {
+        if (!$registration->qrCode) {
             throw new \Exception('QR code tidak ditemukan untuk registrasi ini');
         }
 
-        $qrCode = $this->registration->qrCode;
+        $this->registration = $registration;
+        $this->qrCode = $this->registration->qrCode;
         
-        $this->qrCodeImage = $qrCodeService->generateBase64Image($qrCode);
+        // Generate/get PNG file path
+        $filename = "qr-codes/{$this->qrCode->id}.png";
         
-        $this->validDate = $qrCode->valid_from
+        // Generate if not exists
+        if (!Storage::exists($filename)) {
+            $savedPath = $qrCodeService->saveQrCodeAsPng($this->qrCode);
+            if (!$savedPath) {
+                throw new \Exception('Failed to generate QR code PNG file');
+            }
+        }
+        
+        // Store full path for embedding
+        $this->qrCodePath = Storage::path($filename);
+        
+        // Verify file exists
+        if (!file_exists($this->qrCodePath)) {
+            throw new \Exception("QR code file not found at: {$this->qrCodePath}");
+        }
+        
+        // Format valid date
+        $this->validDate = $this->qrCode->valid_from
             ->locale('id')
             ->isoFormat('dddd, D MMMM YYYY');
     }
 
-    public function envelope(): Envelope
+    public function build()
     {
-        return new Envelope(
-            subject: 'QR Code Tiket Mudik Gratis Lebaran 2026',
-        );
-    }
-
-    public function content(): Content
-    {
-        return new Content(
-            view: 'emails.qr-code',
-            with: [
+        return $this->subject('QR Code Tiket Mudik Gratis Lebaran 2026')
+            ->view('emails.qr-code')
+            ->with([
                 'registration' => $this->registration,
-                'qrCode' => $this->registration->qrCode,
-                'qrCodeImage' => $this->qrCodeImage,
+                'qrCode' => $this->qrCode,
                 'validDate' => $this->validDate,
-            ],
-        );
-    }
-
-    public function attachments(): array
-    {
-        return [];
+                'qrCodePath' => $this->qrCodePath,
+            ]);
     }
 }
