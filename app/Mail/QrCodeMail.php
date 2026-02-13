@@ -17,27 +17,24 @@ class QrCodeMail extends Mailable
     public string $qrCodeImage;
     public string $validDate;
 
-    /**
-     * Create a new message instance.
-     */
     public function __construct(
         public Registration $registration,
         QrCodeService $qrCodeService
     ) {
+        // Validasi QR code exists 
+        if (!$this->registration->qrCode) {
+            throw new \Exception('QR code tidak ditemukan untuk registrasi ini');
+        }
+
         $qrCode = $this->registration->qrCode;
         
-        // Generate QR code image
         $this->qrCodeImage = $qrCodeService->generateBase64Image($qrCode);
         
-        // Format valid date
         $this->validDate = $qrCode->valid_from
             ->locale('id')
             ->isoFormat('dddd, D MMMM YYYY');
     }
 
-    /**
-     * Get the message envelope.
-     */
     public function envelope(): Envelope
     {
         return new Envelope(
@@ -45,9 +42,6 @@ class QrCodeMail extends Mailable
         );
     }
 
-    /**
-     * Get the message content definition.
-     */
     public function content(): Content
     {
         return new Content(
@@ -61,11 +55,6 @@ class QrCodeMail extends Mailable
         );
     }
 
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
     public function attachments(): array
     {
         return [];

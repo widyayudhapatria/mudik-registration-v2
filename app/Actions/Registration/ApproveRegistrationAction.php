@@ -47,14 +47,13 @@ class ApproveRegistrationAction
 
             DB::commit();
 
-            // Queue email with QR code
-            dispatch(new SendQrCodeEmail($registration->fresh(['qrCode', 'formLink'])));
-
             Log::info('Registration approved', [
                 'registration_id' => $registration->id,
                 'approved_by' => $admin->id,
                 'qr_code_id' => $qrCode->id,
             ]);
+
+            dispatch(new SendQrCodeEmail($registration->id));
 
             return $registration->fresh(['qrCode', 'participants']);
 
