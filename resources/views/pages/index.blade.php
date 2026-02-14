@@ -1,7 +1,23 @@
 @extends('layouts.app-v2')
 
 @section('title', 'Mudik Banten - Program Mudik Gratis Lebaran 2026')
-
+@push('styles')
+    <style>
+     html {
+        scroll-behavior: smooth;
+      }
+    </style>
+@endpush
+@section('header')
+    @include('components.header', [
+      'menuItems' => [
+        ['label' => 'Beranda', 'href' => '#home', 'active' => true],
+        ['label' => 'Persyaratan', 'href' => '#terms'],
+        ['label' => 'Cara Daftar', 'href' => '#how-to'],
+        ['label' => 'Daftar', 'href' => '#registration'],
+      ]
+    ])
+@endsection
 @section('content')
     <!-- Hero Section -->
     @include('components.hero', [

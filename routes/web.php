@@ -99,5 +99,10 @@ Route::prefix('auth')->name('auth.')->group(function () {
 });
 
 Route::get('/', function () {
-    return redirect()->route('pages.index');
+    return redirect()->route('public.landing');
 });
+
+// testing form
+Route::get('/form', function () {
+    return view('pages.form');
+})->name('form');

@@ -20,6 +20,9 @@
     <!-- SweetAlert2 with Bootstrap 5 Theme -->
     <link href="https://cdn.jsdelivr.net/npm/@sweetalert2/theme-bootstrap-4@5/bootstrap-4.min.css" rel="stylesheet" />
 
+    <!-- Gijgo Datepicker CSS -->
+    <link href="https://unpkg.com/gijgo@1.9.14/css/gijgo.min.css" rel="stylesheet" type="text/css" />
+
     <!-- Materialdesign icons css -->
     <link href="{{ asset('assets/public/css/materialdesignicons.min.css') }}" rel="stylesheet" />
 
@@ -40,14 +43,7 @@
   </head>
   <body>
     <!-- Navigation Bar-->
-    @include('components.header', [
-      'menuItems' => [
-        ['label' => 'Beranda', 'href' => '#home', 'active' => true],
-        ['label' => 'Persyaratan', 'href' => '#terms'],
-        ['label' => 'Cara Daftar', 'href' => '#how-to'],
-        ['label' => 'Daftar', 'href' => '#registration'],
-      ]
-    ])
+    @yield('header')
 
     <!-- Main Content -->
     @yield('content')
@@ -58,6 +54,10 @@
     <!-- js placed at the end of the document so the pages load faster -->
     <script src="{{ asset('assets/public/js/jquery.min.js') }}"></script>
     <script src="{{ asset('assets/public/js/bootstrap.bundle.min.js') }}"></script>
+
+    <!-- Gijgo Datepicker JS -->
+    <script src="https://unpkg.com/gijgo@1.9.14/js/gijgo.min.js" type="text/javascript"></script>
+
     <!-- Axios for AJAX requests -->
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
 

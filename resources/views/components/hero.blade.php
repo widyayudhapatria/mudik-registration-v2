@@ -32,9 +32,12 @@
                     <p class="pt-4 home-sub-title text-white mx-auto">
                       {!! $slide['subtitle'] !!}
                     </p>
-                    <div class="watch-video pt-4">
-                      <a href="{{ $slide['buttonLink'] }}" class="btn btn-custom">{{ $slide['buttonText'] }}</a>
-                    </div>
+                    <!-- Check condition button -->
+                    @if(!empty($slide['buttonText']) && !empty($slide['buttonLink']))
+                      <div class="watch-video pt-4">
+                        <a href="{{ $slide['buttonLink'] }}" class="btn btn-custom">{{ $slide['buttonText'] }}</a>
+                      </div>
+                    @endif
                   </li>
                 @endforeach
               </ul>
