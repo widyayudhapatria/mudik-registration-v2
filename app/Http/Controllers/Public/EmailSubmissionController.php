@@ -27,17 +27,15 @@ class EmailSubmissionController extends Controller
             $formLink = SubmitEmailAction::run($data);
 
             return $this->responseSuccess(
-                "✅ EMAIL BERHASIL DIKIRIM\n" .
-                "Link formulir pendaftaran telah dikirim ke email Anda.\n" .
-                "Silahkan cek inbox atau spam folder Anda.\n" .
-                "Link akan kadaluarsa dalam 3 hari.\n" .
-                "Terima kasih!",
+                "Link formulir pendaftaran telah dikirim ke email Anda.<br><br>" .
+                    "ilahkan cek inbox atau spam folder Anda.<br>" .
+                    "<b>Link akan kadaluarsa dalam 3 hari.</b><br><br>" .
+                    "Terima kasih!",
                 [
                     'email' => $formLink->email,
                     'expired_at' => $formLink->expired_at->toISOString(),
                 ]
             );
-
         } catch (MudikException $e) {
             return response()->json($e->toArray(), 400);
         }

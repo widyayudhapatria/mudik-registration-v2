@@ -8,6 +8,7 @@ use Illuminate\Mail\Mailable;
 use Illuminate\Mail\Mailables\Content;
 use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\URL;
 
 class FormLinkMail extends Mailable
@@ -16,6 +17,7 @@ class FormLinkMail extends Mailable
 
     public string $formUrl;
     public string $expiredDate;
+    public string $emailDestination;
 
     /**
      * Create a new message instance.
@@ -23,6 +25,13 @@ class FormLinkMail extends Mailable
     public function __construct(
         public FormLink $formLink
     ) {
+        $this->formLink->refresh();
+
+        Log::info('After dispatching email job', [
+            'token' => $this->formLink->token,
+            'expired_at' => $this->formLink->expired_at,
+        ]);
+
         // Generate signed URL
         $this->formUrl = URL::temporarySignedRoute(
             'public.registration.form',
@@ -37,6 +46,8 @@ class FormLinkMail extends Mailable
         $this->expiredDate = $this->formLink->expired_at
             ->locale('id')
             ->isoFormat('dddd, D MMMM YYYY [pukul] HH:mm [WIB]');
+
+        $this->emailDestination = $this->formLink->email;
     }
 
     /**
@@ -55,9 +66,9 @@ class FormLinkMail extends Mailable
     public function content(): Content
     {
         return new Content(
-            view: 'emails.form-link',
+            view: 'emails.form-link-v2',
             with: [
-                'formLink' => $this->formLink,
+                'emailDestination' => $this->emailDestination,
                 'formUrl' => $this->formUrl,
                 'expiredDate' => $this->expiredDate,
             ],
