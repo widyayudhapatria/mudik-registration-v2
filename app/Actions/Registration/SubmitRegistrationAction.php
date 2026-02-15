@@ -2,6 +2,7 @@
 
 namespace App\Actions\Registration;
 
+use App\Actions\FormLink\ValidateFormLinkAction;
 use App\Data\RegistrationData;
 use App\Enums\ErrorCode;
 use App\Exceptions\MudikException;
@@ -30,18 +31,8 @@ class SubmitRegistrationAction
                 ->lockForUpdate()
                 ->first();
 
-            // 2. Validate form link status
-            if ($formLink->status !== 'pending') {
-                throw new MudikException(ErrorCode::LinkInvalid);
-            }
-
-            if ($formLink->isExpired()) {
-                throw new MudikException(ErrorCode::LinkExpired);
-            }
-
-            if ($formLink->used_at !== null) {
-                throw new MudikException(ErrorCode::LinkInvalid);
-            }
+            // 2. Validate form link status using action
+            ValidateFormLinkAction::run($formLink);
 
             // 3. Check daily quota (with lock)
             $quota = DailyQuota::where('date', Carbon::today())
@@ -89,7 +80,6 @@ class SubmitRegistrationAction
             ]);
 
             return $registration->load('participants');
-
         } catch (MudikException $e) {
             DB::rollBack();
             throw $e;

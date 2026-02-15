@@ -28,7 +28,7 @@ class EmailSubmissionController extends Controller
 
             return $this->responseSuccess(
                 "Link formulir pendaftaran telah dikirim ke email Anda.<br><br>" .
-                    "ilahkan cek inbox atau spam folder Anda.<br>" .
+                    "Silahkan cek inbox atau spam folder Anda.<br>" .
                     "<b>Link akan kadaluarsa dalam 3 hari.</b><br><br>" .
                     "Terima kasih!",
                 [

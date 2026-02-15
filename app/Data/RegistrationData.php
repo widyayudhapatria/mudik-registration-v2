@@ -10,6 +10,8 @@ use Spatie\LaravelData\Attributes\Validation\File;
 use Spatie\LaravelData\Attributes\Validation\Integer;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
+use Spatie\LaravelData\Attributes\Validation\Mimes;
+use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Size;
 use Spatie\LaravelData\Attributes\Validation\StringType;
@@ -19,22 +21,22 @@ use Spatie\LaravelData\DataCollection;
 class RegistrationData extends Data
 {
     public function __construct(
-        #[Required, StringType, Max(255)]
+        #[Required, StringType, Min(3), Max(255)]
         public string $representative_name,
         
-        #[Required, StringType, Size(16)]
+         #[Required, StringType, Size(16), Regex('/^\d{16}$/')]
         public string $representative_nik,
         
         #[Required, StringType]
         public string $representative_birth_date,
         
-        #[Required, Integer, Min(1), Max(6)]
+        #[Required, Integer, Min(1), Max(10)]
         public int $family_count,
         
-        #[Required, StringType, Size(16)]
+        #[Required, StringType, Size(16), Regex('/^\d{16}$/')]
         public string $kk_number,
         
-        #[Required, File, Max(2048)]
+        #[Required, File, Mimes('jpg', 'jpeg', 'png'), Max(5120)]
         public UploadedFile $kk_document,
         
         #[Required, BooleanType]

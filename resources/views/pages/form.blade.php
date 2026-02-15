@@ -44,6 +44,7 @@
             <div class="row mt-4 pt-4 justify-content-center">
                 <div class="col-lg-8 text-left">
                     <form id="registrationForm" enctype="multipart/form-data">
+                        @csrf
                         <!-- Data Perwakilan Keluarga -->
                         <div class="card mb-4">
                             <div class="card-body">
@@ -58,7 +59,10 @@
                                         class="form-control"
                                         id="representative_name"
                                         name="representative_name"
-                                        placeholder="nama lengkap sesuai KTP"
+                                        placeholder="Nama Lengkap Perwakilan"
+                                        pattern="[A-Za-z ]+"
+                                        oninput="this.value = this.value.replace(/[^A-Za-z ]/g, '')"
+                                        minlength="3"
                                         required
                                         />
                                 </div>
@@ -69,14 +73,16 @@
                                     </label>
                                     <input
                                         type="text"
-                                        class="form-control"
+                                        class="form-control mb-0"
                                         id="representative_nik"
                                         name="representative_nik"
-                                        placeholder="16 digit nomor KTP"
+                                        placeholder="Nomor KTP Perwakilan (16 digit)"
+                                        minlength="16"
                                         maxlength="16"
                                         pattern="[0-9]{16}"
                                         required
                                         />
+                                    <div class="form-text pb-2">Nomor KTP harus tepat 16 digit</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="representative_birth_date" class="form-label">
@@ -88,7 +94,7 @@
                                         class="form-control"
                                         id="representative_birth_date"
                                         name="representative_birth_date"
-                                        placeholder="dd/mm/yyyy"
+                                        placeholder="Tanggal Lahir Perwakilan (dd/mm/yyyy)"
                                         required
                                         />
                                 </div>
@@ -121,7 +127,7 @@
                                         id="family_count"
                                         name="family_count"
                                         min="1"
-                                        max="20"
+                                        max="10"
                                         value="1"
                                         required
                                         />
@@ -133,21 +139,23 @@
                                     </label>
                                     <input
                                         type="text"
-                                        class="form-control"
+                                        class="form-control mb-0"
                                         id="kk_number"
                                         name="kk_number"
-                                        placeholder="nomor kk"
+                                        placeholder="Nomor Kartu Keluarga (16 digit)"
+                                        minlength="16"
                                         maxlength="16"
                                         pattern="[0-9]{16}"
                                         required
                                         />
+                                    <div class="form-text pb-2">Nomor Kartu Keluarga harus tepat 16 digit</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="kk_document" class="form-label">
                                     Upload Dokumen Kartu Keluarga
                                     <span class="text-danger">*</span>
                                     </label>
-                                    <div class="upload-area border rounded p-4 text-center" id="fileUploadArea">
+                                    <div class="upload-area border rounded p-4 text-center" id="fileUploadArea" style="transition: all 0.3s ease;">
                                         <i class="mdi mdi-cloud-upload" style="font-size: 48px; color: #6c757d"></i>
                                         <p class="mb-2">Klik atau seret file ke sini</p>
                                         <input
@@ -155,7 +163,7 @@
                                             class="form-control d-none"
                                             id="kk_document"
                                             name="kk_document"
-                                            accept="image/*,.pdf"
+                                            accept=".jpg,.jpeg,.png"
                                             required
                                             />
                                         <button
@@ -165,8 +173,11 @@
                                             >
                                         Pilih File
                                         </button>
-                                        <div class="form-text mt-2">Format: JPG, PNG, PDF (Maks. 2MB)</div>
-                                        <div id="fileInfo" class="mt-2 text-success" style="display: none"></div>
+                                        <div class="form-text mt-2">
+                                            <strong>Format:</strong> JPG, JPEG, PNG<br/>
+                                            <strong>Ukuran Max:</strong> 5 MB
+                                        </div>
+                                        <div id="fileInfo" class="mt-3" style="display: none; font-weight: 600;"></div>
                                     </div>
                                 </div>
                             </div>
@@ -231,7 +242,7 @@
                             </span>
                             <span class="btn-loading d-none">
                                 <span class="spinner-border spinner-border-sm me-2"></span>
-                                Mengirim data...
+                                Proses mengirim data...
                             </span>
                             </button>
                         </div>
@@ -250,6 +261,9 @@
         let pesertaCount = 0;
         const maxPeserta = 10;
 
+        // Submit URL from controller
+        const submitUrl = @json($submitUrl ?? '');
+
         // Initialize form
         document.addEventListener("DOMContentLoaded", function () {
             initializeForm();
@@ -265,22 +279,39 @@
         }
 
         function initializeDatepicker(selector) {
-            $(selector).datepicker({
-                uiLibrary: "bootstrap5",
-                format: "dd/mm/yyyy",
-                showOnFocus: true,
-                showRightIcon: false,
-                maxDate: function () {
-                    return new Date();
-                },
-                size: "default",
-                change: function (e) {
-                    // Trigger validation on change
-                    if (e.target) {
-                        $(e.target).valid();
-                    }
-                },
-            });
+            // Wait for jQuery and datepicker to be available
+            if (typeof jQuery === 'undefined') {
+                console.error('jQuery not loaded');
+                return;
+            }
+
+            if (typeof jQuery.fn.datepicker === 'undefined') {
+                console.error('Datepicker plugin not loaded, retrying in 500ms');
+                setTimeout(() => initializeDatepicker(selector), 500);
+                return;
+            }
+
+            const $element = $(selector);
+
+            // Check if already initialized
+            if ($element.data('datepicker')) {
+                return;
+            }
+
+            try {
+                $element.datepicker({
+                    uiLibrary: "bootstrap5",
+                    format: "dd/mm/yyyy",
+                    showOnFocus: true,
+                    showRightIcon: false,
+                    maxDate: function () {
+                        return new Date();
+                    },
+                    size: "default",
+                });
+            } catch (error) {
+                console.error('Error initializing datepicker:', error);
+            }
         }
 
         function setupEventListeners() {
@@ -334,47 +365,92 @@
             // KTP and KK number validation
             document.getElementById("representative_nik").addEventListener("input", formatNumber);
             document.getElementById("kk_number").addEventListener("input", formatNumber);
+
+            // Add focus event to representative birth date to ensure datepicker works
+            const repBirthDateInput = document.getElementById("representative_birth_date");
+            if (repBirthDateInput) {
+                repBirthDateInput.addEventListener("focus", function() {
+                    if (!$(this).data('datepicker')) {
+                        initializeDatepicker("#representative_birth_date");
+                    }
+                });
+            }
         }
 
         function formatNumber(e) {
             e.target.value = e.target.value.replace(/\D/g, "").slice(0, 16);
         }
 
+        // Track valid file upload state
+        let isFileValid = false;
+
         function handleFileUpload(e) {
             const file = e.target.files[0];
             const fileInfo = document.getElementById("fileInfo");
+            const uploadArea = document.getElementById("fileUploadArea");
+            isFileValid = false; // Reset validity
 
-            if (file) {
-                const maxSize = 2 * 1024 * 1024; // 2MB
-                const allowedTypes = ["image/jpeg", "image/png", "image/jpg", "application/pdf"];
-
-                if (!allowedTypes.includes(file.type)) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Format file tidak didukung. Gunakan JPG, PNG, atau PDF.",
-                        icon: "error",
-                        confirmButtonText: "OK",
-                    });
-                    e.target.value = "";
-                    fileInfo.style.display = "none";
-                    return;
-                }
-
-                if (file.size > maxSize) {
-                    Swal.fire({
-                        title: "Error!",
-                        text: "Ukuran file terlalu besar. Maksimal 2MB.",
-                        icon: "error",
-                        confirmButtonText: "OK",
-                    });
-                    e.target.value = "";
-                    fileInfo.style.display = "none";
-                    return;
-                }
-
-                fileInfo.innerHTML = `<i class="mdi mdi-check-circle"></i> ${file.name} (${(file.size / 1024).toFixed(2)} KB)`;
-                fileInfo.style.display = "block";
+            if (!file) {
+                fileInfo.style.display = "none";
+                uploadArea.classList.remove("border-danger", "border-success");
+                return;
             }
+
+            const maxSize = 5 * 1024 * 1024; // 5MB in bytes
+            const allowedTypes = ["image/jpeg", "image/png", "image/jpg"];
+            const fileSizeMB = (file.size / (1024 * 1024)).toFixed(2);
+            const fileSizeKB = (file.size / 1024).toFixed(2);
+
+            // Validate file type
+            if (!allowedTypes.includes(file.type)) {
+                Swal.fire({
+                    title: "Format Tidak Valid!",
+                    html: `<div class="text-start">
+                        <p class="mb-0"><strong>File:</strong> ${file.name}</p>
+                        <p class="text-danger mb-0">Format file tidak didukung.</p>
+                        <p class="mb-0">Silakan gunakan file dengan format: <strong>JPG, JPEG, atau PNG</strong></p>
+                    </div>`,
+                    icon: "error",
+                    confirmButtonText: "Baik, saya mengerti.",
+                });
+                e.target.value = "";
+                fileInfo.style.display = "none";
+                uploadArea.classList.add("border-danger");
+                uploadArea.classList.remove("border-success");
+                return;
+            }
+
+            // Validate file size (5MB = 5242880 bytes)
+            if (file.size > maxSize) {
+                Swal.fire({
+                    title: "Ukuran File Terlalu Besar!",
+                    html: `<div class="text-start">
+                        <p class="mb-0"><strong>File:</strong> ${file.name}</p>
+                        <p class="mb-0"><strong>Ukuran:</strong> ${fileSizeMB} MB</p>
+                        <p class="text-danger mb-0"><strong>Maksimal: 5 MB</strong></p>
+                        <p class="mt-3">Silakan pilih file yang lebih kecil.</p>
+                    </div>`,
+                    icon: "error",
+                    confirmButtonText: "Baik, saya mengerti.",
+                });
+                e.target.value = "";
+                fileInfo.style.display = "none";
+                uploadArea.classList.add("border-danger");
+                uploadArea.classList.remove("border-success");
+                return;
+            }
+
+            // All validations passed
+            isFileValid = true;
+            uploadArea.classList.add("border-success");
+            uploadArea.classList.remove("border-danger");
+
+            const fileSizeDisplay = fileSizeKB > 1024 ? `${fileSizeMB} MB` : `${fileSizeKB} KB`;
+            fileInfo.innerHTML = `<span class="text-success"><i class="mdi mdi-check-circle"></i> File diterima: ${file.name}</span><br/>
+                <small class="text-muted">Ukuran: ${fileSizeDisplay} (dari maksimal 5 MB)</small>`;
+            fileInfo.style.display = "block";
+
+            console.log(`File valid: ${file.name} - ${fileSizeDisplay}`);
         }
 
         function addPesertaForm() {
@@ -409,13 +485,13 @@
 
                 <div class="mb-3">
                     <label for="namaPeserta${pesertaCount}" class="form-label">Nama Lengkap <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control" id="namaPeserta${pesertaCount}" name="namaPeserta[]" placeholder="nama lengkap" required>
+                    <input type="text" class="form-control" id="namaPeserta${pesertaCount}" name="namaPeserta[]" pattern="[A-Za-z ]+" oninput="this.value = this.value.replace(/[^A-Za-z ]/g, '')" minlength="3" placeholder="Nama Lengkap" required>
                 </div>
 
                 <div class="mb-3">
                     <label for="ktpPeserta${pesertaCount}" class="form-label">KTP / KIA <span class="text-danger">*</span></label>
-                    <input type="text" class="form-control ktp-input" id="ktpPeserta${pesertaCount}" name="ktpPeserta[]" placeholder="nomor KTP / KIA" maxlength="16" required>
-                    <div class="form-text">Masukkan nomor KTP (16 digit) atau KIA</div>
+                    <input type="text" class="form-control mb-0 ktp-input" id="ktpPeserta${pesertaCount}" name="ktpPeserta[]" placeholder="Nomor KTP / KIA" minlength="16" maxlength="16" pattern="[0-9]{16}" required>
+                    <div class="form-text p-2">Nomor KTP/KIA harus tepat 16 digit</div>
                 </div>
 
                 <div class="mb-3">
@@ -439,7 +515,18 @@
             ktpInput.addEventListener("input", formatNumber);
 
             // Initialize datepicker for this peserta's birth date
-            initializeDatepicker(`#tanggalLahirPeserta${pesertaCount}`);
+            const datepickerSelector = `#tanggalLahirPeserta${pesertaCount}`;
+            initializeDatepicker(datepickerSelector);
+
+            // Add focus event to ensure datepicker works on focus
+            const datepickerInput = pesertaDiv.querySelector(".datepicker-input");
+            if (datepickerInput) {
+                datepickerInput.addEventListener("focus", function() {
+                    if (!$(this).data('datepicker')) {
+                        initializeDatepicker(datepickerSelector);
+                    }
+                });
+            }
 
             // Update button visibility
             updateTambahPesertaButton();
@@ -457,6 +544,9 @@
                     cancelButtonText: "Batal",
                 }).then((result) => {
                     if (result.isConfirmed) {
+                        // Destroy datepicker for this peserta before removing
+                        $(`#tanggalLahirPeserta${id}`).datepicker('destroy');
+
                         pesertaForm.remove();
                         pesertaCount--;
                         updatePesertaNumbers();
@@ -489,32 +579,93 @@
 
         function handleTambahkanPerwakilan(e) {
             if (e.target.checked) {
-                // Auto-fill first participant with representative data
-                const nama = document.getElementById("representative_name").value;
-                const ktp = document.getElementById("representative_nik").value;
-                const tanggalLahir = $("#representative_birth_date").val();
+            // Validasi data perwakilan sudah terisi
+            const nama = document.getElementById("representative_name").value.trim();
+            const ktp = document.getElementById("representative_nik").value.trim();
+            const tanggalLahir = $("#representative_birth_date").val();
 
-                if (pesertaCount > 0) {
-                    document.getElementById("namaPeserta1").value = nama;
-                    document.getElementById("ktpPeserta1").value = ktp;
-                    $("#tanggalLahirPeserta1").val(tanggalLahir);
-
-                    // Make first participant fields readonly
-                    document.getElementById("namaPeserta1").setAttribute("readonly", true);
-                    document.getElementById("ktpPeserta1").setAttribute("readonly", true);
-                    $("#tanggalLahirPeserta1").prop("readonly", true).addClass("readonly-datepicker");
-                }
-            } else {
-                // Remove readonly and clear values
-                if (pesertaCount > 0) {
-                    document.getElementById("namaPeserta1").removeAttribute("readonly");
-                    document.getElementById("ktpPeserta1").removeAttribute("readonly");
-                    $("#tanggalLahirPeserta1").prop("readonly", false).removeClass("readonly-datepicker");
-                    document.getElementById("namaPeserta1").value = "";
-                    document.getElementById("ktpPeserta1").value = "";
-                    $("#tanggalLahirPeserta1").val("");
-                }
+            // Check if representative data is empty
+            if (!nama || !ktp || !tanggalLahir) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    html: `Pengisian data perwakilan masih ada yang kosong:<br/><br/><div class="text-start">
+                        ${!nama ? '<p class="fw-bold mb-0">- Nama Lengkap Perwakilan</p>' : ''}
+                        ${!ktp ? '<p class="fw-bold mb-0">- Nomor KTP Perwakilan</p>' : ''}
+                        ${!tanggalLahir ? '<p class="fw-bold mb-0">- Tanggal Lahir Perwakilan</p>' : ''}
+                        </div><br/>Silakan isi semua data perwakilan terlebih dahulu.`,
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+                // Uncheck checkbox
+                e.target.checked = false;
+                return;
             }
+
+            // Validate name length (min 3 characters)
+            if (nama.length < 3) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Nama perwakilan harus minimal 3 karakter.",
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+                e.target.checked = false;
+                return;
+            }
+
+            // Validate NIK (must be 16 digits)
+            const nikDigits = ktp.replace(/\D/g, '');
+            if (nikDigits.length !== 16) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Nomor KTP harus tepat 16 angka.",
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+                e.target.checked = false;
+                return;
+            }
+
+            // All validation passed, proceed with adding to participant
+            if (pesertaCount > 0) {
+                document.getElementById("namaPeserta1").value = nama;
+                document.getElementById("ktpPeserta1").value = ktp;
+                $("#tanggalLahirPeserta1").val(tanggalLahir);
+
+                // Make first participant fields readonly
+                document.getElementById("namaPeserta1").setAttribute("readonly", true);
+                document.getElementById("ktpPeserta1").setAttribute("readonly", true);
+                $("#tanggalLahirPeserta1").prop("readonly", true).addClass("readonly-datepicker");
+            }
+
+            // Make representative fields readonly to prevent data mismatch
+            document.getElementById("representative_name").setAttribute("readonly", true);
+            document.getElementById("representative_nik").setAttribute("readonly", true);
+            $("#representative_birth_date").prop("readonly", true).addClass("readonly-datepicker");
+
+            // Show info message
+            Swal.fire({
+                title: "Info",
+                html: "Data perwakilan sekarang tidak bisa diubah. <br/><strong>Uncheck checkbox</strong> untuk mengubah data perwakilan.",
+                icon: "warning",
+                confirmButtonText: "OK",
+            });
+        } else {
+            // Remove readonly and clear values from participant
+            if (pesertaCount > 0) {
+                document.getElementById("namaPeserta1").removeAttribute("readonly");
+                document.getElementById("ktpPeserta1").removeAttribute("readonly");
+                $("#tanggalLahirPeserta1").prop("readonly", false).removeClass("readonly-datepicker");
+                document.getElementById("namaPeserta1").value = "";
+                document.getElementById("ktpPeserta1").value = "";
+                $("#tanggalLahirPeserta1").val("");
+            }
+
+            // Remove readonly from representative fields
+            document.getElementById("representative_name").removeAttribute("readonly");
+            document.getElementById("representative_nik").removeAttribute("readonly");
+            $("#representative_birth_date").prop("readonly", false).removeClass("readonly-datepicker");
+        }
         }
 
         function validateJumlahAnggota(e) {
@@ -532,6 +683,14 @@
             }
         }
 
+        // Convert date format from dd/mm/yyyy to YYYY-MM-DD
+        function convertDateFormat(dateString) {
+            if (!dateString) return '';
+            const parts = dateString.split('/');
+            if (parts.length !== 3) return dateString;
+            return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
         function handleFormSubmit(e) {
             e.preventDefault();
 
@@ -539,10 +698,56 @@
             const jumlahAnggota = parseInt(document.getElementById("family_count").value);
             const jumlahPeserta = document.querySelectorAll(".peserta-form").length;
 
+            if (jumlahPeserta === 0) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Anda harus menambahkan minimal 1 peserta.",
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+                return;
+            }
+
             if (jumlahPeserta > jumlahAnggota) {
                 Swal.fire({
                     title: "Peringatan!",
                     text: `Jumlah peserta (${jumlahPeserta}) melebihi jumlah anggota keluarga (${jumlahAnggota}). Silakan sesuaikan.`,
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+                return;
+            }
+
+            // Validate representative name (min 3 characters)
+            const repName = document.getElementById("representative_name").value.trim();
+            if (repName.length < 3) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Nama perwakilan harus terdiri dari minimal 3 karakter.",
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+                return;
+            }
+
+            // Validate representative NIK (16 digits)
+             const repNik = document.getElementById("representative_nik").value.replace(/\D/g, '');
+            if (repNik.length !== 16) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "NIK perwakilan harus tepat 16 angka.",
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+                return;
+            }
+
+            // Validate KK number (16 digits)
+            const kkNumber = document.getElementById("kk_number").value.replace(/\D/g, '');
+            if (kkNumber.length !== 16) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Nomor KK harus tepat 16 angka.",
                     icon: "warning",
                     confirmButtonText: "OK",
                 });
@@ -590,61 +795,275 @@
                 return;
             }
 
-            // Show loading
-            Swal.fire({
-                title: "Memproses...",
-                text: "Mohon tunggu sebentar",
-                allowOutsideClick: false,
-                allowEscapeKey: false,
-                didOpen: () => {
-                    Swal.showLoading();
-                },
+            // Validate participants
+            let pesertaValid = true;
+            let allPesertaForms = document.querySelectorAll(".peserta-form");
+            allPesertaForms.forEach((form, index) => {
+                const name = form.querySelector('input[name="namaPeserta[]"]').value.trim();
+                const nikKia = form.querySelector('input[name="ktpPeserta[]"]').value.replace(/\D/g, '');
+
+                if (name.length < 3) {
+                    Swal.fire({
+                        title: "Peringatan!",
+                        text: `Nama peserta ${index + 1} harus terdiri dari minimal 3 karakter.`,
+                        icon: "warning",
+                        confirmButtonText: "OK",
+                    });
+                    pesertaValid = false;
+                    return false;
+                }
+
+                if (nikKia.length !== 16) {
+                    Swal.fire({
+                        title: "Peringatan!",
+                        text: `NIK/KIA peserta ${index + 1} harus tepat 16 angka.`,
+                        icon: "warning",
+                        confirmButtonText: "OK",
+                    });
+                    pesertaValid = false;
+                    return false;
+                }
             });
 
-            // Simulate form submission (replace with actual AJAX call)
-            setTimeout(() => {
-                // Collect form data
-                const formData = new FormData(document.getElementById("registrationForm"));
+            if (!pesertaValid) return;
 
-                // Add additional data
-                formData.append("representative_name", document.getElementById("representative_name").value);
-                formData.append("representative_nik", document.getElementById("representative_nik").value);
-                formData.append("representative_birth_date", $("#representative_birth_date").val());
-                formData.append("family_count", document.getElementById("family_count").value);
-                formData.append("kk_number", document.getElementById("kk_number").value);
-
-                // Here you would send formData to your PHP backend
-                // Example: fetch('/php/contact.php', { method: 'POST', body: formData })
-
+            // Validate file upload
+            const kkDocument = document.getElementById("kk_document");
+            if (!kkDocument.files || kkDocument.files.length === 0) {
                 Swal.fire({
-                    title: "Berhasil!",
-                    html: `
-                    <p>Pendaftaran Anda telah berhasil dikirim.</p>
-                    <p><strong>Nomor Registrasi:</strong> REG-${Date.now()}</p>
-                    <p class="text-muted">Silakan simpan nomor registrasi untuk referensi Anda.</p>
-                    `,
-                    icon: "success",
+                    title: "Peringatan!",
+                    text: "Anda harus upload dokumen Kartu Keluarga (KK).",
+                    icon: "warning",
                     confirmButtonText: "OK",
-                }).then(() => {
-                    // Reset form
-                    document.getElementById("registrationForm").reset();
-                    document.getElementById("fileInfo").style.display = "none";
-
-                    // Reset datepicker
-                    $("#representative_birth_date").val("");
-
-                    // Reset peserta forms
-                    document.getElementById("pesertaContainer").innerHTML = "";
-                    pesertaCount = 0;
-                    addPesertaForm();
-
-                    // Scroll to top
-                    window.scrollTo({
-                        top: 0,
-                        behavior: "smooth"
-                    });
                 });
-            }, 2000);
+                return;
+            }
+
+            if (!isFileValid) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    html: `<div class="text-start">
+                        <p>File yang dipilih tidak melewati validasi:</p>
+                        <ul class="mt-2">
+                            <li>Pastikan format file: <strong>JPG, JPEG, atau PNG</strong></li>
+                            <li>Pastikan ukuran file tidak melebihi <strong>5 MB</strong></li>
+                        </ul>
+                    </div>`,
+                    icon: "warning",
+                    confirmButtonText: "OK",
+                });
+                return;
+            }
+
+            // Show loading on button submit
+            const submitBtn = document.getElementById("submitFormBtn");
+            const btnText = submitBtn.querySelector(".btn-text");
+            const btnLoading = submitBtn.querySelector(".btn-loading");
+            submitBtn.disabled = true;
+            btnText.classList.add('d-none');
+            btnLoading.classList.remove('d-none');
+
+            // Collect form data
+            const formData = new FormData();
+
+            // Add CSRF token
+            const csrfToken = document.querySelector('input[name="_token"]').value;
+            formData.append('_token', csrfToken);
+
+            // Add representative data with converted date
+            formData.append("representative_name", document.getElementById("representative_name").value);
+            formData.append("representative_nik", document.getElementById("representative_nik").value);
+            formData.append("representative_birth_date", convertDateFormat($("#representative_birth_date").val()));
+            formData.append("family_count", document.getElementById("family_count").value);
+            formData.append("kk_number", document.getElementById("kk_number").value);
+
+            // Add KK document
+            const kkDocumentFile = document.getElementById("kk_document").files[0];
+            if (kkDocumentFile) {
+                formData.append("kk_document", kkDocumentFile);
+            }
+
+            // Add has_child_under_4
+            formData.append("has_child_under_4", document.getElementById("has_child_under_4").checked ? '1' : '0');
+
+            // Collect participants data
+            const pesertaFormsData = document.querySelectorAll(".peserta-form");
+            pesertaFormsData.forEach((form, index) => {
+                const name = form.querySelector('input[name="namaPeserta[]"]').value;
+                const nikKia = form.querySelector('input[name="ktpPeserta[]"]').value;
+                const birthDate = form.querySelector('input[name="tanggalLahirPeserta[]"]').value;
+
+                formData.append(`participants[${index}][full_name]`, name);
+                formData.append(`participants[${index}][nik_kia]`, nikKia);
+                formData.append(`participants[${index}][birth_date]`, convertDateFormat(birthDate));
+            });
+
+            // Submit to backend
+            fetch(submitUrl, {
+                method: 'POST',
+                body: formData,
+                headers: {
+                    'X-Requested-With': 'XMLHttpRequest',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                Swal.close();
+
+                if (data.success) {
+                    //reset submit button
+                    resetSubmitButton();
+
+                    Swal.fire({
+                        title: "Pendaftaran Berhasil!",
+                        html: `
+                        <div class="text-start">
+                            <p class="mb-3">${data.message}</p>
+                            ${data.data && data.data.email ? `<p><strong>Email:</strong> ${data.data.email}</p>` : ''}
+                            <p class="text-muted mt-3">Silakan cek email secara berkala.</p>
+                        </div>
+                        `,
+                        allowOutsideClick: false,
+                        allowEscapeKey: false,
+                        icon: "success",
+                        confirmButtonText: "Baik, saya mengerti.",
+                    }).then(() => {
+                        // Reset form
+                        clearAllFormData();
+                        // Show redirect timer
+                        showRedirectTimer();
+                    });
+                } else {
+                    //reset submit button
+                    resetSubmitButton();
+
+                    // Handle error from backend
+                    let errorMessage = 'Terjadi kesalahan saat memproses pendaftaran.';
+
+                    if (data.errors) {
+                        errorMessage += '<div class="text-start mt-2">';
+                        for (let field in data.errors) {
+                            data.errors[field].forEach(err => {
+                                errorMessage += `<p class="mb-0 fw-bolder">${err}</p>`;
+                            });
+                        }
+                        errorMessage += '</div><br/>Silakan refresh dan isi semua data dengan benar dan lengkap, pastikan juga file yang diupload sesuai dengan ketentuan.';
+                    }
+
+                    Swal.fire({
+                        title: "Gagal!",
+                        html: errorMessage,
+                        icon: "error",
+                        confirmButtonText: "Baik, saya mengerti.",
+                    });
+                }
+            })
+            .catch(error => {
+                Swal.close();
+                //reset submit button
+                resetSubmitButton();
+                Swal.fire({
+                    title: "Error!",
+                    text: "Terjadi kesalahan pada koneksi. Silakan coba lagi.",
+                    icon: "error",
+                    confirmButtonText: "Baik, saya mengerti.",
+                });
+            });
+        }
+
+        // Clear all from inputs and reset form -- success
+        function clearAllFormData() {
+            // Destroy existing datepickers first
+            $("#representative_birth_date").datepicker('destroy');
+            $(".datepicker-input").datepicker('destroy');
+
+            document.getElementById("registrationForm").reset();
+            document.getElementById("fileInfo").style.display = "none";
+
+            // Reset datepicker
+            $("#representative_birth_date").val("");
+
+            // Reset peserta forms
+            document.getElementById("pesertaContainer").innerHTML = "";
+            pesertaCount = 0;
+
+            // Re-initialize representative datepicker
+            setTimeout(() => {
+                initializeDatepicker("#representative_birth_date");
+                addPesertaForm();
+            }, 100);
+
+            // Scroll to top
+            window.scrollTo({
+                top: 0,
+                behavior: "smooth"
+            });
+        }
+
+        // Show redirect timer to home page after success
+        function showRedirectTimer() {
+            let timeLeft = 3;
+            const redirectUrl = window.location.origin;
+
+            Swal.fire({
+                title: "Pengalihan Halaman",
+                html: `
+                <div class="text-start">
+                    <p class="mb-3">Halaman akan otomatis kembali ke beranda dalam <strong id="timerCount">${timeLeft}</strong> detik...</p>
+                    <div class="progress" style="height: 25px;">
+                        <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated"
+                            role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
+                        </div>
+                    </div>
+                </div>
+                `,
+                allowOutsideClick: false,
+                allowEscapeKey: false,
+                icon: "info",
+                confirmButtonText: "Kembali ke Beranda",
+                didOpen: () => {
+                    // Start countdown timer
+                    const timerInterval = setInterval(() => {
+                        timeLeft--;
+                        const timerCountElement = document.getElementById("timerCount");
+                        const progressBar = document.getElementById("progressBar");
+
+                        if (timerCountElement) {
+                            timerCountElement.textContent = timeLeft;
+                        }
+
+                        // Update progress bar width
+                        if (progressBar) {
+                            const percentage = (timeLeft / 3) * 100;
+                            progressBar.style.width = percentage + "%";
+                        }
+
+                        // Redirect when timer reaches 0
+                        if (timeLeft <= 0) {
+                            clearInterval(timerInterval);
+                            Swal.close();
+                            window.location.href = redirectUrl;
+                        }
+                    }, 1000); // Update setiap 1 detik
+                }
+            }).then((result) => {
+                // Jika user klik button confirm sebelum timer habis
+                if (result.isConfirmed) {
+                    window.location.href = redirectUrl;
+                }
+            });
+        }
+
+        // reset button submit
+        function resetSubmitButton() {
+            const submitBtn = document.getElementById("submitFormBtn");
+            if (!submitBtn) return;
+            const btnText = submitBtn.querySelector(".btn-text");
+            const btnLoading = submitBtn.querySelector(".btn-loading");
+            if (btnText) btnText.classList.remove('d-none');
+            if (btnLoading) btnLoading.classList.add('d-none');
+            submitBtn.disabled = false;
         }
     </script>
 @endpush

@@ -21,164 +21,198 @@
         <!--Template Color-->
         <link href="{{ asset('assets/public/css/colors/yellow.css')}}" rel="stylesheet" />
         <style>
-            .error-icon {
-            font-size: 120px;
-            color: #dc3545;
-            margin-bottom: 30px;
+           .error-icon {
+                font-size: 120px;
+                color: #dc3545;
+                margin-bottom: 30px;
             }
+
             .error-code {
-            font-size: 80px;
-            font-weight: 700;
-            color: #dc3545;
-            margin-bottom: 20px;
-            line-height: 1;
+                font-size: 80px;
+                font-weight: 700;
+                color: #dc3545;
+                margin-bottom: 20px;
+                line-height: 1;
             }
+
             .error-title {
-            font-size: 32px;
-            font-weight: 600;
-            color: #333;
-            margin-bottom: 20px;
+                font-size: 32px;
+                font-weight: 600;
+                color: #333;
+                margin-bottom: 20px;
             }
+
             .error-description {
-            font-size: 18px;
-            color: #666;
-            line-height: 1.8;
-            margin-bottom: 30px;
+                font-size: 18px;
+                color: #666;
+                line-height: 1.8;
+                margin-bottom: 30px;
             }
+
             .info-box {
-            background-color: #fff3cd;
-            border-left: 4px solid #ffc107;
-            padding: 20px;
-            border-radius: 8px;
-            margin: 30px 0;
-            text-align: left;
+                background-color: #fff3cd;
+                border-left: 4px solid #ffc107;
+                padding: 20px;
+                border-radius: 8px;
+                margin: 30px 0;
+                text-align: left;
             }
+
             .info-box h5 {
-            color: #856404;
-            font-weight: 600;
-            margin-bottom: 15px;
+                color: #856404;
+                font-weight: 600;
+                margin-bottom: 15px;
             }
+
             .info-box ul {
-            margin-bottom: 0;
-            padding-left: 20px;
+                margin-bottom: 0;
+                padding-left: 20px;
             }
+
             .info-box li {
-            color: #856404;
-            margin-bottom: 8px;
-            font-size: 16px;
+                color: #856404;
+                margin-bottom: 8px;
+                font-size: 16px;
             }
+
             .btn-home {
-            padding: 15px 40px;
-            font-size: 18px;
-            font-weight: 600;
-            border-radius: 50px;
-            transition: all 0.3s ease;
+                padding: 15px 40px;
+                font-size: 18px;
+                font-weight: 600;
+                border-radius: 50px;
+                transition: all 0.3s ease;
             }
+
             .btn-home:hover {
-            transform: translateY(-3px);
-            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
+                transform: translateY(-3px);
+                box-shadow: 0 10px 20px rgba(0, 0, 0, 0.15);
             }
+
             .contact-box {
-            background-color: #f8f9fa;
-            border-radius: 8px;
-            padding: 25px;
-            margin-top: 30px;
+                background-color: #f8f9fa;
+                border-radius: 8px;
+                padding: 25px;
+                margin-top: 30px;
             }
+
             .contact-box h5 {
-            color: #333;
-            font-weight: 600;
-            margin-bottom: 15px;
+                color: #333;
+                font-weight: 600;
+                margin-bottom: 15px;
             }
+
             .contact-box p {
-            color: #666;
-            margin-bottom: 5px;
-            font-size: 16px;
+                color: #666;
+                margin-bottom: 5px;
+                font-size: 16px;
             }
+
             .section-error {
-            height: 100vh;
-            display: flex;
-            align-items: center;
-            justify-content: center;
-            padding: 40px 20px;
-            overflow: hidden;
+                height: 100vh;
+                display: flex;
+                align-items: center;
+                justify-content: center;
+                padding: 40px 20px;
+                overflow: hidden;
             }
+
             body {
-            overflow: hidden;
+                overflow: hidden;
             }
+
             .error-icon {
-            font-size: 80px;
-            margin-bottom: 20px;
+                font-size: 80px;
+                margin-bottom: 20px;
             }
+
             .error-code {
-            font-size: 60px;
-            margin-bottom: 15px;
+                font-size: 60px;
+                margin-bottom: 15px;
             }
+
             .error-title {
-            font-size: 24px;
-            margin-bottom: 15px;
+                font-size: 24px;
+                margin-bottom: 15px;
             }
+
             .error-description {
-            font-size: 16px;
-            margin-bottom: 20px;
+                font-size: 16px;
+                margin-bottom: 20px;
             }
+
             .info-box {
-            padding: 15px;
-            margin: 20px 0;
+                padding: 15px;
+                margin: 20px 0;
             }
+
             .info-box h5 {
-            font-size: 16px;
-            margin-bottom: 10px;
+                font-size: 16px;
+                margin-bottom: 10px;
             }
+
             .info-box li {
-            font-size: 14px;
-            margin-bottom: 5px;
+                font-size: 14px;
+                margin-bottom: 5px;
             }
+
             .btn-home {
-            padding: 12px 30px;
-            font-size: 16px;
-            margin: 20px 0;
+                padding: 12px 30px;
+                font-size: 16px;
+                margin: 20px 0;
             }
+
             .contact-box {
-            padding: 15px;
-            margin-top: 20px;
+                padding: 15px;
+                margin-top: 20px;
             }
+
             .contact-box h5 {
-            font-size: 16px;
-            margin-bottom: 10px;
+                font-size: 16px;
+                margin-bottom: 10px;
             }
+
             .contact-box p {
-            font-size: 14px;
-            margin-bottom: 3px;
+                font-size: 14px;
+                margin-bottom: 3px;
             }
+
             @media (max-width: 768px) {
-            .error-icon {
-            font-size: 60px;
-            }
-            .error-code {
-            font-size: 48px;
-            }
-            .error-title {
-            font-size: 20px;
-            }
-            .error-description {
-            font-size: 14px;
-            }
-            .info-box h5 {
-            font-size: 14px;
-            }
-            .info-box li {
-            font-size: 12px;
-            }
-            .btn-home {
-            padding: 10px 25px;
-            font-size: 14px;
-            }
-            .contact-box h5 {
-            font-size: 14px;
-            }
-            .contact-box p {
-            font-size: 12px;
-            }
+                .error-icon {
+                    font-size: 60px;
+                }
+
+                .error-code {
+                    font-size: 48px;
+                }
+
+                .error-title {
+                    font-size: 20px;
+                }
+
+                .error-description {
+                    font-size: 14px;
+                }
+
+                .info-box h5 {
+                    font-size: 14px;
+                }
+
+                .info-box li {
+                    font-size: 12px;
+                }
+
+                .btn-home {
+                    padding: 10px 25px;
+                    font-size: 14px;
+                }
+
+                .contact-box h5 {
+                    font-size: 14px;
+                }
+
+                .contact-box p {
+                    font-size: 12px;
+                }
             }
         </style>
     </head>
@@ -199,12 +233,11 @@
                         <!-- Error Description -->
                         <p class="error-description">
                             Link formulir pendaftaran yang Anda gunakan
-                            <strong>tidak valid</strong>
-                            , sudah
-                            <strong>kadaluarsa</strong>
-                            , atau sudah
-                            <strong>pernah digunakan</strong>
-                            .
+                            <strong>tidak valid, </strong>
+                            sudah
+                            <strong>kadaluarsa, </strong>
+                            atau sudah
+                            <strong>pernah digunakan.</strong>
                             <br />
                             Silakan buat link pendaftaran baru melalui halaman utama.
                         </p>

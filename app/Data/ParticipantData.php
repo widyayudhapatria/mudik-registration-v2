@@ -12,12 +12,12 @@ use Spatie\LaravelData\Data;
 class ParticipantData extends Data
 {
     public function __construct(
-        #[Required, StringType, Max(255)]
+        #[Required, StringType, Min(3), Max(255)]
         public string $full_name,
-        
-        #[Required, StringType, Size(16)]
+
+        #[Required, StringType, Size(16), Regex('/^\d{16}$/')]
         public string $nik_kia,
-        
+
         #[Required, StringType]
         public string $birth_date,
     ) {}
