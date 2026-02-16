@@ -21,6 +21,7 @@ class FormLink extends Model
     protected $fillable = [
         'email',
         'token',
+        'generated_link', 
         'expired_at',
         'used_at',
         'resend_count',

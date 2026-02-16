@@ -45,6 +45,7 @@ class SubmitEmailAction
             Log::info('Before dispatching email job', [
                 'form_link_id' => $formLink->id,
                 'token' => $formLink->token,
+                'generated_link' => $formLink->generated_link,
                 'expired_at' => $formLink->expired_at,
             ]);
 
@@ -69,10 +70,12 @@ class SubmitEmailAction
     protected function createNewLink(string $email): FormLink
     {
         $expiryDays = config('mudik.form_link_expiry_days', 3);
+        $token = Str::random(64);
 
         return FormLink::create([
             'email' => $email,
-            'token' => Str::random(64),
+            'token' => $token,
+            'generated_link' => route('public.registration.form', ['token' => $token]),
             'expired_at' => Carbon::now()->addDays($expiryDays),
             'status' => FormLinkStatus::Pending->value,
         ]);
@@ -81,9 +84,11 @@ class SubmitEmailAction
     protected function recreateLink(FormLink $formLink): FormLink
     {
         $expiryDays = config('mudik.form_link_expiry_days', 3);
+        $token = Str::random(64);
 
         $formLink->update([
-            'token' => Str::random(64),
+            'token' => $token,
+            'generated_link' => route('public.registration.form', ['token' => $token]),
             'expired_at' => Carbon::now()->addDays($expiryDays),
             'used_at' => null,
             'status' => FormLinkStatus::Pending->value,
