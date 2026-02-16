@@ -59,6 +59,14 @@
                     <span>Kuota Harian</span>
                 </a>
             </li>
+            @if(auth('admin')->user()->isSuperAdmin())
+            <li class="sidebar-menu-item">
+                <a href="{{ route('cms.email-requests.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.email-requests.*') ? 'active' : '' }}">
+                    <i class="bi bi-envelope-check"></i>
+                    <span>Email Requests</span>
+                </a>
+            </li>
+            @endif
             @can('scan', App\Models\QrCode::class)
             <li class="sidebar-menu-item">
                 <a href="{{ route('cms.scanner.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.scanner.*') ? 'active' : '' }}">

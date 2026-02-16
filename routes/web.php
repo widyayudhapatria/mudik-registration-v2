@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CMS\DashboardController;
+use App\Http\Controllers\CMS\EmailRequestController;
 use App\Http\Controllers\CMS\QuotaManagementController;
 use App\Http\Controllers\CMS\RegistrationManagementController;
 use App\Http\Controllers\Public\EmailSubmissionController;
@@ -48,6 +49,11 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
         Route::get('/', [QuotaManagementController::class, 'index'])->name('index');
         Route::get('/today', [QuotaManagementController::class, 'today'])->name('today');
         Route::post('/', [QuotaManagementController::class, 'store'])->name('store');
+    });
+
+    Route::prefix('email-requests')->name('email-requests.')->group(function () {
+        Route::get('/', [EmailRequestController::class, 'index'])->name('index');
+        Route::get('/{formLink}', [EmailRequestController::class, 'show'])->name('show');
     });
 
     Route::prefix('scanner')->name('scanner.')->middleware(['scanner.permission'])->group(function () {
