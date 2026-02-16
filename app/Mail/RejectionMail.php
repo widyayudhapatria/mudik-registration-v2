@@ -5,8 +5,6 @@ namespace App\Mail;
 use App\Models\Registration;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 
 class RejectionMail extends Mailable
@@ -15,51 +13,30 @@ class RejectionMail extends Mailable
 
     public string $rejectionReason;
     public string $websiteUrl;
+    public array $mudikConfig;
 
     /**
      * Create a new message instance.
      */
     public function __construct(
-        public Registration $registration
+        public Registration $registration,
+        array $mudikConfig = []
     ) {
-        $this->rejectionReason = $this->registration->rejection_reason 
-            ?? 'Tidak ada alasan yang diberikan.';
-            
         $this->websiteUrl = config('app.url', 'http://localhost:8000');
+        $this->rejectionReason = $this->registration->rejection_reason ?? 'Tidak ada alasan yang diberikan.';
+        $this->mudikConfig = $mudikConfig ?: config('mudik');
     }
 
-    /**
-     * Get the message envelope.
-     */
-    public function envelope(): Envelope
-    {
-        return new Envelope(
-            subject: 'Pemberitahuan Pendaftaran Mudik Gratis Lebaran 2026',
-        );
-    }
 
-    /**
-     * Get the message content definition.
-     */
-    public function content(): Content
+    public function build()
     {
-        return new Content(
-            view: 'emails.rejection',
-            with: [
+        return $this->subject('Pemberitahuan Penolakan - ' . config('app.name'))
+            ->view('emails.rejection-v2')
+            ->with([
                 'registration' => $this->registration,
                 'rejectionReason' => $this->rejectionReason,
                 'websiteUrl' => $this->websiteUrl,
-            ],
-        );
-    }
-
-    /**
-     * Get the attachments for the message.
-     *
-     * @return array<int, \Illuminate\Mail\Mailables\Attachment>
-     */
-    public function attachments(): array
-    {
-        return [];
+                'mudikConfig' => $this->mudikConfig,
+            ]);
     }
 }

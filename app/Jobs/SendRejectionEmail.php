@@ -32,7 +32,7 @@ class SendRejectionEmail implements ShouldQueue
      */
     public function handle(): void
     {
-        $subject = 'Pemberitahuan Pendaftaran Mudik Gratis Lebaran 2026';
+        $subject = 'Pemberitahuan Penolakan - ' . config('app.name');
 
         // Create email log
         $emailLog = EmailLog::logRejectionEmail(
@@ -43,7 +43,12 @@ class SendRejectionEmail implements ShouldQueue
 
         try {
             Mail::to($this->registration->formLink->email)
-                ->send(new RejectionMail($this->registration));
+                ->send(
+                    new RejectionMail(
+                        $this->registration,
+                        config('mudik')
+                    )
+                );
 
             // Mark as sent
             $emailLog->markAsSent();
@@ -52,7 +57,6 @@ class SendRejectionEmail implements ShouldQueue
                 'registration_id' => $this->registration->id,
                 'email' => $this->registration->formLink->email,
             ]);
-
         } catch (\Throwable $e) {
             $emailLog->markAsFailed($e->getMessage());
 

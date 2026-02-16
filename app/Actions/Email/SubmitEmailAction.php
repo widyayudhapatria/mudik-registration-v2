@@ -25,40 +25,32 @@ class SubmitEmailAction
             DB::beginTransaction();
 
             // Check if email already exists with valid status
-            $existingLink = FormLink::where('email', $data->email)
-                ->whereIn('status', [
-                    FormLinkStatus::Submitted->value,
-                    FormLinkStatus::Approved->value,
-                ])
-                ->first();
+            $existingLink = FormLink::where('email', $data->email)->first();
 
-            if ($existingLink) {
+            if ($existingLink && in_array($existingLink->status, [FormLinkStatus::Submitted->value, FormLinkStatus::Approved->value])) {
                 throw new MudikException(ErrorCode::EmailExists);
             }
 
-            // Check if email can recreate link (rejected or expired)
-            $canRecreate = FormLink::where('email', $data->email)
-                ->where(function ($query) {
-                    $query->where('status', FormLinkStatus::Rejected->value)
-                        ->orWhere('expired_at', '<', Carbon::now());
-                })
-                ->first();
 
-            if ($canRecreate) {
+            if ($existingLink) {
                 // Recreate link
-                $formLink = $this->recreateLink($canRecreate);
+                $formLink = $this->recreateLink($existingLink);
             } else {
                 // Create new link
                 $formLink = $this->createNewLink($data->email);
             }
 
             DB::commit();
+            Log::info('Before dispatching email job', [
+                'form_link_id' => $formLink->id,
+                'token' => $formLink->token,
+                'expired_at' => $formLink->expired_at,
+            ]);
 
             // Queue email job
             dispatch(new SendFormLinkEmail($formLink));
 
             return $formLink;
-
         } catch (MudikException $e) {
             DB::rollBack();
             throw $e;

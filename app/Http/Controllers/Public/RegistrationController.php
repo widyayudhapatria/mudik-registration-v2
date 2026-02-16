@@ -26,7 +26,7 @@ class RegistrationController extends Controller
             ['token' => $token]
         );
 
-        return view('public.registration.form', [
+        return view('pages.form', [
             'formLink' => $formLink,
             'token' => $token,
             'submitUrl' => $submitUrl,
@@ -43,18 +43,15 @@ class RegistrationController extends Controller
             $registration = SubmitRegistrationAction::run($formLink, $data);
 
             return $this->responseSuccess(
-                "✅ PENDAFTARAN BERHASIL\n" .
-                "Terima kasih telah mendaftar!\n" .
-                "Pendaftaran Anda sedang diproses.\n" .
-                "Tim kami akan melakukan verifikasi data dalam waktu maksimal 2x24 jam.\n" .
-                "Anda akan menerima notifikasi via email jika pendaftaran Anda\n" .
-                "disetujui atau memerlukan perbaikan data.",
+                "Terima kasih telah mendaftar!<br/>" .
+                    "Mohon tunggu, pendaftaran Anda sedang diproses.<br/><br/>" .
+                    "Tim kami akan melakukan verifikasi data dalam waktu maksimal <b>1x24 jam.</b><br/><br/>" .
+                    "Anda akan menerima notifikasi via email jika pendaftaran Anda disetujui atau memerlukan perbaikan data.<br/>",
                 [
                     'registration_id' => $registration->id,
                     'email' => $formLink->email,
                 ]
             );
-
         } catch (MudikException $e) {
             return response()->json($e->toArray(), 400);
         }

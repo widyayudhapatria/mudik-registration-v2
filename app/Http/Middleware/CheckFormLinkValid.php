@@ -2,6 +2,7 @@
 
 namespace App\Http\Middleware;
 
+use App\Actions\FormLink\ValidateFormLinkAction;
 use App\Enums\ErrorCode;
 use App\Exceptions\MudikException;
 use App\Models\FormLink;
@@ -13,39 +14,31 @@ class CheckFormLinkValid
 {
     public function handle(Request $request, Closure $next): Response
     {
-        $token = $request->route('token');
+        try {
+            $token = $request->route('token');
 
-        if (!$token) {
-            throw new MudikException(ErrorCode::LinkInvalid);
+            if (!$token) {
+                throw new MudikException(ErrorCode::LinkInvalid);
+            }
+
+            // Get formLink with lock for update (prevent race condition)
+            $formLink = FormLink::where('token', $token)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$formLink) {
+                throw new MudikException(ErrorCode::LinkInvalid);
+            }
+
+            // Validate form link using action
+            ValidateFormLinkAction::run($formLink);
+
+            // Share form link to request for controller usage
+            $request->merge(['formLink' => $formLink]);
+
+            return $next($request);
+        } catch (MudikException $e) {
+            throw $e;
         }
-
-        $formLink = FormLink::where('token', $token)->first();
-
-        if (!$formLink) {
-            throw new MudikException(ErrorCode::LinkInvalid);
-        }
-
-        if ($formLink->isExpired()) {
-            throw new MudikException(ErrorCode::LinkExpired);
-        }
-
-        if ($formLink->used_at !== null) {
-            throw new MudikException(
-                ErrorCode::LinkInvalid,
-                'Link sudah digunakan'
-            );
-        }
-
-        if ($formLink->status !== 'pending') {
-            throw new MudikException(
-                ErrorCode::LinkInvalid,
-                'Link sudah diproses'
-            );
-        }
-
-        // share ke request agar bisa dipakai di controller
-        $request->merge(['formLink' => $formLink]);
-
-        return $next($request);
     }
 }
