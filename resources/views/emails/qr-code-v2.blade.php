@@ -549,16 +549,15 @@
                                                     <tr>
                                                         <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px;">
                                                             <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%;" width="100%" class="mcnTextContentContainer">
-                                                                <tbody>
+                                                               <tbody>
                                                                     <tr>
                                                                         <td valign="top" class="mcnTextContent" style="padding: 0px 18px 9px; color: #6c757d; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 14px; line-height: 150%; text-align: center;">
-                                                                            <p style="margin: 0;"><strong>Mudik Gratis Lebaran 2026</strong></p>
-                                                                            <p style="margin: 5px 0;">Program Pemerintah Provinsi Banten</p>
+                                                                            <p style="margin: 0;"><strong>{{ $mudikConfig['website']['name'] }}</strong></p>
+                                                                            <p style="margin: 5px 0;">{{ $mudikConfig['website']['tagline'] }}</p>
                                                                             <p style="margin: 10px 0; font-size: 12px; color: #999;">
-                                                                                Email ini dikirim otomatis, mohon tidak membalas email ini.<br>
-                                                                                Jika Anda memerlukan bantuan, silahkan hubungi kontak di atas.
+                                                                                Email ini dikirim secara otomatis, mohon tidak membalas email ini.
                                                                             </p>
-                                                                            <p style="margin: 10px 0; font-size: 12px; color: #999;">© 2026 Mudik Gratis Lebaran. All rights reserved.</p>
+                                                                            <p style="margin: 10px 0; font-size: 12px; color: #999;">© 2026 {{ $mudikConfig['website']['name'] }}. All rights reserved.</p>
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>

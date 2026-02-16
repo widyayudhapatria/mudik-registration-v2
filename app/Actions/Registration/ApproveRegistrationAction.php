@@ -35,11 +35,8 @@ class ApproveRegistrationAction
                 );
             }
 
-            // Approve registration
-            $notes = $data->admin_notes instanceof \Spatie\LaravelData\Optional
-                ? null
-                : $data->admin_notes;
-
+            // Approve registration and fallback null admin notes
+            $notes = $data->admin_notes ?? null;
             $registration->approve($admin->id, $notes);
 
             // Generate QR Code
@@ -53,6 +50,7 @@ class ApproveRegistrationAction
                 'qr_code_id' => $qrCode->id,
             ]);
 
+            // Queue QR code email
             dispatch(new SendQrCodeEmail($registration->id));
 
             return $registration->fresh(['qrCode', 'participants']);

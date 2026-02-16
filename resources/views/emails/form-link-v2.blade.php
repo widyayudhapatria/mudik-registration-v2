@@ -14,234 +14,275 @@
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <title>Link Pendaftaran Mudik Gratis</title>
         <style type="text/css">
-            /* Reset Styles */
+           /* Reset Styles */
             body,
             #bodyTable,
             #bodyCell {
-            height: 100%;
-            margin: 0;
-            padding: 0;
-            width: 100%;
+                height: 100%;
+                margin: 0;
+                padding: 0;
+                width: 100%;
             }
+
             table {
-            border-collapse: collapse;
-            mso-table-lspace: 0pt;
-            mso-table-rspace: 0pt;
+                border-collapse: collapse;
+                mso-table-lspace: 0pt;
+                mso-table-rspace: 0pt;
             }
+
             img,
             a img {
-            border: 0;
-            height: auto;
-            outline: none;
-            text-decoration: none;
+                border: 0;
+                height: auto;
+                outline: none;
+                text-decoration: none;
             }
+
             p {
-            margin: 10px 0;
-            padding: 0;
+                margin: 10px 0;
+                padding: 0;
             }
+
             h1,
             h2,
             h3,
             h4,
             h5,
             h6 {
-            display: block;
-            margin: 0;
-            padding: 0;
+                display: block;
+                margin: 0;
+                padding: 0;
             }
+
             img {
-            -ms-interpolation-mode: bicubic;
+                -ms-interpolation-mode: bicubic;
             }
+
             #outlook a {
-            padding: 0;
+                padding: 0;
             }
+
             .ReadMsgBody {
-            width: 100%;
+                width: 100%;
             }
+
             .ExternalClass {
-            width: 100%;
+                width: 100%;
             }
+
             .ExternalClass,
             .ExternalClass p,
             .ExternalClass td,
             .ExternalClass div,
             .ExternalClass span,
             .ExternalClass font {
-            line-height: 100%;
+                line-height: 100%;
             }
+
             p,
             a,
             li,
             td,
             blockquote {
-            mso-line-height-rule: exactly;
-            -ms-text-size-adjust: 100%;
-            -webkit-text-size-adjust: 100%;
+                mso-line-height-rule: exactly;
+                -ms-text-size-adjust: 100%;
+                -webkit-text-size-adjust: 100%;
             }
+
             a[href^="tel"],
             a[href^="sms"] {
-            color: inherit;
-            cursor: default;
-            text-decoration: none;
+                color: inherit;
+                cursor: default;
+                text-decoration: none;
             }
+
             a[x-apple-data-detectors] {
-            color: inherit !important;
-            text-decoration: none !important;
-            font-size: inherit !important;
-            font-family: inherit !important;
-            font-weight: inherit !important;
-            line-height: inherit !important;
+                color: inherit !important;
+                text-decoration: none !important;
+                font-size: inherit !important;
+                font-family: inherit !important;
+                font-weight: inherit !important;
+                line-height: inherit !important;
             }
+
             /* Template Styles */
             body {
-            background-color: #f4f4f4;
-            font-family: "Roboto", Arial, Helvetica, sans-serif;
+                background-color: #f4f4f4;
+                font-family: "Roboto", Arial, Helvetica, sans-serif;
             }
+
             .templateContainer {
-            max-width: 600px !important;
-            background-color: #ffffff;
+                max-width: 600px !important;
+                background-color: #ffffff;
             }
+
             #templateHeader {
-            background-color: #f4f4f4;
-            border-top: 0;
-            border-bottom: 0;
+                background-color: #f4f4f4;
+                border-top: 0;
+                border-bottom: 0;
             }
+
             .headerContainer {
-            background-color: transparent;
-            padding: 20px 10px;
+                background-color: transparent;
+                padding: 20px 10px;
             }
+
             #templateBody {
-            background-color: #ffffff;
-            border-top: 0;
-            border-bottom: 0;
+                background-color: #ffffff;
+                border-top: 0;
+                border-bottom: 0;
             }
+
             .bodyContainer {
-            background-color: transparent;
-            padding: 30px;
+                background-color: transparent;
+                padding: 30px;
             }
+
             .bodyContainer .mcnTextContent,
             .bodyContainer .mcnTextContent p {
-            color: #333333;
-            font-family: "Roboto", Arial, Helvetica, sans-serif;
-            font-size: 16px;
-            line-height: 150%;
-            text-align: left;
+                color: #333333;
+                font-family: "Roboto", Arial, Helvetica, sans-serif;
+                font-size: 16px;
+                line-height: 150%;
+                text-align: left;
             }
+
             .bodyContainer .mcnTextContent a {
-            color: #f58514;
-            font-weight: normal;
-            text-decoration: underline;
+                color: #f58514;
+                font-weight: normal;
+                text-decoration: underline;
             }
+
             #templateFooter {
-            background-color: #f4f4f4;
-            border-top: 0;
-            border-bottom: 0;
+                background-color: #f4f4f4;
+                border-top: 0;
+                border-bottom: 0;
             }
+
             .footerContainer {
-            background-color: #f8f9fa;
-            padding: 20px;
+                background-color: #f8f9fa;
+                padding: 20px;
             }
+
             .footerContainer .mcnTextContent,
             .footerContainer .mcnTextContent p {
-            color: #6c757d;
-            font-family: "Roboto", Arial, Helvetica, sans-serif;
-            font-size: 14px;
-            line-height: 150%;
-            text-align: center;
+                color: #6c757d;
+                font-family: "Roboto", Arial, Helvetica, sans-serif;
+                font-size: 14px;
+                line-height: 150%;
+                text-align: center;
             }
+
             .footerContainer .mcnTextContent a {
-            color: #6c757d;
-            font-weight: normal;
-            text-decoration: underline;
+                color: #6c757d;
+                font-weight: normal;
+                text-decoration: underline;
             }
+
             /* Component Styles */
             .greeting {
-            color: #333333;
-            font-size: 16px;
-            margin-bottom: 20px;
+                color: #333333;
+                font-size: 16px;
+                margin-bottom: 20px;
             }
+
             .cta-button {
-            background-color: #f58514;
-            color: #ffffff !important;
-            display: inline-block;
-            font-weight: bold;
-            padding: 15px 20px;
-            text-decoration: none;
-            border-radius: 5px;
-            mso-padding-alt: 0;
+                background-color: #f58514;
+                color: #ffffff !important;
+                display: inline-block;
+                font-weight: bold;
+                padding: 15px 20px;
+                text-decoration: none;
+                border-radius: 5px;
+                mso-padding-alt: 0;
             }
+
             .expiry-notice {
-            background-color: #f8d7da;
-            border-left: 4px solid #dc3545;
-            color: #721c24;
-            padding: 12px;
+                background-color: #f8d7da;
+                border-left: 4px solid #dc3545;
+                color: #721c24;
+                padding: 12px;
             }
+
             .divider {
-            background-color: #dee2e6;
-            height: 1px;
+                background-color: #dee2e6;
+                height: 1px;
             }
+
             h4 {
-            color: #f58514;
-            font-size: 18px;
-            font-weight: bold;
-            margin-bottom: 10px;
+                color: #f58514;
+                font-size: 18px;
+                font-weight: bold;
+                margin-bottom: 10px;
             }
+
             /* Responsive Styles */
             @media only screen and (min-width: 768px) {
-            .templateContainer {
-            width: 600px !important;
+                .templateContainer {
+                    width: 600px !important;
+                }
             }
-            }
+
             @media only screen and (max-width: 480px) {
-            body,
-            table,
-            td,
-            p,
-            a,
-            li,
-            blockquote {
-            -webkit-text-size-adjust: none !important;
-            }
-            body {
-            width: 100% !important;
-            min-width: 100% !important;
-            }
-            .templateContainer {
-            max-width: 100% !important;
-            width: 100% !important;
-            }
-            .headerContainer,
-            .bodyContainer,
-            .footerContainer {
-            padding-left: 18px !important;
-            padding-right: 18px !important;
-            }
-            h1 {
-            font-size: 24px !important;
-            line-height: 125% !important;
-            }
-            h2 {
-            font-size: 20px !important;
-            line-height: 125% !important;
-            }
-            h3 {
-            font-size: 18px !important;
-            line-height: 125% !important;
-            }
-            h4 {
-            font-size: 16px !important;
-            line-height: 150% !important;
-            }
-            .bodyContainer .mcnTextContent,
-            .bodyContainer .mcnTextContent p {
-            font-size: 16px !important;
-            line-height: 150% !important;
-            }
-            .footerContainer .mcnTextContent,
-            .footerContainer .mcnTextContent p {
-            font-size: 12px !important;
-            line-height: 150% !important;
-            }
+
+                body,
+                table,
+                td,
+                p,
+                a,
+                li,
+                blockquote {
+                    -webkit-text-size-adjust: none !important;
+                }
+
+                body {
+                    width: 100% !important;
+                    min-width: 100% !important;
+                }
+
+                .templateContainer {
+                    max-width: 100% !important;
+                    width: 100% !important;
+                }
+
+                .headerContainer,
+                .bodyContainer,
+                .footerContainer {
+                    padding-left: 18px !important;
+                    padding-right: 18px !important;
+                }
+
+                h1 {
+                    font-size: 24px !important;
+                    line-height: 125% !important;
+                }
+
+                h2 {
+                    font-size: 20px !important;
+                    line-height: 125% !important;
+                }
+
+                h3 {
+                    font-size: 18px !important;
+                    line-height: 125% !important;
+                }
+
+                h4 {
+                    font-size: 16px !important;
+                    line-height: 150% !important;
+                }
+
+                .bodyContainer .mcnTextContent,
+                .bodyContainer .mcnTextContent p {
+                    font-size: 16px !important;
+                    line-height: 150% !important;
+                }
+
+                .footerContainer .mcnTextContent,
+                .footerContainer .mcnTextContent p {
+                    font-size: 12px !important;
+                    line-height: 150% !important;
+                }
             }
         </style>
     </head>
@@ -268,7 +309,7 @@
                                                                             <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: left">
                                                                                 <img
                                                                                     align="left"
-                                                                                    alt="Mudik Gratis Lebaran 2026 Logo"
+                                                                                    alt="Mudik Gratis 2026"
                                                                                     src="https://i.postimg.cc/JhrmSNq3/285x114.png"
                                                                                     height="65"
                                                                                     style="
@@ -545,12 +586,9 @@
                                                                                 >
                                                                                 <p><strong>Butuh bantuan?</strong></p>
                                                                                 <p>
-                                                                                    📧 Email:
-                                                                                    <a href="mailto:support@mudikgratis.com" style="color: #f58514; text-decoration: underline">support@mudikgratis.com</a>
-                                                                                    <br />
-                                                                                    📞 Telepon: 021-1234567
-                                                                                    <br />
-                                                                                    🕐 Senin - Jumat, 08:00 - 17:00 WIB
+                                                                                     📧 Email: <a href="mailto:{{ $mudikConfig['support']['email'] }}" style="color: #f58514; text-decoration: underline;">{{ $mudikConfig['support']['email'] }}</a><br>
+                                                                                    📞 Telepon: {{ $mudikConfig['support']['phone'] }}<br>
+                                                                                    🕐 {{ $mudikConfig['support']['schedule'] }}
                                                                                 </p>
                                                                             </td>
                                                                         </tr>
@@ -590,14 +628,12 @@
                                                                                 text-align: center;
                                                                                 "
                                                                                 >
-                                                                                <p style="margin: 0"><strong>Mudik Gratis Lebaran 2026</strong></p>
-                                                                                <p style="margin: 5px 0">Program Pemerintah Provinsi Banten</p>
-                                                                                <p style="margin: 10px 0; font-size: 12px; color: #999">
-                                                                                    Email ini dikirim otomatis, mohon tidak membalas email ini.
-                                                                                    <br />
-                                                                                    Jika Anda memerlukan bantuan, silahkan hubungi kontak di atas.
+                                                                               <p style="margin: 0;"><strong>{{ $mudikConfig['website']['name'] }}</strong></p>
+                                                                                <p style="margin: 5px 0;">{{ $mudikConfig['website']['tagline'] }}</p>
+                                                                                <p style="margin: 10px 0; font-size: 12px; color: #999;">
+                                                                                    Email ini dikirim secara otomatis, mohon tidak membalas email ini.
                                                                                 </p>
-                                                                                <p style="margin: 10px 0; font-size: 12px; color: #999">© 2026 Mudik Gratis Lebaran. All rights reserved.</p>
+                                                                                <p style="margin: 10px 0; font-size: 12px; color: #999;">© 2026 {{ $mudikConfig['website']['name'] }}. All rights reserved.</p>
                                                                             </td>
                                                                         </tr>
                                                                     </tbody>

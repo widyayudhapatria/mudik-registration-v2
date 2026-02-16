@@ -215,7 +215,7 @@
                                         name="has_child_under_4"
                                         />
                                     <label class="form-check-label" for="has_child_under_4">
-                                    Saya menyatakan bahwa anak dibawah 4 tahun akan dipangku selama perjalanan.
+                                        <strong>Memiliki anak dibawah 4 tahun,</strong> saya menyatakan bahwa anak dibawah 4 tahun akan dipangku selama perjalanan.
                                     </label>
                                 </div>
                                 <div class="form-check mb-3">
@@ -375,6 +375,16 @@
                     }
                 });
             }
+
+            // Event listener data_valid checkbox to validate umur peserta
+            document.getElementById("data_valid").addEventListener("change", function(e) {
+                if (this.checked) {
+                    if (!validateChildUnder4OnDataValid()) {
+                        // Fallback jika validasi gagal, tetap uncheck checkbox
+                        this.checked = false;
+                    }
+                }
+            });
         }
 
         function formatNumber(e) {
@@ -689,6 +699,87 @@
             const parts = dateString.split('/');
             if (parts.length !== 3) return dateString;
             return `${parts[2]}-${parts[1]}-${parts[0]}`;
+        }
+
+        function calculateAge(birthDateString) {
+            if (!birthDateString) return null;
+            const parts = birthDateString.split('/');
+            if (parts.length !== 3) return null;
+
+            const day = parseInt(parts[0]);
+            const month = parseInt(parts[1]);
+            const year = parseInt(parts[2]);
+
+            const birthDate = new Date(year, month - 1, day);
+            const today = new Date();
+
+            let age = today.getFullYear() - birthDate.getFullYear();
+            const monthDiff = today.getMonth() - birthDate.getMonth();
+
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birthDate.getDate())) {
+                age--;
+            }
+
+            return age;
+        }
+
+        function validateChildUnder4OnDataValid() {
+            const hasChildCheckbox = document.getElementById("has_child_under_4");
+            const dataValidCheckbox = document.getElementById("data_valid");
+            const pesertaForms = document.querySelectorAll(".peserta-form");
+
+            let hasAnyChildUnder4 = false;
+
+            // Check if any participant is under 4 years old
+            pesertaForms.forEach((form) => {
+                const birthDateInput = form.querySelector('input[name="tanggalLahirPeserta[]"]');
+                if (birthDateInput && birthDateInput.value) {
+                    const age = calculateAge(birthDateInput.value);
+                    if (age !== null && age < 4) {
+                        hasAnyChildUnder4 = true;
+                    }
+                }
+            });
+
+            // Case 1: has_child_under_4 is checked but no children under 4 found
+            if (hasChildCheckbox.checked && !hasAnyChildUnder4) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    html: `<div class="text-start">
+                        <p class="mb-3"><strong>Data tidak konsisten :</strong></p>
+                        <p>Anda mencentang "Memiliki anak dibawah 4 tahun", tetapi data peserta yang Anda inputkan tidak memiliki anak berusia dibawah 4 tahun.</p>
+                        <p class="mt-2">Silakan periksa kembali data peserta Anda.</p>
+                    </div>`,
+                    icon: "error",
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    hasChildCheckbox.checked = false;
+                    dataValidCheckbox.checked = false;
+                });
+                return false;
+            }
+
+            // Case 2: has_child_under_4 is NOT checked but children under 4 found
+            if (!hasChildCheckbox.checked && hasAnyChildUnder4) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    html: `<div class="text-start">
+                        <p class="mb-3"><strong>Data tidak konsisten :</strong></p>
+                        <p>Data peserta memiliki anak berusia dibawah 4 tahun, tetapi checkbox "Memiliki anak dibawah 4 tahun" belum dicentang.</p>
+                        <p class="mt-2">Silakan centang checkbox "Memiliki anak dibawah 4 tahun" terlebih dahulu.</p>
+                    </div>`,
+                    icon: "error",
+                    confirmButtonText: "OK",
+                }).then(() => {
+                    dataValidCheckbox.checked = false;
+                    hasChildCheckbox.checked = true;
+                    hasChildCheckbox.focus();
+                });
+                return false;
+            }
+
+            // All validations passed
+            return true;
         }
 
         function handleFormSubmit(e) {

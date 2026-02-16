@@ -18,14 +18,17 @@ class FormLinkMail extends Mailable
     public string $formUrl;
     public string $expiredDate;
     public string $emailDestination;
+    public array $mudikConfig;
 
     /**
      * Create a new message instance.
      */
     public function __construct(
-        public FormLink $formLink
+        public FormLink $formLink,
+        array $mudikConfig = []
     ) {
         $this->formLink->refresh();
+        $this->mudikConfig = $mudikConfig ?: config('mudik');
 
         Log::info('After dispatching email job', [
             'token' => $this->formLink->token,
@@ -56,7 +59,7 @@ class FormLinkMail extends Mailable
     public function envelope(): Envelope
     {
         return new Envelope(
-            subject: 'Link Pendaftaran Mudik Gratis Lebaran 2026',
+            subject: 'Link Pendaftaran - ' . config('app.name'),
         );
     }
 
@@ -71,6 +74,7 @@ class FormLinkMail extends Mailable
                 'emailDestination' => $this->emailDestination,
                 'formUrl' => $this->formUrl,
                 'expiredDate' => $this->expiredDate,
+                'mudikConfig' => $this->mudikConfig,
             ],
         );
     }
