@@ -33,11 +33,8 @@ class RejectRegistrationAction
                 );
             }
 
-            // Reject registration
-            $notes = $data->admin_notes instanceof \Spatie\LaravelData\Optional
-                ? null
-                : $data->admin_notes;
-
+            // Reject registration and fallback null admin notes
+            $notes = $data->admin_notes ?? null;
             $registration->reject($admin->id, $data->rejection_reason, $notes);
 
 

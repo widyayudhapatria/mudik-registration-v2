@@ -295,7 +295,7 @@
             <form id="approveForm">
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Catatan (opsional)</label>
-                    <textarea class="form-control" name="notes" rows="3" placeholder="Tambahkan catatan jika diperlukan"></textarea>
+                    <textarea class="form-control" name="admin_notes" rows="3" placeholder="Tambahkan catatan jika diperlukan"></textarea>
                 </div>
                 <button type="submit" class="btn btn-success w-100">
                     <i class="bi bi-check-circle-fill me-2"></i>Setujui Pendaftaran
@@ -314,7 +314,7 @@
                 </div>
                 <div class="mb-3">
                     <label class="form-label fw-semibold">Catatan (opsional)</label>
-                    <textarea class="form-control" name="notes" rows="2" placeholder="Catatan tambahan"></textarea>
+                    <textarea class="form-control" name="admin_notes" rows="2" placeholder="Catatan tambahan"></textarea>
                 </div>
                 <button type="submit" class="btn btn-danger w-100">
                     <i class="bi bi-x-circle-fill me-2"></i>Tolak Pendaftaran
