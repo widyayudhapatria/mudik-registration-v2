@@ -32,7 +32,7 @@ class SendFormLinkEmail implements ShouldQueue
      */
     public function handle(): void
     {
-        $subject = 'Link Pendaftaran Mudik Gratis Lebaran 2026';
+        $subject = 'Link Pendaftaran - ' . config('app.name');
 
         // Create email log
         $emailLog = EmailLog::logFormLinkEmail(
@@ -43,7 +43,12 @@ class SendFormLinkEmail implements ShouldQueue
 
         try {
             Mail::to($this->formLink->email)
-                ->send(new FormLinkMail($this->formLink));
+                ->send(
+                    new FormLinkMail(
+                        $this->formLink,
+                        config('mudik')
+                    )
+                );
 
             // Mark as sent
             $emailLog->markAsSent();
@@ -52,7 +57,6 @@ class SendFormLinkEmail implements ShouldQueue
                 'form_link_id' => $this->formLink->id,
                 'email' => $this->formLink->email,
             ]);
-
         } catch (\Throwable $e) {
             $emailLog->markAsFailed($e->getMessage());
 
