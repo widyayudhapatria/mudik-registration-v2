@@ -34,21 +34,12 @@ class RejectRegistrationAction
             }
 
             // Reject registration
-            $notes = $data->admin_notes instanceof \Spatie\LaravelData\Optional 
-                ? null 
+            $notes = $data->admin_notes instanceof \Spatie\LaravelData\Optional
+                ? null
                 : $data->admin_notes;
 
             $registration->reject($admin->id, $data->rejection_reason, $notes);
 
-            // Return quota (decrement used)
-            $quota = DailyQuota::where('date', $registration->created_at->toDateString())
-                ->lockForUpdate()
-                ->first();
-
-            if ($quota) {
-                $quota->decrementUsed();
-                Cache::forget('quota:' . $quota->date->toDateString());
-            }
 
             DB::commit();
 
@@ -62,7 +53,6 @@ class RejectRegistrationAction
             ]);
 
             return $registration->fresh();
-
         } catch (MudikException $e) {
             DB::rollBack();
             throw $e;
