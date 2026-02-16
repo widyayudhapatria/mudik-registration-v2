@@ -31,7 +31,8 @@ class RegistrationManagementController extends Controller
     {
         $this->authorize('viewAny', Registration::class);
 
-        $registrations = Registration::with([
+        $registrations = Registration::withTrashed()
+            ->with([
                 'formLink',
                 'participants',
                 'approvedBy',
@@ -61,7 +62,7 @@ class RegistrationManagementController extends Controller
 
         $registration->load([
             'formLink',
-            'participants',
+            'participants' => fn($q) => $q->withTrashed(),
             'approvedBy',
             'rejectedBy',
             'qrCode'
@@ -99,7 +100,6 @@ class RegistrationManagementController extends Controller
                 'Pendaftaran berhasil disetujui',
                 $registration
             );
-
         } catch (MudikException $e) {
             return response()->json($e->toArray(), 400);
         }
@@ -125,7 +125,6 @@ class RegistrationManagementController extends Controller
                 'Pendaftaran berhasil ditolak',
                 $registration
             );
-
         } catch (MudikException $e) {
             return response()->json($e->toArray(), 400);
         }

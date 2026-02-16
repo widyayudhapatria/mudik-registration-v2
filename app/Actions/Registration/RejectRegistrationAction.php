@@ -6,11 +6,8 @@ use App\Data\RejectRegistrationData;
 use App\Enums\ErrorCode;
 use App\Exceptions\MudikException;
 use App\Models\Admin;
-use App\Models\DailyQuota;
 use App\Models\Registration;
 use App\Jobs\SendRejectionEmail;
-use Carbon\Carbon;
-use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
@@ -37,16 +34,22 @@ class RejectRegistrationAction
             $notes = $data->admin_notes ?? null;
             $registration->reject($admin->id, $data->rejection_reason, $notes);
 
+            // Soft delete participants first (cascading)
+            $registration->participants()->delete();
+
+            // Soft delete registration itself
+            $registration->delete();
 
             DB::commit();
 
-            // Queue rejection email
+            // Queue rejection email (use withTrashed to access soft-deleted data)
             dispatch(new SendRejectionEmail($registration->fresh('formLink')));
 
-            Log::info('Registration rejected', [
+            Log::info('Registration rejected and soft deleted', [
                 'registration_id' => $registration->id,
                 'rejected_by' => $admin->id,
                 'reason' => $data->rejection_reason,
+                'participants_count' => $registration->participants()->withTrashed()->count(),
             ]);
 
             return $registration->fresh();

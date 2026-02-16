@@ -8,11 +8,13 @@ use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Registration extends Model
 {
     use HasFactory;
     use Filterable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -129,13 +131,13 @@ class Registration extends Model
         $this->approved_by = $adminId;
         $this->approved_at = now();
         $this->admin_notes = $notes;
-        
+
         $saved = $this->save();
-        
+
         if ($saved) {
             $this->formLink->markAsApproved();
         }
-        
+
         return $saved;
     }
 
@@ -148,13 +150,13 @@ class Registration extends Model
         $this->rejected_at = now();
         $this->rejection_reason = $reason;
         $this->admin_notes = $notes;
-        
+
         $saved = $this->save();
-        
+
         if ($saved) {
             $this->formLink->markAsRejected();
         }
-        
+
         return $saved;
     }
 
