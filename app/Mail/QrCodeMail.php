@@ -7,8 +7,6 @@ use App\Models\QrCode;
 use App\Services\QrCodeService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Mail\Mailable;
-use Illuminate\Mail\Mailables\Content;
-use Illuminate\Mail\Mailables\Envelope;
 use Illuminate\Queue\SerializesModels;
 use Illuminate\Support\Facades\Storage;
 
@@ -62,7 +60,7 @@ class QrCodeMail extends Mailable
 
     public function build()
     {
-        return $this->subject('QR Code Tiket Mudik Gratis Lebaran 2026')
+        return $this->subject('QR Code Tiket - ' . config('app.name'))
             ->view('emails.qr-code-v2')
             ->with([
                 'registration' => $this->registration,
