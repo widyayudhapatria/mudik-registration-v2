@@ -41,7 +41,7 @@
         .detail-card {
             padding: 25px;
         }
-        
+
         .participant-card {
             padding: 16px;
         }
@@ -52,36 +52,36 @@
             padding: 20px;
             margin-bottom: 16px;
         }
-        
+
         .detail-section {
             margin-bottom: 20px;
         }
-        
+
         .detail-section-title {
             font-size: 1.1rem;
         }
-        
+
         .detail-label {
             font-size: 0.85rem;
         }
-        
+
         .detail-value {
             font-size: 0.95rem;
         }
-        
+
         .participant-card {
             padding: 16px;
             margin-bottom: 12px;
         }
-        
+
         .participant-card h6 {
             font-size: 0.95rem;
         }
-        
+
         .document-preview {
             max-width: 100%;
         }
-        
+
         /* Stack sidebar on mobile */
         .col-lg-8,
         .col-lg-4 {
@@ -93,19 +93,24 @@
         .detail-card {
             padding: 16px;
         }
-        
+
         .detail-card h5 {
             font-size: 1rem;
         }
-        
+
         .detail-card h6 {
             font-size: 0.9rem;
         }
-        
+
         .btn {
             font-size: 0.9rem;
             padding: 8px 16px;
         }
+    }
+
+    .medium-zoom-overlay,
+    .medium-zoom-image--opened {
+        z-index: 1001 !important;
     }
 </style>
 @endpush
@@ -122,54 +127,52 @@
     <div class="col-lg-8">
         <div class="detail-card">
             <h5 class="fw-bold mb-4">Informasi Perwakilan</h5>
-            
-            <div class="row detail-section">
+
+            <div class="row detail-section mb-0">
                 <div class="col-md-6 mb-3">
                     <div class="detail-label">Nama Lengkap</div>
                     <div class="detail-value">{{ $registration->representative_name }}</div>
                 </div>
-                
+
                 <div class="col-md-6 mb-3">
                     <div class="detail-label">NIK</div>
                     <div class="detail-value">{{ $registration->representative_nik }}</div>
                 </div>
-                
+
                 <div class="col-md-6 mb-3">
                     <div class="detail-label">Tanggal Lahir</div>
                     <div class="detail-value">{{ $registration->representative_birth_date->format('d/m/Y') }}</div>
                 </div>
-                
-                <div class="col-md-6 mb-3">
-                    <div class="detail-label">Nomor KK</div>
-                    <div class="detail-value">{{ $registration->kk_number }}</div>
-                </div>
-                
-                <div class="col-md-6 mb-3">
-                    <div class="detail-label">Jumlah Anggota</div>
-                    <div class="detail-value">{{ $registration->family_count }} orang</div>
-                </div>
-                
+
                 <div class="col-md-6 mb-3">
                     <div class="detail-label">Email</div>
                     <div class="detail-value">{{ $registration->formLink->email }}</div>
                 </div>
             </div>
-            
-            @if($registration->has_child_under_4)
-            <div class="alert alert-warning">
-                <i class="bi bi-exclamation-triangle-fill me-2"></i>
-                <strong>Perhatian:</strong> Ada anak dibawah 4 tahun yang akan dipangku
-            </div>
-            @endif
         </div>
-        
+
+        <div class="detail-card">
+            <h5 class="fw-bold mb-4">Informasi Data Keluarga</h5>
+            <div class="row detail-section mb-0">
+                <div class="col-md-6 mb-3">
+                    <div class="detail-label">Jumlah Anggota Keluarga</div>
+                    <div class="detail-value">{{ $registration->family_count }} orang</div>
+                </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="detail-label">Nomor Kartu Keluarga</div>
+                    <div class="detail-value">{{ $registration->kk_number }}</div>
+                </div>
+            </div>
+        </div>
+
         <!-- Participants -->
         <div class="detail-card">
             <h5 class="fw-bold mb-4">
                 <i class="bi bi-people-fill me-2"></i>
                 Daftar Peserta ({{ $registration->participants->count() }})
             </h5>
-            
+
             @foreach($registration->participants as $index => $participant)
             <div class="participant-card">
                 <div class="d-flex justify-content-between align-items-start">
@@ -184,12 +187,19 @@
                 </div>
             </div>
             @endforeach
+
+            @if($registration->has_child_under_4)
+            <div class="alert alert-info">
+                <i class="bi bi-exclamation-triangle-fill me-2"></i>
+                <strong>Menyetujui :</strong> Ada anak dibawah 4 tahun yang akan dipangku.
+            </div>
+            @endif
         </div>
-        
+
         <!-- Document KK -->
         <div class="detail-card">
             <h5 class="fw-bold mb-4">Dokumen Kartu Keluarga</h5>
-            
+
             @if($registration->kk_document_path)
             <div class="text-center">
                 @if(Str::endsWith($registration->kk_document_path, '.pdf'))
@@ -197,11 +207,11 @@
                     <i class="bi bi-file-earmark-pdf-fill me-2"></i>Lihat PDF
                 </a>
                 @else
-                <img src="{{ Storage::url($registration->kk_document_path) }}" alt="Kartu Keluarga" class="document-preview">
+                <img id="kkDocumentImage" src="{{ Storage::url($registration->kk_document_path) }}" alt="Kartu Keluarga" class="document-preview" style="cursor: zoom-in;">
                 <div class="mt-3">
-                    <a href="{{ Storage::url($registration->kk_document_path) }}" target="_blank" class="btn btn-outline-primary">
+                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('kkDocumentImage').click()">
                         <i class="bi bi-zoom-in me-2"></i>Perbesar
-                    </a>
+                    </button>
                 </div>
                 @endif
             </div>
@@ -210,19 +220,19 @@
             @endif
         </div>
     </div>
-    
+
     <!-- Sidebar Actions -->
     <div class="col-lg-4">
         <!-- Status Card -->
         <div class="detail-card">
             <h6 class="fw-bold mb-3">Status Pendaftaran</h6>
-            
+
             @if($registration->isApproved())
             <div class="alert alert-success mb-3">
                 <i class="bi bi-check-circle-fill me-2"></i>
                 <strong>Disetujui</strong>
             </div>
-            
+
             <div class="small">
                 <div class="mb-2">
                     <strong>Disetujui oleh:</strong><br>
@@ -239,20 +249,20 @@
                 </div>
                 @endif
             </div>
-            
+
             @if($registration->qrCode)
             <hr>
             <a href="{{ route('scan.view', $registration->qrCode->token_qr) }}" class="btn btn-primary w-100" target="_blank">
                 <i class="bi bi-qr-code me-2"></i>Lihat QR Code
             </a>
             @endif
-            
+
             @elseif($registration->isRejected())
             <div class="alert alert-danger mb-3">
                 <i class="bi bi-x-circle-fill me-2"></i>
                 <strong>Ditolak</strong>
             </div>
-            
+
             <div class="small">
                 <div class="mb-2">
                     <strong>Ditolak oleh:</strong><br>
@@ -273,13 +283,13 @@
                 </div>
                 @endif
             </div>
-            
+
             @else
             <div class="alert alert-warning mb-3">
                 <i class="bi bi-clock-fill me-2"></i>
                 <strong>Menunggu Review</strong>
             </div>
-            
+
             <!-- Approval Form -->
             @can('approve', $registration)
             <form id="approveForm">
@@ -292,9 +302,9 @@
                 </button>
             </form>
             @endcan
-            
+
             <hr>
-            
+
             <!-- Rejection Form -->
             @can('reject', $registration)
             <form id="rejectForm">
@@ -313,18 +323,18 @@
             @endcan
             @endif
         </div>
-        
+
         <!-- Timeline -->
         <div class="detail-card">
             <h6 class="fw-bold mb-3">Timeline</h6>
-            
+
             <div class="small">
                 <div class="mb-3">
                     <i class="bi bi-circle-fill text-primary me-2" style="font-size: 0.5rem;"></i>
                     <strong>Dibuat:</strong><br>
                     <span class="text-muted ms-3">{{ $registration->created_at->format('d/m/Y H:i') }}</span>
                 </div>
-                
+
                 @if($registration->approved_at)
                 <div class="mb-3">
                     <i class="bi bi-circle-fill text-success me-2" style="font-size: 0.5rem;"></i>
@@ -332,7 +342,7 @@
                     <span class="text-muted ms-3">{{ $registration->approved_at->format('d/m/Y H:i') }}</span>
                 </div>
                 @endif
-                
+
                 @if($registration->rejected_at)
                 <div class="mb-3">
                     <i class="bi bi-circle-fill text-danger me-2" style="font-size: 0.5rem;"></i>
@@ -347,20 +357,31 @@
 @endsection
 
 @push('scripts')
+<script src="https://cdnjs.cloudflare.com/ajax/libs/medium-zoom/1.1.0/medium-zoom.min.js" defer></script>
 <script>
+// Initialize medium-zoom when library is ready
+document.addEventListener('DOMContentLoaded', function() {
+    if (typeof mediumZoom !== 'undefined') {
+        mediumZoom('#kkDocumentImage', {
+            margin: 24,
+            background: '#fafafa',
+        });
+    }
+});
+
 document.getElementById('approveForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
     if (!confirm('Yakin ingin menyetujui pendaftaran ini?')) return;
-    
+
     const formData = new FormData(this);
-    
+
     try {
         const response = await axios.post(
             '{{ route("cms.registrations.approve", $registration) }}',
             Object.fromEntries(formData)
         );
-        
+
         if (response.data.success) {
             alert('Pendaftaran berhasil disetujui!');
             location.reload();
@@ -372,17 +393,17 @@ document.getElementById('approveForm')?.addEventListener('submit', async functio
 
 document.getElementById('rejectForm')?.addEventListener('submit', async function(e) {
     e.preventDefault();
-    
+
     if (!confirm('Yakin ingin menolak pendaftaran ini?')) return;
-    
+
     const formData = new FormData(this);
-    
+
     try {
         const response = await axios.post(
             '{{ route("cms.registrations.reject", $registration) }}',
             Object.fromEntries(formData)
         );
-        
+
         if (response.data.success) {
             alert('Pendaftaran berhasil ditolak');
             location.reload();
