@@ -32,8 +32,7 @@ class SendQrCodeEmail implements ShouldQueue
     public function handle(QrCodeService $qrCodeService): void
     {
         // Load fresh data dari database dengan relationships
-        $registration = Registration::with(['qrCode', 'formLink'])
-            ->findOrFail($this->registrationId);
+        $registration = Registration::with(['qrCode', 'formLink'])->findOrFail($this->registrationId);
 
         // Validasi QR code exists
         if (!$registration->qrCode) {
@@ -43,7 +42,7 @@ class SendQrCodeEmail implements ShouldQueue
             throw new \Exception('QR code tidak ditemukan untuk registrasi ini');
         }
 
-        $subject = 'QR Code Tiket Mudik Gratis Lebaran 2026';
+        $subject = 'QR Code Tiket - ' . config('app.name');
 
         $emailLog = EmailLog::logQrCodeEmail(
             $registration->form_link_id,
@@ -53,7 +52,13 @@ class SendQrCodeEmail implements ShouldQueue
 
         try {
             Mail::to($registration->formLink->email)
-                ->send(new QrCodeMail($registration, $qrCodeService));
+                ->send(
+                    new QrCodeMail(
+                        $registration,
+                        $qrCodeService,
+                        config('mudik')
+                    )
+                );
 
             $emailLog->markAsSent();
 
@@ -61,7 +66,6 @@ class SendQrCodeEmail implements ShouldQueue
                 'registration_id' => $this->registrationId,
                 'email' => $registration->formLink->email,
             ]);
-
         } catch (\Throwable $e) {
             $emailLog->markAsFailed($e->getMessage());
 

@@ -31,13 +31,13 @@ class ApproveRegistrationAction
             if ($registration->isApproved() || $registration->isRejected()) {
                 throw new MudikException(
                     ErrorCode::ServerError,
-                    'Pendaftaran sudah diproses sebelumnya'
+                    'Gagal Approve / Reject: Pendaftaran sudah diproses sebelumnya'
                 );
             }
 
             // Approve registration
-            $notes = $data->admin_notes instanceof \Spatie\LaravelData\Optional 
-                ? null 
+            $notes = $data->admin_notes instanceof \Spatie\LaravelData\Optional
+                ? null
                 : $data->admin_notes;
 
             $registration->approve($admin->id, $notes);
@@ -56,7 +56,6 @@ class ApproveRegistrationAction
             dispatch(new SendQrCodeEmail($registration->id));
 
             return $registration->fresh(['qrCode', 'participants']);
-
         } catch (MudikException $e) {
             DB::rollBack();
             throw $e;
