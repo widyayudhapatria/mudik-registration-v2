@@ -215,7 +215,7 @@
                                         name="has_child_under_4"
                                         />
                                     <label class="form-check-label" for="has_child_under_4">
-                                        <strong>Memiliki anak dibawah 4 tahun,</strong> saya menyatakan bahwa anak dibawah 4 tahun akan dipangku selama perjalanan.
+                                        <strong>Memiliki anak dibawah 4 tahun sebagai peserta mudik ?</strong> Saya menyatakan bahwa anak dibawah 4 tahun akan dipangku selama perjalanan.
                                     </label>
                                 </div>
                                 <div class="form-check mb-3">
@@ -656,9 +656,9 @@
             // Show info message
             Swal.fire({
                 title: "Info",
-                html: "Data perwakilan sekarang tidak bisa diubah. <br/><strong>Uncheck checkbox</strong> untuk mengubah data perwakilan.",
+                html: "Data perwakilan sekarang tidak bisa diubah. <br/><strong>Uncheck</strong> untuk mengubah data perwakilan.",
                 icon: "warning",
-                confirmButtonText: "OK",
+                confirmButtonText: "Baik, saya mengerti.",
             });
         } else {
             // Remove readonly and clear values from participant
@@ -747,11 +747,11 @@
                     title: "Peringatan!",
                     html: `<div class="text-start">
                         <p class="mb-3"><strong>Data tidak konsisten :</strong></p>
-                        <p>Anda mencentang "Memiliki anak dibawah 4 tahun", tetapi data peserta yang Anda inputkan tidak memiliki anak berusia dibawah 4 tahun.</p>
+                        <p>Anda mencentang <strong>"Memiliki anak dibawah 4 tahun"</strong>, tetapi data peserta yang Anda inputkan tidak memiliki anak berusia dibawah 4 tahun.</p>
                         <p class="mt-2">Silakan periksa kembali data peserta Anda.</p>
                     </div>`,
                     icon: "error",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 }).then(() => {
                     hasChildCheckbox.checked = false;
                     dataValidCheckbox.checked = false;
@@ -765,11 +765,11 @@
                     title: "Peringatan!",
                     html: `<div class="text-start">
                         <p class="mb-3"><strong>Data tidak konsisten :</strong></p>
-                        <p>Data peserta memiliki anak berusia dibawah 4 tahun, tetapi checkbox "Memiliki anak dibawah 4 tahun" belum dicentang.</p>
-                        <p class="mt-2">Silakan centang checkbox "Memiliki anak dibawah 4 tahun" terlebih dahulu.</p>
+                        <p>Data peserta memiliki anak berusia dibawah 4 tahun, tetapi checkbox <strong>"Memiliki anak dibawah 4 tahun"</strong> belum dicentang.</p>
+                        <p class="mt-2">Silakan centang checkbox <strong>"Memiliki anak dibawah 4 tahun"</strong> terlebih dahulu.</p>
                     </div>`,
                     icon: "error",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 }).then(() => {
                     dataValidCheckbox.checked = false;
                     hasChildCheckbox.checked = true;
@@ -794,7 +794,7 @@
                     title: "Peringatan!",
                     text: "Anda harus menambahkan minimal 1 peserta.",
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan tambahkan peserta.",
                 });
                 return;
             }
@@ -802,9 +802,9 @@
             if (jumlahPeserta > jumlahAnggota) {
                 Swal.fire({
                     title: "Peringatan!",
-                    text: `Jumlah peserta (${jumlahPeserta}) melebihi jumlah anggota keluarga (${jumlahAnggota}). Silakan sesuaikan.`,
+                    text: `Jumlah peserta mudik (${jumlahPeserta}) melebihi jumlah anggota keluarga (${jumlahAnggota}). Silakan sesuaikan.`,
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan sesuaikan.",
                 });
                 return;
             }
@@ -816,7 +816,7 @@
                     title: "Peringatan!",
                     text: "Nama perwakilan harus terdiri dari minimal 3 karakter.",
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 });
                 return;
             }
@@ -828,7 +828,7 @@
                     title: "Peringatan!",
                     text: "NIK perwakilan harus tepat 16 angka.",
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 });
                 return;
             }
@@ -840,7 +840,7 @@
                     title: "Peringatan!",
                     text: "Nomor KK harus tepat 16 angka.",
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 });
                 return;
             }
@@ -851,7 +851,7 @@
                     title: "Peringatan!",
                     text: "Tanggal lahir perwakilan harus diisi.",
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 });
                 return;
             }
@@ -870,7 +870,7 @@
                     title: "Peringatan!",
                     text: "Semua tanggal lahir peserta harus diisi.",
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 });
                 return;
             }
@@ -881,7 +881,7 @@
                     title: "Peringatan!",
                     text: "Anda harus menyetujui pernyataan data sebelum submit.",
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 });
                 return;
             }
@@ -898,7 +898,7 @@
                         title: "Peringatan!",
                         text: `Nama peserta ${index + 1} harus terdiri dari minimal 3 karakter.`,
                         icon: "warning",
-                        confirmButtonText: "OK",
+                        confirmButtonText: "Baik, saya akan periksa kembali.",
                     });
                     pesertaValid = false;
                     return false;
@@ -909,7 +909,7 @@
                         title: "Peringatan!",
                         text: `NIK/KIA peserta ${index + 1} harus tepat 16 angka.`,
                         icon: "warning",
-                        confirmButtonText: "OK",
+                        confirmButtonText: "Baik, saya akan periksa kembali.",
                     });
                     pesertaValid = false;
                     return false;
@@ -925,7 +925,7 @@
                     title: "Peringatan!",
                     text: "Anda harus upload dokumen Kartu Keluarga (KK).",
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 });
                 return;
             }
@@ -941,7 +941,7 @@
                         </ul>
                     </div>`,
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
                 });
                 return;
             }
@@ -1030,20 +1030,22 @@
                     resetSubmitButton();
 
                     // Handle error from backend
-                    let errorMessage = 'Terjadi kesalahan saat memproses pendaftaran.';
+                    let errorMessage = 'Terjadi kesalahan saat memproses pendaftaran :<br/><br/>';
+                    errorMessage += '<div class="text-start mt-2">';
 
                     if (data.errors) {
-                        errorMessage += '<div class="text-start mt-2">';
                         for (let field in data.errors) {
                             data.errors[field].forEach(err => {
-                                errorMessage += `<p class="mb-0 fw-bolder">${err}</p>`;
+                                errorMessage += `<p class="mb-0 fw-bolder">- ${err}</p>`;
                             });
                         }
-                        errorMessage += '</div><br/>Silakan refresh dan isi semua data dengan benar dan lengkap, pastikan juga file yang diupload sesuai dengan ketentuan.';
+                    }else{
+                        errorMessage += `<p class="mb-0 fw-bolder">- ${data.message}</p>`;
                     }
+                    errorMessage += '</div><br/>Mohon periksa kembali data dan pastikan file yang diunggah sesuai ketentuan.';
 
                     Swal.fire({
-                        title: "Gagal!",
+                        title: "Pendaftaran Gagal!",
                         html: errorMessage,
                         icon: "error",
                         confirmButtonText: "Baik, saya mengerti.",
@@ -1101,7 +1103,7 @@
                 title: "Pengalihan Halaman",
                 html: `
                 <div class="text-start">
-                    <p class="mb-3">Halaman akan otomatis kembali ke beranda dalam <strong id="timerCount">${timeLeft}</strong> detik...</p>
+                    <p class="mb-3">Halaman akan otomatis kembali ke beranda dalam <strong id="timerCount">${timeLeft} detik.</strong></p>
                     <div class="progress" style="height: 25px;">
                         <div id="progressBar" class="progress-bar progress-bar-striped progress-bar-animated"
                             role="progressbar" style="width: 100%;" aria-valuenow="100" aria-valuemin="0" aria-valuemax="100">
@@ -1121,7 +1123,7 @@
                         const progressBar = document.getElementById("progressBar");
 
                         if (timerCountElement) {
-                            timerCountElement.textContent = timeLeft;
+                            timerCountElement.textContent = timeLeft + " detik.";
                         }
 
                         // Update progress bar width

@@ -24,19 +24,20 @@ class SubmitEmailAction
         try {
             DB::beginTransaction();
 
-            // Check if email already exists with valid status
+            // Check if email already exists
             $existingLink = FormLink::where('email', $data->email)->first();
 
+            // Check if email already has form_link with submitted/approved (sedang direview atau sudah disetujui)
             if ($existingLink && in_array($existingLink->status, [FormLinkStatus::Submitted->value, FormLinkStatus::Approved->value])) {
                 throw new MudikException(ErrorCode::EmailExists);
             }
 
-
-            if ($existingLink) {
-                // Recreate link
+            // Check if status pending -- Update (recreate) karena belum ada registration
+            if ($existingLink && $existingLink->status === FormLinkStatus::Pending->value) {
                 $formLink = $this->recreateLink($existingLink);
             } else {
-                // Create new link
+                // Create new form_link -- Status rejected atau tidak ada form_link sama sekali
+                // Rejected -- Create new karena form_link_id sudah punya registration (unique constraint)
                 $formLink = $this->createNewLink($data->email);
             }
 

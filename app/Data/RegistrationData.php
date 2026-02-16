@@ -23,28 +23,28 @@ class RegistrationData extends Data
     public function __construct(
         #[Required, StringType, Min(3), Max(255)]
         public string $representative_name,
-        
-         #[Required, StringType, Size(16), Regex('/^\d{16}$/')]
+
+        #[Required, StringType, Size(16), Regex('/^\d{16}$/')]
         public string $representative_nik,
-        
+
         #[Required, StringType]
         public string $representative_birth_date,
-        
+
         #[Required, Integer, Min(1), Max(10)]
         public int $family_count,
-        
+
         #[Required, StringType, Size(16), Regex('/^\d{16}$/')]
         public string $kk_number,
-        
+
         #[Required, File, Mimes('jpg', 'jpeg', 'png'), Max(5120)]
         public UploadedFile $kk_document,
-        
-        #[Required, BooleanType]
-        public bool $has_child_under_4 = false,
-        
+
         #[Required, ArrayType]
         /** @var DataCollection<ParticipantData> */
         public DataCollection $participants,
+
+        #[Required, BooleanType]
+        public bool $has_child_under_4 = false,
     ) {}
 
     public function toModelArray(): array

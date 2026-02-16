@@ -96,20 +96,41 @@ class SubmitRegistrationAction
 
     protected function checkDuplicates(RegistrationData $data): void
     {
-        // Check KK duplicate
-        if (Registration::where('kk_number', $data->kk_number)->exists()) {
+        // Check KK duplicate (only active registrations with submitted/approved form_link)
+        if (Registration::withoutTrashed()
+            ->where('kk_number', $data->kk_number)
+            ->whereHas('formLink', function ($query) {
+                $query->whereIn('status', ['pending', 'submitted', 'approved']);
+            })
+            ->exists()
+        ) {
             throw new MudikException(ErrorCode::DuplicateKK);
         }
 
-        // Check representative NIK
-        if (Registration::where('representative_nik', $data->representative_nik)->exists()) {
+        // Check representative NIK (only active registrations with submitted/approved form_link)
+        if (Registration::withoutTrashed()
+            ->where('representative_nik', $data->representative_nik)
+            ->whereHas('formLink', function ($query) {
+                $query->whereIn('status', ['pending', 'submitted', 'approved']);
+            })
+            ->exists()
+        ) {
             throw new MudikException(ErrorCode::DuplicateNIK);
         }
 
-        // Check all participants NIK/KIA
+        // Check all participants NIK/KIA (only active participants with active registration and submitted/approved form_link)
         foreach ($data->participants as $participant) {
-            if (Participant::where('nik_kia', $participant->nik_kia)->exists()) {
-                throw new MudikException(ErrorCode::DuplicateKIA);
+            if (Participant::withoutTrashed()
+                ->where('nik_kia', $participant->nik_kia)
+                ->whereHas('registration', function ($query) {
+                    $query->withoutTrashed()
+                        ->whereHas('formLink', function ($q) {
+                            $q->whereIn('status', ['pending', 'submitted', 'approved']);
+                        });
+                })
+                ->exists()
+            ) {
+                throw new MudikException(ErrorCode::DuplicateKTPKIAParticipant);
             }
         }
     }
