@@ -58,11 +58,10 @@
                             <tr>
                                 <th>Form Link</th>
                                 <td>
-                                    @php
-                                        $url = route('public.registration.form', ['token' => $formLink->token]);
-                                    @endphp
-                                    <a href="{{ $url }}" target="_blank" class="text-break">{{ $url }}</a>
-                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('{{ $url }}')">
+                                    <a href="{{ $formLink->generated_link }}" target="_blank" class="text-break">
+                                        {{ $formLink->generated_link }}
+                                    </a>
+                                    <button class="btn btn-sm btn-outline-secondary ms-2" onclick="copyToClipboard('{{ $formLink->generated_link }}')">
                                         <i class="bi bi-clipboard"></i>
                                     </button>
                                 </td>
