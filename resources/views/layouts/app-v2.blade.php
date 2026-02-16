@@ -3,13 +3,13 @@
   <head>
     <meta charset="utf-8" />
     <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-    <meta name="description" content="Mudik Banten - Program Mudik Gratis Lebaran 2026" />
-    <meta name="author" content="mudik banten team" />
+    <meta name="description" content="{{ config('mudik.website.tagline') }}" />
+    <meta name="author" content="{{ config('mudik.website.name') }}" />
     <meta name="csrf-token" content="{{ csrf_token() }}">
 
     <link rel="shortcut icon" href="{{ asset('assets/public/images/favicon.ico') }}" />
 
-    <title>@yield('title', 'Mudik Banten - Program Mudik Gratis Lebaran 2026')</title>
+    <title>@yield('title', config('mudik.website.name'))</title>
 
     <!-- Google Fonts -->
     <link href="https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,700|Roboto:400,500,700" rel="stylesheet" />

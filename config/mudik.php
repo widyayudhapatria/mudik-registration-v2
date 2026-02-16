@@ -48,7 +48,7 @@ return [
     */
     'email' => [
         'from_address' => env('MAIL_FROM_ADDRESS', 'noreply@mudiklebaran.id'),
-        'from_name' => env('MAIL_FROM_NAME', 'Mudik Lebaran 2026'),
+        'from_name' => env('MAIL_FROM_NAME', 'Mudik Bersama Kabupaten Banten 2026'),
         'max_retry' => 3,
     ],
 
@@ -69,4 +69,36 @@ return [
     |--------------------------------------------------------------------------
     */
     'default_daily_quota' => env('DEFAULT_DAILY_QUOTA', 100),
+
+    /*
+    |--------------------------------------------------------------------------
+    | Website Information
+    |--------------------------------------------------------------------------
+    */
+    'website' => [
+        'name' => env('APP_NAME', 'Mudik Bersama Kabupaten Banten 2026'),
+        'tagline' => env('APP_TAGLINE', 'Platform Registrasi Mudik Bersama Kabupaten Banten 2026'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Support Information
+    |--------------------------------------------------------------------------
+    */
+    'support' => [
+        'email' => env('SUPPORT_EMAIL', 'support@mudiklebaran.id'),
+        'phone' => env('SUPPORT_PHONE', '+62-XXX-XXXX-XXXX'),
+        'schedule' => env('SUPPORT_SCHEDULE', 'Senin-Jumat: 08:00 - 17:00 WIB'),
+    ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Business Rules & Schedule
+    |--------------------------------------------------------------------------
+    */
+    'schedule' => [
+        'qr_code_valid_from' => env('QR_CODE_VALID_FROM', '2026-03-01 10:00:00'),
+        'qr_code_valid_until' => env('QR_CODE_VALID_UNTIL', '2026-03-01 23:00:00'),
+        'ticket_exchange' => env('TICKET_EXCHANGE_SCHEDULE', 'Tanggal 1-5 April 2026'),
+    ],
 ];

@@ -1,5 +1,5 @@
 @extends('layouts.app-v2')
-@section('title', 'Formulir Pendaftaran Mudik Gratis - Mudik Banten')
+@section('title', 'Formulir Pendaftaran - ' . config('mudik.website.name'))
 @push('styles')
     <style>
      html {

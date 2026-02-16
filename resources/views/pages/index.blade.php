@@ -1,6 +1,6 @@
 @extends('layouts.app-v2')
 
-@section('title', 'Mudik Banten - Program Mudik Gratis Lebaran 2026')
+@section('title', 'Homepage - ' . config('mudik.website.name'))
 @push('styles')
     <style>
      html {
@@ -288,7 +288,7 @@
                                 Kontak:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>(021) 1234-5678 / prov.banten@gov.id</b>
+                                <b>{{ config('mudik.support.phone') }} / {{ config('mudik.support.email') }}</b>
                             </h5>
                         </div>
                     </div>

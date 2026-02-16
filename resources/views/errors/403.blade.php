@@ -274,16 +274,16 @@
                             <p>
                                 <i class="mdi mdi-email-outline"></i>
                                 Email:
-                                <a href="mailto:support@mudikgratis.com">support@mudikgratis.com</a>
+                                <a href="mailto:{{ config('mudik.support.email') }}">{{ config('mudik.support.email') }}</a>
                             </p>
                             <p>
                                 <i class="mdi mdi-phone-outline"></i>
                                 Telepon:
-                                <a href="tel:02112345678">021-1234567</a>
+                                <a href="tel:{{ config('mudik.support.phone') }}">{{ config('mudik.support.phone') }}</a>
                             </p>
                             <p>
                                 <i class="mdi mdi-clock-outline"></i>
-                                Senin - Jumat, 08:00 - 17:00 WIB
+                                {{ config('mudik.support.schedule') }}
                             </p>
                         </div>
                     </div>
