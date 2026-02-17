@@ -12,10 +12,12 @@ class DatabaseSeeder extends Seeder
     public function run(): void
     {
         $this->call([
-            AdminSeeder::class,
-            DailyQuotaSeeder::class,
-            MudikRolesAndPermissionsSeeder::class,
-            AssignAdminRolesSeeder::class,
+            AdminSeeder::class,              // Seed admin users
+            DestinationQuotaSeeder::class,   // Seed destinations + daily quotas
+            FormLinkSeeder::class,           // Seed form links with various statuses
+            RegistrationSeeder::class,       // Seed registrations (submitted, approved, rejected)
+            ParticipantSeeder::class,        // Seed participants for each registration
+            QrCodeSeeder::class,             // Seed QR codes for approved registrations
         ]);
     }
 }
