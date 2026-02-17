@@ -168,13 +168,179 @@
             color: #757575;
         }
 
+        /* Past quota styling (disabled) */
+        .past-quota {
+            opacity: 0.7;
+            background-color: #fafafa;
+        }
+
+        .quota-action-btn[disabled] {
+            pointer-events: none;
+            opacity: 0.6;
+        }
+
         .modal-body {
             padding: 16px;
+        }
+
+        /* Past date card (disabled) */
+        .quota-date-card.past-date {
+            background: #f5f5f5;
+            border-left-color: #bdbdbd;
+            color: #9e9e9e;
+            opacity: 0.9;
+        }
+
+        .quota-date-card.past-date .quota-date-title,
+        .quota-date-card.past-date .quota-date-info {
+            color: #757575;
         }
 
         .form-floating>.form-control:focus {
             border-color: #4CAF50;
             box-shadow: 0 0 0 0.18rem rgba(76, 175, 80, 0.18);
+        }
+
+        /* Destination Summary Table */
+        .destination-grid-table {
+            width: 100%;
+            border-collapse: collapse;
+        }
+
+        .destination-grid-table thead th {
+            background-color: #f8f9fa;
+            border: 1px solid #dee2e6;
+            padding: 10px 12px;
+            font-weight: 700;
+            color: #212121;
+            text-align: left;
+            font-size: 12px;
+            text-transform: uppercase;
+            letter-spacing: 0.5px;
+        }
+
+        .destination-grid-table tbody td {
+            border: 1px solid #dee2e6;
+            padding: 10px 12px;
+            vertical-align: middle;
+            color: #424242;
+            font-size: 12px;
+        }
+
+        .destination-grid-table tbody tr:hover {
+            background-color: #f8f9fa;
+        }
+
+        .dest-name {
+            font-weight: 600;
+            color: #212121;
+        }
+
+        .dest-code {
+            font-size: 11px;
+            color: #999;
+        }
+
+        .dest-quota-value {
+            font-weight: 600;
+            text-align: center;
+        }
+
+        .detail-btn {
+            padding: 5px 12px;
+            font-size: 11px;
+            border-radius: 6px;
+            white-space: nowrap;
+        }
+
+        /* Detail Modal Styles */
+        .detail-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 16px;
+            padding-bottom: 12px;
+            border-bottom: 2px solid #f0f0f0;
+        }
+
+        .detail-dest-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: #212121;
+        }
+
+        .detail-quota-info {
+            display: grid;
+            grid-template-columns: repeat(3, 1fr);
+            gap: 12px;
+            margin-bottom: 16px;
+        }
+
+        .detail-quota-item {
+            background: #f8f9fa;
+            padding: 10px;
+            border-radius: 8px;
+            text-align: center;
+        }
+
+        .detail-quota-label {
+            font-size: 11px;
+            color: #757575;
+            margin-bottom: 4px;
+        }
+
+        .detail-quota-value {
+            font-size: 20px;
+            font-weight: 700;
+            color: #2196F3;
+        }
+
+        .detail-suggestion {
+            background: #e3f2fd;
+            border-left: 4px solid #2196F3;
+            padding: 12px;
+            border-radius: 6px;
+            margin-bottom: 16px;
+            font-size: 12px;
+        }
+
+        .suggestion-label {
+            color: #1565c0;
+            font-weight: 600;
+        }
+
+        .daily-quota-table {
+            width: 100%;
+            margin-top: 12px;
+        }
+
+        .daily-quota-table thead th {
+            background-color: #f0f0f0;
+            border: 1px solid #e0e0e0;
+            padding: 8px 10px;
+            font-weight: 600;
+            color: #424242;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .daily-quota-table tbody td {
+            border: 1px solid #e0e0e0;
+            padding: 8px 10px;
+            text-align: center;
+            font-size: 11px;
+        }
+
+        .daily-quota-table tbody tr:nth-child(even) {
+            background-color: #fafafa;
+        }
+
+        .daily-quota-table tbody tr:hover {
+            background-color: #f0f0f0;
+        }
+
+        .date-cell {
+            text-align: left !important;
         }
 
         @media (max-width: 992px) {
@@ -360,25 +526,40 @@
 
     <!-- Summary -->
     <div class="summary-card">
-        <h5 class="fw-bold mb-3">Ringkasan Kuota (Periode yang Dipilih)</h5>
-        <div class="summary-grid">
-            <div class="summary-item">
-                <div class="summary-value" style="color: #2196F3;">{{ $quotas->count() }}</div>
-                <div class="summary-label">Total Entry Kuota</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-value" style="color: #4CAF50;">{{ number_format($quotas->sum('quota_daily')) }}</div>
-                <div class="summary-label">Total Kuota</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-value" style="color: #FF9800;">{{ number_format($quotas->sum('used_daily')) }}</div>
-                <div class="summary-label">Sudah Terpakai</div>
-            </div>
-            <div class="summary-item">
-                <div class="summary-value" style="color: #9C27B0;">{{ number_format($quotas->sum('remaining_daily')) }}
-                </div>
-                <div class="summary-label">Sisa Kuota</div>
-            </div>
+        <h5 class="fw-bold mb-3">Ringkasan Kuota Destinasi</h5>
+        <div style="overflow-x: auto;">
+            <table class="destination-grid-table">
+                <thead>
+                    <tr>
+                        <th style="width: 25%;">Kota</th>
+                        <th style="width: 18%; text-align: center;">Total Quota</th>
+                        <th style="width: 18%; text-align: center;">Terpakai</th>
+                        <th style="width: 18%; text-align: center;">Sisa</th>
+                        <th style="width: 21%; text-align: center;">Action</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @foreach ($destinations as $dest)
+                        <tr>
+                            <td>
+                                <div class="dest-name">{{ $dest->name }}</div>
+                                <span class="dest-code">{{ $dest->code }}</span>
+                            </td>
+                            <td class="dest-quota-value">{{ number_format($dest->total_quota) }}</td>
+                            <td class="dest-quota-value" style="color: #FF9800;">{{ number_format($dest->used_quota) }}
+                            </td>
+                            <td class="dest-quota-value" style="color: #4CAF50;">
+                                {{ number_format($dest->remaining_quota) }}</td>
+                            <td style="text-align: center;">
+                                <button class="btn btn-sm btn-outline-primary detail-btn"
+                                    onclick="showDestinationDetail({{ $dest->id }}, '{{ $dest->name }}')">
+                                    <i class="bi bi-eye me-1"></i>Detail
+                                </button>
+                            </td>
+                        </tr>
+                    @endforeach
+                </tbody>
+            </table>
         </div>
     </div>
 
@@ -389,7 +570,8 @@
                 $dateObj = \Carbon\Carbon::parse($dateStr);
                 $isToday = $dateObj->isToday();
             @endphp
-            <div class="quota-date-card {{ $isToday ? 'today' : '' }}">
+            @php $isPastDate = $dateObj->isBefore(\Carbon\Carbon::today()); @endphp
+            <div class="quota-date-card {{ $isToday ? 'today' : '' }} {{ $isPastDate ? 'past-date' : '' }}">
                 <!-- Date Header -->
                 <div class="quota-date-header">
                     <div>
@@ -398,6 +580,9 @@
                             @if ($isToday)
                                 <span class="badge bg-success ms-2" style="font-size: 11px;">Hari Ini</span>
                             @endif
+                            @if ($isPastDate)
+                                <span class="badge bg-secondary ms-2" style="font-size: 11px;">Lewat</span>
+                            @endif
                         </div>
                         <div class="quota-date-info">
                             {{ $dateObj->isoFormat('dddd') }}
@@ -405,7 +590,7 @@
                     </div>
                     <div class="quota-date-badge">
                         <span style="font-size: 13px; color: #757575;">
-                            📊 {{ $quotasForDate->count() }} kota
+                            {{ $quotasForDate->count() }} kota
                         </span>
                     </div>
                 </div>
@@ -434,8 +619,10 @@
                                     } elseif ($percentage >= 60) {
                                         $barClass = 'warning';
                                     }
+
+                                    $isPast = $quota->date->isBefore(\Carbon\Carbon::today());
                                 @endphp
-                                <tr>
+                                <tr class="{{ $isPast ? 'past-quota' : '' }}">
                                     <td>
                                         <div class="quota-destination-name">{{ $quota->destination->name }}</div>
                                         <span class="quota-destination-code">{{ $quota->destination->code }}</span>
@@ -459,11 +646,18 @@
                                         </div>
                                     </td>
                                     <td style="text-align: center;">
-                                        <button class="btn btn-sm btn-outline-primary quota-action-btn"
-                                            onclick="editQuota({{ $quota->id }}, {{ $quota->destination_id }}, '{{ $quota->date->toDateString() }}', {{ $quota->quota_daily }}, '{{ $quota->destination->name }}')"
-                                            title="Edit Kuota">
-                                            <i class="bi bi-pencil"></i> Edit
-                                        </button>
+                                        @if ($isPast)
+                                            <button class="btn btn-sm btn-outline-secondary quota-action-btn" disabled
+                                                title="Tanggal sudah lewat - tidak bisa diedit">
+                                                <i class="bi bi-x-circle"></i> Tidak bisa edit
+                                            </button>
+                                        @else
+                                            <button class="btn btn-sm btn-outline-primary quota-action-btn"
+                                                onclick="editQuota({{ $quota->id }}, {{ $quota->destination_id }}, '{{ $quota->date->toDateString() }}', {{ $quota->quota_daily }}, '{{ $quota->destination->name }}')"
+                                                title="Edit Kuota">
+                                                <i class="bi bi-pencil"></i> Edit
+                                            </button>
+                                        @endif
                                     </td>
                                 </tr>
                             @endforeach
@@ -482,6 +676,92 @@
         @endforelse
     </div>
 @endsection
+
+<!-- Destination Detail Modal -->
+<div class="modal fade" id="detailModal" tabindex="-1">
+    <div class="modal-dialog modal-lg modal-dialog-scrollable">
+        <div class="modal-content" style="border-radius: 16px; border: none;">
+            <div class="modal-header border-0">
+                <h5 class="modal-title fw-bold" id="detailModalTitle">Detail Kuota Destinasi</h5>
+                <button type="button" class="btn-close" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body">
+                <!-- Header Info -->
+                <div class="detail-header">
+                    <div class="detail-dest-name" id="detailDestName">-</div>
+                </div>
+
+                <!-- Quota Info -->
+                <div class="detail-quota-info">
+                    <div class="detail-quota-item">
+                        <div class="detail-quota-label">Total Quota (destination)</div>
+                        <div class="detail-quota-value" id="detailTotalQuota">0</div>
+                    </div>
+                    <div class="detail-quota-item">
+                        <div class="detail-quota-label">Sudah Terpakai (approved)</div>
+                        <div class="detail-quota-value" style="color: #FF9800;" id="detailUsedQuota">0</div>
+                    </div>
+                    <div class="detail-quota-item">
+                        <div class="detail-quota-label">Sisa Quota (remaining)</div>
+                        <div class="detail-quota-value" style="color: #4CAF50;" id="detailRemainingQuota">0</div>
+                    </div>
+                </div>
+                <!-- Daily Quotas Table -->
+                <h6 class="fw-bold mb-0">
+                    Set Kuota (Semua Tanggal)
+                </h6>
+                <div style="overflow-x: auto;">
+                    <table class="daily-quota-table">
+                        <thead>
+                            <tr>
+                                <th style="width: 25%;">Tanggal</th>
+                                <th style="width: 18%; text-align: center;">Daily Quota</th>
+                                <th style="width: 18%; text-align: center;">Terpakai</th>
+                                <th style="width: 18%; text-align: center;">Sisa</th>
+                            </tr>
+                        </thead>
+                        <tbody id="detailQuotasBody">
+                            <tr>
+                                <td colspan="4" style="text-align: center; color: #999; padding: 20px;">
+                                    Loading...
+                                </td>
+                            </tr>
+                        </tbody>
+                    </table>
+                </div>
+                <!-- Suggestion -->
+                <div class="detail-suggestion" style="margin-top: 20px; margin-bottom: 10px;">
+                    <div class="suggestion-label">Info Summary:</div>
+                    <div style="margin-top: 6px;">
+                        <strong>Total plot (daily) quota:</strong> <span id="detailTotalDailyQuota">0</span> kuota
+                        <br>
+                        <strong>Remaining keseluruhan:</strong> <span id="detailRemainingSummary"
+                            style="color: #1565c0; font-weight: 600;">0</span> kuota
+                        <br>
+                        <strong>Dibutuhkan alokasi:</strong> <span id="detailQuotaNeedSummary"
+                            style="color: #FF9800; font-weight: 600;">0</span> kuota
+                        <br><br>
+                        <div id="allocationAlert"
+                            style="background: rgba(21, 101, 192, 0.1); padding: 10px; border-radius: 6px; margin-top: 8px; display: none;">
+                            <span style="color: #1565c0; font-size: 13px; font-weight: 700;">
+                                ✓ Anda perlu mengalokasikan +
+                            </span>
+                            <span id="detailAllocatableQuota"
+                                style="color: #1565c0; font-weight: 700; font-size: 16px; display: inline-block;">
+                                0
+                            </span>
+                            <span style="color: #1565c0; font-size: 13px;">kuota lagi supaya kuota terpenuhi</span>
+                        </div>
+                    </div>
+                </div>
+                <div id="emptyQuotasMessage" style="display: none; text-align: center; padding: 30px; color: #999;">
+                    <i class="bi bi-inbox fs-2 d-block mb-2"></i>
+                    <p>Belum ada kuota yang diset untuk destinasi ini</p>
+                </div>
+            </div>
+        </div>
+    </div>
+</div>
 
 <!-- Add/Edit Quota Modal -->
 <div class="modal fade" id="addQuotaModal" tabindex="-1">
@@ -534,7 +814,7 @@
                         <i class="bi bi-info-circle-fill me-2"></i>
                         <small>
                             <strong>Catatan:</strong> Jika kuota untuk tanggal ini sudah ada,
-                            maka akan di-update dengan nilai baru.
+                            silahkan gunakan tombol <strong>Edit</strong> pada listing untuk memperbarui kuota.
                         </small>
                     </div>
 
@@ -723,5 +1003,113 @@
                 hintEl.textContent = 'Pilih destinasi untuk melihat informasi kuota';
             }
         });
+
+        // Show destination detail modal
+        async function showDestinationDetail(destinationId, destinationName) {
+            try {
+                // Update modal title
+                document.getElementById('detailModalTitle').textContent = `Detail Kuota: ${destinationName}`;
+                document.getElementById('detailDestName').textContent = destinationName;
+
+                // Fetch destination detail
+                const response = await axios.get(`/cms/quotas/destination/${destinationId}/detail`);
+                const data = response.data;
+
+                if (!data.success) {
+                    alert('Gagal memuat detail kuota');
+                    return;
+                }
+
+                // Populate info
+                const dest = data.destination;
+                document.getElementById('detailTotalQuota').textContent = number_format(dest.total_quota);
+                document.getElementById('detailUsedQuota').textContent = number_format(dest.used_quota);
+                document.getElementById('detailRemainingQuota').textContent = number_format(dest.remaining_quota);
+
+                // Populate suggestion
+                // Calculate quota allocation recommendation
+                const today = data.current_date; // Use server-provided current date to handle timezone correctly
+
+                // Total daily quota dari tanggal aktif (today onwards) saja
+                const totalDailyQuotaFromToday = data.daily_quotas
+                    .filter(q => q.date >= today)
+                    .reduce((sum, q) => sum + q.quota_daily, 0);
+
+                // Remaining quota dari destination (total - used)
+                const remainingQuota = dest.remaining_quota;
+
+                // Quota yang perlu ditambah = remaining - total daily quota aktif
+                const quotaNeeded = Math.max(0, remainingQuota - totalDailyQuotaFromToday);
+
+                // Populate Info Summary
+                document.getElementById('detailTotalDailyQuota').textContent = number_format(totalDailyQuotaFromToday);
+                document.getElementById('detailRemainingSummary').textContent = number_format(remainingQuota);
+                document.getElementById('detailQuotaNeedSummary').textContent = number_format(quotaNeeded);
+                document.getElementById('detailAllocatableQuota').textContent = number_format(quotaNeeded);
+
+                // Show/hide allocation alert based on quotaNeeded
+                const allocationAlert = document.getElementById('allocationAlert');
+                if (quotaNeeded > 0) {
+                    allocationAlert.style.display = 'block';
+                } else {
+                    allocationAlert.style.display = 'none';
+                }
+
+                // Populate daily quotas table
+                const quotasBody = document.getElementById('detailQuotasBody');
+                const emptyMsg = document.getElementById('emptyQuotasMessage');
+
+                if (data.daily_quotas.length === 0) {
+                    quotasBody.closest('table').style.display = 'none';
+                    emptyMsg.style.display = 'block';
+                } else {
+                    quotasBody.closest('table').style.display = 'table';
+                    emptyMsg.style.display = 'none';
+
+                    // Calculate totals for today onwards only
+                    const dailyQuotasFromToday = data.daily_quotas.filter(q => q.date >= today);
+                    const totalQuotaDaily = dailyQuotasFromToday.reduce((sum, q) => sum + q.quota_daily, 0);
+                    const totalUsedDaily = dailyQuotasFromToday.reduce((sum, q) => sum + q.used_daily, 0);
+                    const totalRemainingDaily = dailyQuotasFromToday.reduce((sum, q) => sum + q.remaining_daily, 0);
+
+                    quotasBody.innerHTML = data.daily_quotas.map(quota => {
+                        const today = data.current_date; // Use server-provided current date
+                        const isPassedDate = quota.date < today;
+                        const rowClass = isPassedDate ? 'style="opacity: 0.6; background-color: #f5f5f5;text-decoration: line-through;"' : '';
+
+                        return `
+                            <tr ${rowClass}>
+                                <td class="date-cell">
+                                    ${quota.date_formatted}
+                                    ${isPassedDate ? '<span style="font-size: 10px; color: #999; margin-left: 8px;">(Lewat)</span>' : ''}
+                                </td>
+                                <td style="text-align: center;"><strong>${quota.quota_daily}</strong></td>
+                                <td style="text-align: center; color: #FF9800;"><strong>${quota.used_daily}</strong></td>
+                                <td style="text-align: center; color: #4CAF50;"><strong>${quota.remaining_daily}</strong></td>
+                            </tr>
+                        `;
+                    }).join('') + `
+                        <tr style="background-color: #f0f0f0; font-weight: 700; border-top: 2px solid #dee2e6;">
+                            <td class="date-cell" style="font-weight: 700;">Total</td>
+                            <td style="text-align: center;"><strong>${totalQuotaDaily}</strong></td>
+                            <td style="text-align: center; color: #FF9800;"><strong>${totalUsedDaily}</strong></td>
+                            <td style="text-align: center; color: #4CAF50;"><strong>${totalRemainingDaily}</strong></td>
+                        </tr>
+                    `;
+                }
+
+                // Show detail modal
+                const detailModal = new bootstrap.Modal(document.getElementById('detailModal'));
+                detailModal.show();
+            } catch (error) {
+                console.error('Error:', error);
+                alert('Gagal memuat detail kuota: ' + (error.response?.data?.message || error.message));
+            }
+        }
+
+        // Helper function untuk format number
+        function number_format(num) {
+            return new Intl.NumberFormat('id-ID').format(num);
+        }
     </script>
 @endpush

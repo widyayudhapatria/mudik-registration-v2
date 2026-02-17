@@ -33,7 +33,8 @@ class QuotaManagementController extends Controller
     {
         $this->authorize('viewAny', DailyQuota::class);
 
-        $startDate = $request->query('start_date', Carbon::today()->toDateString());
+        // Default start date: include recent past so admin can see recently passed quotas
+        $startDate = $request->query('start_date', Carbon::today()->subDays(30)->toDateString());
         $endDate = $request->query('end_date', Carbon::today()->addDays(30)->toDateString());
         $destinationId = $request->query('destination_id');
 
@@ -45,14 +46,23 @@ class QuotaManagementController extends Controller
             $query->where('destination_id', $destinationId);
         }
 
+        // Get quotas ordered by date asc, destination asc
         $quotas = $query->orderBy('date', 'asc')
             ->orderBy('destination_id', 'asc')
             ->get();
 
-        // Group quotas by date for view
+        // Re-order so that dates >= today (today + future) appear first, then past dates afterwards
+        $today = Carbon::today()->toDateString();
+        [$futureOrToday, $past] = $quotas->partition(function ($quota) use ($today) {
+            return $quota->date->toDateString() >= $today;
+        });
+
+        $quotas = $futureOrToday->merge($past);
+
+        // Group quotas by date for view (preserves the above ordering)
         $quotasByDate = $quotas->groupBy(function ($quota) {
             return $quota->date->toDateString();
-        })->sortKeys();
+        });
 
         // Get all active destinations for filter
         $destinations = Destination::active()->ordered()->get();
@@ -224,10 +234,17 @@ class QuotaManagementController extends Controller
                 );
             }
 
-            // Validate quota doesn't exceed destination remaining quota
-            if ($data->quota_daily > $destination->remaining_quota) {
+            // Calculate total quota scheduled for today and future dates (exclude past dates)
+            $totalNotPassedQuota = DailyQuota::where('destination_id', $data->destination_id)
+                ->where('date', '>=', Carbon::today()->toDateString())
+                ->sum('quota_daily');
+
+            // Validate: total quota from today onwards should not exceed destination total quota
+            $newTotal = $totalNotPassedQuota + $data->quota_daily;
+            if ($newTotal > $destination->total_quota) {
+                $remaining = $destination->total_quota - $totalNotPassedQuota;
                 return $this->responseError(
-                    "Kuota harian melebihi sisa kuota destinasi ({$destination->remaining_quota}). Silahkan kurangi jumlah kuota.",
+                    "Total kuota hari ini dan ke depan ({$totalNotPassedQuota} + {$data->quota_daily} = {$newTotal}) melebihi total kuota destinasi ({$destination->total_quota}). Sisa yang bisa dialokasikan: {$remaining}.",
                     'EXCEED_REMAINING_QUOTA',
                     422
                 );
@@ -268,5 +285,49 @@ class QuotaManagementController extends Controller
                 500
             );
         }
+    }
+
+    /**
+     * Get destination summary with all daily quotas for detail modal.
+     * GET /cms/quotas/destination/{id}/detail
+     */
+    public function destinationDetail(Destination $destination): JsonResponse
+    {
+        $this->authorize('viewAny', DailyQuota::class);
+
+        // Get all daily quotas for this destination (all time, not filtered by date range)
+        $dailyQuotas = DailyQuota::where('destination_id', $destination->id)
+            ->orderBy('date', 'asc')
+            ->get()
+            ->map(function ($quota) {
+                return [
+                    'id' => $quota->id,
+                    'date' => $quota->date->toDateString(),
+                    'date_formatted' => $quota->date->format('d M Y'),
+                    'quota_daily' => $quota->quota_daily,
+                    'used_daily' => $quota->used_daily,
+                    'remaining_daily' => $quota->remaining_daily,
+                ];
+            });
+
+        // Calculate total already plotted and remaining to plot
+        $totalPlotted = $dailyQuotas->sum('quota_daily');
+        $remainingToPlot = $destination->remaining_quota;
+
+        return response()->json([
+            'success' => true,
+            'current_date' => Carbon::today()->toDateString(),
+            'destination' => [
+                'id' => $destination->id,
+                'name' => $destination->name,
+                'code' => $destination->code,
+                'total_quota' => $destination->total_quota,
+                'used_quota' => $destination->used_quota,
+                'remaining_quota' => $destination->remaining_quota,
+            ],
+            'daily_quotas' => $dailyQuotas,
+            'total_plotted' => $totalPlotted,
+            'remaining_to_plot' => $remainingToPlot,
+        ]);
     }
 }

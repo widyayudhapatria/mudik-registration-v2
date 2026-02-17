@@ -7,6 +7,7 @@ use App\Enums\ErrorCode;
 use App\Exceptions\MudikException;
 use App\Models\DailyQuota;
 use App\Models\Destination;
+use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -41,21 +42,29 @@ class EditQuotaAction
 
             // Validate: daily quota should not exceed destination total quota
             // Calculate total daily scheduled (excluding current quota)
-            $totalDailyScheduled = DailyQuota::where('destination_id', $destination_id)
+            $today = Carbon::today()->toDateString();
+            $totalNotPassedQuota = DailyQuota::where('destination_id', $destination_id)
                 ->where('id', '!=', $quota->id)
+                ->where('date', '>=', $today)
                 ->sum('quota_daily');
 
-            if (($totalDailyScheduled + $data->quota_daily) > $destination->total_quota) {
+            $newTotal = $totalNotPassedQuota + $data->quota_daily;
+
+            // remining destination = total quota - used quota
+            $remainingDestinationQuota = $destination->total_quota - $destination->used_quota;
+
+            if ($newTotal > $remainingDestinationQuota) {
+                $remaining = $remainingDestinationQuota - $totalNotPassedQuota;
                 throw new MudikException(
                     ErrorCode::QuotaExceededDestination,
                     sprintf(
-                        'Total daily quota terjadwal (%d + %d = %d) melebihi total quota destination %s (%d). Sisa: %d',
-                        $totalDailyScheduled,
+                        'Total kuota hari ini dan ke depan (%d + %d = %d) melebihi sisa kuota destinasi %s (%d). Hanya sisa: %d',
+                        $totalNotPassedQuota,
                         $data->quota_daily,
-                        $totalDailyScheduled + $data->quota_daily,
+                        $newTotal,
                         $destination->name,
-                        $destination->total_quota,
-                        $destination->total_quota - $totalDailyScheduled
+                        $remainingDestinationQuota,
+                        $remaining
                     )
                 );
             }
