@@ -18,15 +18,39 @@
 @push('scripts')
 <script src="https://unpkg.com/html5-qrcode"></script>
 <script>
-const scanner = new Html5QrcodeScanner("reader", {fps:10, qrbox:250});
-scanner.render(token => {
-    scanner.pause();
-    window.location.href = `/cms/scanner/scan/${token}`;
-});
-document.getElementById('manualForm').addEventListener('submit', e => {
-    e.preventDefault();
-    const token = document.getElementById('tokenInput').value.trim();
-    if(token) window.location.href = `/cms/scanner/scan/${token}`;
-});
+    function extractToken(scannedValue) {
+        try {
+            const url = new URL(scannedValue);
+            if (url.searchParams.has('t')) {
+                return url.searchParams.get('t');
+            }
+            const pathParts = url.pathname.split('/').filter(Boolean);
+            const scanIndex = pathParts.indexOf('scan');
+            if (scanIndex !== -1 && pathParts[scanIndex + 1]) {
+                return pathParts[scanIndex + 1];
+            }
+        } catch {
+        }
+        return scannedValue;
+    }
+
+    function redirectToScan(scannedValue) {
+        const token = extractToken(scannedValue.trim());
+        if (token) {
+            window.location.href = `/cms/scanner/scan/${encodeURIComponent(token)}`;
+        }
+    }
+
+    const scanner = new Html5QrcodeScanner("reader", { fps: 10, qrbox: 250 });
+    scanner.render(scannedValue => {
+        scanner.pause();
+        redirectToScan(scannedValue);
+    });
+
+    document.getElementById('manualForm').addEventListener('submit', e => {
+        e.preventDefault();
+        const value = document.getElementById('tokenInput').value.trim();
+        if (value) redirectToScan(value);
+    });
 </script>
 @endpush
