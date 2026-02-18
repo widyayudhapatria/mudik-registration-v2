@@ -70,4 +70,10 @@ class QrCodeMail extends Mailable
                 'mudikConfig' => $this->mudikConfig,
             ]);
     }
+
+    public function render(): string
+    {
+        $html = parent::render();
+        return preg_replace('/>\s+</', '><', $html);
+    }
 }
