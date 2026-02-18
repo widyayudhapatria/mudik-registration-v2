@@ -6,6 +6,7 @@ use App\Data\ApproveRegistrationData;
 use App\Enums\ErrorCode;
 use App\Exceptions\MudikException;
 use App\Models\Admin;
+use App\Models\Destination;
 use App\Models\Registration;
 use App\Services\QrCodeService;
 use App\Jobs\SendQrCodeEmail;
@@ -35,9 +36,30 @@ class ApproveRegistrationAction
                 );
             }
 
+            // CRITICAL: Lock destination and validate remaining quota
+            $destination = Destination::lockForUpdate()
+                ->findOrFail($registration->destination_id);
+
+            // Validate: destination remaining quota must be >= family_count
+            if ($destination->remaining_quota < $registration->family_count) {
+                throw new MudikException(
+                    ErrorCode::DestinationQuotaFull,
+                    sprintf(
+                        'Quota destination %s tidak mencukupi. Tersisa: %d orang, Dibutuhkan: %d orang',
+                        $destination->name,
+                        $destination->remaining_quota,
+                        $registration->family_count
+                    )
+                );
+            }
+
             // Approve registration and fallback null admin notes
             $notes = $data->admin_notes ?? null;
             $registration->approve($admin->id, $notes);
+
+            // CRITICAL: Update destination used_quota (confirmed booking)
+            $destination->used_quota += $registration->family_count;
+            $destination->save();
 
             // Generate QR Code
             $qrCode = $this->qrCodeService->generateForRegistration($registration);
@@ -47,6 +69,11 @@ class ApproveRegistrationAction
             Log::info('Registration approved', [
                 'registration_id' => $registration->id,
                 'approved_by' => $admin->id,
+                'destination_id' => $destination->id,
+                'destination_name' => $destination->name,
+                'family_count' => $registration->family_count,
+                'destination_used_quota' => $destination->used_quota,
+                'destination_remaining_quota' => $destination->remaining_quota,
                 'qr_code_id' => $qrCode->id,
             ]);
 
