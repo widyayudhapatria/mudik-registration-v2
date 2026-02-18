@@ -4,10 +4,12 @@ namespace App\Providers;
 
 use App\Models\Admin;
 use App\Models\DailyQuota;
+use App\Models\Destination;
 use App\Models\QrCode;
 use App\Models\Registration;
 use App\Policies\AdminPolicy;
 use App\Policies\DashboardPolicy;
+use App\Policies\DestinationPolicy;
 use App\Policies\QrCodePolicy;
 use App\Policies\QuotaPolicy;
 use App\Policies\RegistrationPolicy;
@@ -24,7 +26,8 @@ class AuthServiceProvider extends ServiceProvider
         Registration::class => RegistrationPolicy::class,
         QrCode::class => QrCodePolicy::class,
         DailyQuota::class => QuotaPolicy::class,
-        Admin::class => AdminPolicy::class, 
+        Destination::class => DestinationPolicy::class,
+        Admin::class => AdminPolicy::class,
     ];
 
     /**

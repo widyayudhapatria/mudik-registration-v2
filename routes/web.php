@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CMS\DashboardController;
+use App\Http\Controllers\CMS\DestinationManagementController;
 use App\Http\Controllers\CMS\EmailRequestController;
 use App\Http\Controllers\CMS\QuotaManagementController;
 use App\Http\Controllers\CMS\RegistrationManagementController;
@@ -45,9 +46,20 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
         Route::post('/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('reject');
     });
 
+    Route::prefix('destinations')->name('destinations.')->group(function () {
+        Route::get('/', [DestinationManagementController::class, 'index'])->name('index');
+        Route::get('/{destination}', [DestinationManagementController::class, 'show'])->name('show');
+        Route::post('/', [DestinationManagementController::class, 'store'])->name('store');
+        Route::put('/{destination}', [DestinationManagementController::class, 'update'])->name('update');
+        Route::delete('/{destination}', [DestinationManagementController::class, 'destroy'])->name('destroy');
+        Route::post('/{destination}/toggle-active', [DestinationManagementController::class, 'toggleActive'])->name('toggle-active');
+    });
+
     Route::prefix('quotas')->name('quotas.')->group(function () {
         Route::get('/', [QuotaManagementController::class, 'index'])->name('index');
         Route::get('/today', [QuotaManagementController::class, 'today'])->name('today');
+        Route::get('/destination/{destination}', [QuotaManagementController::class, 'getByDestination'])->name('by-destination');
+        Route::get('/destination/{destination}/detail', [QuotaManagementController::class, 'destinationDetail'])->name('destination.detail');
         Route::post('/', [QuotaManagementController::class, 'store'])->name('store');
     });
 
