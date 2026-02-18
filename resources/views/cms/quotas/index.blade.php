@@ -542,8 +542,13 @@
                     @foreach ($destinations as $dest)
                         <tr>
                             <td>
-                                <div class="dest-name">{{ $dest->name }}</div>
-                                <span class="dest-code">{{ $dest->code }}</span>
+                                <div class="dest-name">
+                                    {{ $dest->name }}
+                                    @if (!$dest->is_active)
+                                        <span class="badge bg-secondary ms-2" style="font-size: 11px;">Nonaktif</span>
+                                    @endif
+                                </div>
+                                    <span class="dest-code">{{ $dest->code }}</span>
                             </td>
                             <td class="dest-quota-value">{{ number_format($dest->total_quota) }}</td>
                             <td class="dest-quota-value" style="color: #FF9800;">{{ number_format($dest->used_quota) }}
@@ -624,7 +629,12 @@
                                 @endphp
                                 <tr class="{{ $isPast ? 'past-quota' : '' }}">
                                     <td>
-                                        <div class="quota-destination-name">{{ $quota->destination->name }}</div>
+                                        <div class="quota-destination-name">
+                                            {{ $quota->destination->name }}
+                                            @if(isset($quota->destination) && !$quota->destination->is_active)
+                                                <span class="badge bg-secondary ms-2" style="font-size: 11px;">Nonaktif</span>
+                                            @endif
+                                        </div>
                                         <span class="quota-destination-code">{{ $quota->destination->code }}</span>
                                     </td>
                                     <td style="text-align: center;">
