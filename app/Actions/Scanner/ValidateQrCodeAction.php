@@ -4,25 +4,44 @@ namespace App\Actions\Scanner;
 
 use App\Enums\ErrorCode;
 use App\Exceptions\MudikException;
+use App\Models\Admin;
 use App\Models\QrCode;
+use App\Models\ScanLog;
 use Carbon\Carbon;
+use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
+use Throwable;
 
 class ValidateQrCodeAction
 {
     use AsAction;
 
-    public function handle(string $tokenQr): array
+    public function handle(string $tokenQr, ?Admin $admin = null): array
     {
         // Find QR code
         $qrCode = QrCode::where('token_qr', $tokenQr)
             ->with([
                 'registration.formLink',
+                'registration.destination',
                 'registration.participants'
             ])
             ->first();
 
         if (!$qrCode) {
+            // Log not-found failure if admin provided
+            if ($admin) {
+                try {
+                    ScanLog::logFailure(
+                        null,
+                        $admin->id,
+                        sprintf('QR not found: %s', $tokenQr),
+                        request()->ip(),
+                        request()->userAgent()
+                    );
+                } catch (Throwable $e) {
+                    Log::warning('Failed to log QR not-found attempt', ['error' => $e->getMessage()]);
+                }
+            }
             throw new MudikException(
                 ErrorCode::QrNotFound,
                 null,
@@ -53,6 +72,34 @@ class ValidateQrCodeAction
                 $additionalData['scanned_by'] = $qrCode->scannedBy?->name;
             }
 
+            // Log validation failure if admin provided
+            if ($admin) {
+                try {
+                    $now = Carbon::now();
+                    $failureReason = match (true) {
+                        $validation['has_been_scanned'] => sprintf(
+                            'Already scanned at %s by %s',
+                            $qrCode->scanned_at?->toDateTimeString() ?? 'unknown',
+                            $qrCode->scannedBy?->name ?? 'unknown'
+                        ),
+                        !$validation['is_within_valid_period'] => $now->isBefore($qrCode->valid_from)
+                            ? 'QR Code is not yet valid'
+                            : 'QR Code has expired',
+                        default => $errorCode->getMessage(),
+                    };
+
+                    ScanLog::logFailure(
+                        $qrCode->id,
+                        $admin->id,
+                        $failureReason,
+                        request()->ip(),
+                        request()->userAgent()
+                    );
+                } catch (Throwable $e) {
+                    Log::warning('Failed to log validation failure', ['error' => $e->getMessage()]);
+                }
+            }
+
             throw new MudikException(
                 $errorCode,
                 null,
@@ -81,6 +128,12 @@ class ValidateQrCodeAction
                     'family_count' => $qrCode->registration->family_count,
                     'kk_number' => $qrCode->registration->kk_number,
                     'has_child_under_4' => $qrCode->registration->has_child_under_4,
+                    'destination_name' => $qrCode->registration->destination?->name,
+                ],
+                'participants_summary' => [
+                    'total' => $qrCode->registration->participants->count(),
+                    'children_under_4' => $qrCode->registration->participants->where('is_child_under_4', true)->count(),
+                    'adults' => $qrCode->registration->participants->where('is_child_under_4', false)->count(),
                 ],
                 'email' => $qrCode->registration->formLink->email,
                 'participants' => $qrCode->registration->participants->map(function ($participant) {
@@ -89,6 +142,7 @@ class ValidateQrCodeAction
                         'full_name' => $participant->full_name,
                         'nik_kia' => $participant->nik_kia,
                         'birth_date' => $participant->birth_date->format('Y-m-d'),
+                        'birth_date_js' => $participant->birth_date->toIso8601String(),
                         'age' => $participant->getAge(),
                         'is_child_under_4' => $participant->is_child_under_4,
                     ];

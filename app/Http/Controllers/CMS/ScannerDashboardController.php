@@ -67,7 +67,7 @@ class ScannerDashboardController extends Controller
             $cacheKey = 'cms.scanner.scan_logs.page.1';
             $cached = Cache::remember($cacheKey, 10, function () use ($perPage) {
                 $logs = ScanLog::query()
-                    ->where('scan_result', 'success')
+                    ->whereIn('scan_result', ['success', 'failed'])
                     ->with(['qrCode.registration', 'admin'])
                     ->latest('scanned_at')
                     ->paginate($perPage);
@@ -77,13 +77,14 @@ class ScannerDashboardController extends Controller
                     $destinationName = $reg?->destination?->name ?? null;
                     return [
                         'id' => $log->id,
-                        'nama' => $reg?->representative_name ?? 'N/A',
+                        'nama' => $reg?->representative_name ?? ($log->token_scanned ?? 'N/A'),
                         'destination' => $destinationName ?? 'N/A',
                         'kk' => $reg?->kk_number ?? 'N/A',
                         'jumlah' => $reg?->family_count ?? 0,
                         'petugas' => $log->admin?->name ?? 'System',
-                        'waktu' => $log->scanned_at->format('d M Y H:i'),
-                        'status' => 'Berhasil'
+                        'waktu' => $log->scanned_at?->format('d M Y H:i') ?? '-',
+                        'status' => $log->isFailed() ? 'Gagal' : 'Berhasil',
+                        'failure_reason' => $log->isFailed() ? $log->failure_reason : null,
                     ];
                 });
 
@@ -105,7 +106,7 @@ class ScannerDashboardController extends Controller
 
         // Other pages: do not cache (higher latencies acceptable for paged history)
         $logs = ScanLog::query()
-            ->where('scan_result', 'success')
+            ->whereIn('scan_result', ['success', 'failed'])
             ->with(['qrCode.registration', 'admin'])
             ->latest('scanned_at')
             ->paginate($perPage, ['*'], 'page', $page);
@@ -115,13 +116,14 @@ class ScannerDashboardController extends Controller
             $destinationName = $reg?->destination?->name ?? null;
             return [
                 'id' => $log->id,
-                'nama' => $reg?->representative_name ?? 'N/A',
+                'nama' => $reg?->representative_name ?? ($log->token_scanned ?? 'N/A'),
                 'destination' => $destinationName ?? 'N/A',
                 'kk' => $reg?->kk_number ?? 'N/A',
                 'jumlah' => $reg?->family_count ?? 0,
                 'petugas' => $log->admin?->name ?? 'System',
-                'waktu' => $log->scanned_at->format('d M Y H:i'),
-                'status' => 'Berhasil'
+                'waktu' => $log->scanned_at?->format('d M Y H:i') ?? '-',
+                'status' => $log->isFailed() ? 'Gagal' : 'Berhasil',
+                'failure_reason' => $log->isFailed() ? $log->failure_reason : null,
             ];
         });
 

@@ -351,30 +351,8 @@
 
         </div>
 
-        {{-- Right: Stats & History --}}
+        {{-- Right: History --}}
         <div class="col-lg-5">
-
-            {{-- Stats --}}
-            <div class="row g-2 mb-3">
-                <div class="col-4">
-                    <div class="stat-card">
-                        <h3 id="statTotal">0</h3>
-                        <small>Total Scan</small>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="stat-card success-stat">
-                        <h3 id="statSuccess">0</h3>
-                        <small>Berhasil</small>
-                    </div>
-                </div>
-                <div class="col-4">
-                    <div class="stat-card failed-stat">
-                        <h3 id="statFailed">0</h3>
-                        <small>Gagal</small>
-                    </div>
-                </div>
-            </div>
 
             {{-- History --}}
             <div class="scanner-card">
@@ -604,53 +582,66 @@
             if (html5QrCode && isScanning) html5QrCode.resume();
         }
 
+        // ── Calculate Age ──────────────────────────────────────
+
+        function calculateAge(birthDate) {
+            const today = new Date();
+            const birth = new Date(birthDate);
+            let age = today.getFullYear() - birth.getFullYear();
+            const monthDiff = today.getMonth() - birth.getMonth();
+            if (monthDiff < 0 || (monthDiff === 0 && today.getDate() < birth.getDate())) {
+                age--;
+            }
+            return age;
+        }
+
         // ── UI Rendering ──────────────────────────────────────
 
         function showValidResult(data, token) {
             const reg = data.registration;
             const pax = data.participants || [];
             const pHTML = pax.map(p => `
-        <li class="${p.is_child_under_4 ? 'child' : ''}">
-            <i class="bi bi-person-fill text-secondary"></i>
-            <span>${p.full_name}</span>
-            ${p.is_child_under_4 ? '<span class="badge bg-warning text-dark ms-auto small">Anak &lt;4th</span>' : ''}
-        </li>`).join('');
+                <li class="${p.is_child_under_4 ? 'child' : ''}">
+                    <i class="bi bi-person-fill text-secondary"></i>
+                    <span>${p.full_name}, ${p.birth_date} (${p.age} tahun)</span>
+                    ${p.is_child_under_4 ? '<span class="badge bg-warning text-dark ms-auto small">Anak &lt;4th</span>' : ''}
+                </li>`).join('');
 
             const panel = document.getElementById('scanResultPanel');
             panel.className = 'result-valid';
             panel.innerHTML = `
-        <div class="result-header">
-            <i class="bi bi-check-circle-fill text-success fs-5"></i>
-            QR Code Valid — Konfirmasi Scan
-        </div>
-        <div class="result-body">
-            <table class="info-table w-100 mb-3">
-                <tr><td>Nama Perwakilan</td><td>${reg.representative_name}</td></tr>
-                <tr><td>No. KK</td><td>${reg.kk_number}</td></tr>
-                <tr><td>Jumlah Anggota</td><td><strong>${reg.family_count} orang</strong></td></tr>
-                <tr><td>Email</td><td>${data.email ?? '-'}</td></tr>
-                <tr><td>Berlaku</td><td>${formatDate(data.qr_code.valid_from)} – ${formatDate(data.qr_code.valid_until)}</td></tr>
-            </table>
+                <div class="result-header">
+                    <i class="bi bi-check-circle-fill text-success fs-5"></i>
+                    QR Code Valid — Konfirmasi Scan
+                </div>
+                <div class="result-body">
+                    <table class="info-table w-100 mb-3">
+                        <tr><td>Nama Perwakilan</td><td>${reg.representative_name}</td></tr>
+                        <tr><td>Tujuan</td><td><strong>${reg.destination_name ?? '-'}</strong></td></tr>
+                        <tr><td>No. KK</td><td>${reg.kk_number}</td></tr>
+                        <tr><td>Email</td><td>${data.email ?? '-'}</td></tr>
+                        <tr><td>Berlaku</td><td>${formatDate(data.qr_code.valid_from)} – ${formatDate(data.qr_code.valid_until)}</td></tr>
+                    </table>
 
-            ${pax.length ? `<div class="mb-3">
-                            <p class="small text-muted fw-bold mb-1">DAFTAR PESERTA</p>
-                            <ul class="participant-list">${pHTML}</ul>
-                        </div>` : ''}
+                    ${pax.length ? `<div class="mb-3">
+                                                        <p class="small text-muted fw-bold mb-1">DAFTAR PESERTA MUDIK (${data.participants_summary.total} orang)</p>
+                                                        <ul class="participant-list">${pHTML}</ul>
+                                                    </div>` : ''}
 
-            ${reg.has_child_under_4 ? `<div class="alert alert-warning py-2 px-3 small mb-3">
-                            <i class="bi bi-exclamation-triangle me-1"></i>
-                            <strong>Perhatian:</strong> Anak dibawah 4 tahun wajib dipangku selama perjalanan!
-                        </div>` : ''}
+                    ${reg.has_child_under_4 ? `<div class="alert alert-warning py-2 px-3 small mb-3">
+                                                        <i class="bi bi-exclamation-triangle me-1"></i>
+                                                        <strong>Perhatian:</strong> Anak dibawah 4 tahun wajib dipangku selama perjalanan!
+                                                    </div>` : ''}
 
-            <div class="d-flex gap-2 flex-wrap mt-2">
-                <button class="btn btn-confirm" onclick="confirmScan('${token}')">
-                    <i class="bi bi-check2-circle me-1"></i> Konfirmasi Scan
-                </button>
-                <button class="btn btn-cancel-scan" onclick="cancelScan()">
-                    <i class="bi bi-x me-1"></i> Batal
-                </button>
-            </div>
-        </div>`;
+                    <div class="d-flex gap-2 flex-wrap mt-2">
+                        <button class="btn btn-confirm" onclick="confirmScan('${token}')">
+                            <i class="bi bi-check2-circle me-1"></i> Konfirmasi Scan
+                        </button>
+                        <button class="btn btn-cancel-scan" onclick="cancelScan()">
+                            <i class="bi bi-x me-1"></i> Batal
+                        </button>
+                    </div>
+                </div>`;
             panel.style.display = 'block';
             panel.scrollIntoView({
                 behavior: 'smooth',
@@ -663,24 +654,25 @@
             const pHTML = pax.map(p => `
         <li class="${p.is_child_under_4 ? 'child' : ''}">
             <i class="bi bi-person-check-fill text-success"></i>
-            ${p.full_name}
+            ${p.full_name}, ${p.birth_date} (${p.age} tahun)
             ${p.is_child_under_4 ? '<span class="badge bg-warning text-dark ms-auto small">Anak &lt;4th</span>' : ''}
         </li>`).join('');
 
             return `
         <table class="info-table w-100 mb-3">
-            <tr><td>Nama</td><td>${reg.representative_name}</td></tr>
-            <tr><td>Jumlah Tiket</td><td><strong>${reg.family_count} tiket</strong></td></tr>
+                <tr><td>Nama Perwakilan</td><td>${reg.representative_name}</td></tr>
+                <tr><td>Tujuan</td><td><strong>${reg.destination_name ?? '-'}</strong></td></tr>
+                <tr><td>Jumlah Tiket</td><td><strong>${d.participants_summary.total} tiket</strong></td></tr>
             <tr><td>Waktu Scan</td><td>${formatDatetime(d.scanned_at)}</td></tr>
             <tr><td>Petugas</td><td>${d.scanned_by?.name ?? '-'}</td></tr>
         </table>
         ${pax.length ? `<div class="mb-3">
-                        <p class="small text-muted fw-bold mb-1">PESERTA</p>
-                        <ul class="participant-list">${pHTML}</ul>
-                    </div>` : ''}
+                                            <p class="small text-muted fw-bold mb-1">DAFTAR PESERTA MUDIK (${d.participants_summary.total} orang)</p>
+                                            <ul class="participant-list">${pHTML}</ul>
+                                        </div>` : ''}
         ${d.warnings?.length ? `<div class="alert alert-warning py-2 px-3 small mb-2">
-                        <i class="bi bi-exclamation-triangle me-1"></i> ${d.warnings[0]}
-                    </div>` : ''}
+                                            <i class="bi bi-exclamation-triangle me-1"></i> ${d.warnings[0]}
+                                        </div>` : ''}
         <div class="alert alert-success py-2 px-3 small mb-3">
             <i class="bi bi-ticket-perforated me-1"></i> Tiket dapat ditukarkan kepada peserta!
         </div>
@@ -794,9 +786,7 @@
         }
 
         function updateStats() {
-            document.getElementById('statTotal').textContent = stats.total;
-            document.getElementById('statSuccess').textContent = stats.success;
-            document.getElementById('statFailed').textContent = stats.failed;
+            // Stats updated in local memory, displayed in dashboard only
         }
 
         function scheduleResume(ms) {
