@@ -11,6 +11,7 @@ use App\Exceptions\MudikException;
 use App\Filters\RegistrationFilters;
 use App\Http\Controllers\Controller;
 use App\Models\Registration;
+use App\Models\Destination;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -34,6 +35,7 @@ class RegistrationManagementController extends Controller
         $registrations = Registration::withTrashed()
             ->with([
                 'formLink',
+                'destination',
                 'participants',
                 'approvedBy',
                 'rejectedBy'
@@ -41,6 +43,8 @@ class RegistrationManagementController extends Controller
             ->useFilters(RegistrationFilters::class)
             ->latest('created_at')
             ->paginate(20);
+        
+        $destinations = Destination::ordered()->get();
 
         if ($request->wantsJson()) {
             return response()->json($registrations);
@@ -48,6 +52,7 @@ class RegistrationManagementController extends Controller
 
         return view('cms.registrations.index', [
             'registrations' => $registrations,
+            'destinations' => $destinations,
         ]);
     }
 

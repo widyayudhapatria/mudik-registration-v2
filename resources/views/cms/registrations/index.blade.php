@@ -205,6 +205,18 @@
                     <option value="rejected" {{ request('status') == 'rejected' ? 'selected' : '' }}>Ditolak</option>
                 </select>
             </div>
+
+            <div class="col-md-3 col-12">
+                <label class="form-label fw-semibold small">Tujuan</label>
+                <select name="destination_id" class="form-select">
+                    <option value="">Semua Tujuan</option>
+                    @foreach($destinations as $destination)
+                    <option value="{{ $destination->id }}" {{ request('destination_id') == $destination->id ? 'selected' : '' }}>
+                        {{ $destination->name }}
+                    </option>
+                    @endforeach
+                </select>
+            </div>
             
             <div class="col-md-3 col-sm-6 col-12">
                 <label class="form-label fw-semibold small">Tanggal Dari</label>
@@ -250,7 +262,7 @@
                         <th>ID</th>
                         <th>Perwakilan</th>
                         <th>NIK</th>
-                        <th>No. KK</th>
+                        <th>Tujuan</th>
                         <th>Jumlah</th>
                         <th>Tanggal</th>
                         <th>Status</th>
@@ -266,7 +278,7 @@
                             <div class="small text-muted">{{ $registration->formLink->email }}</div>
                         </td>
                         <td>{{ $registration->representative_nik }}</td>
-                        <td>{{ $registration->kk_number }}</td>
+                        <td>{{ $registration->destination->name }}</td>
                         <td>
                             <span class="badge bg-info">{{ $registration->family_count }} orang</span>
                         </td>
