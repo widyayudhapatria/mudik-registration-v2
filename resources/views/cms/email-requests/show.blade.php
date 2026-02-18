@@ -124,25 +124,13 @@
                                     <td><strong>{{ $formLink->registration->representative_name }}</strong></td>
                                 </tr>
                                 <tr>
-                                    <th>Phone</th>
-                                    <td>{{ $formLink->registration->representative_phone }}</td>
+                                    <th>Destination</th>
+                                    <td>{{ $formLink->registration->destination->name }}</td>
                                 </tr>
                                 <tr>
                                     <th>Total Participants</th>
                                     <td>
                                         <span class="badge bg-info">{{ $formLink->registration->participants->count() }} people</span>
-                                    </td>
-                                </tr>
-                                <tr>
-                                    <th>Registration Status</th>
-                                    <td>
-                                        @if($formLink->registration->status === 'pending')
-                                            <span class="badge bg-warning">Pending</span>
-                                        @elseif($formLink->registration->status === 'approved')
-                                            <span class="badge bg-success">Approved</span>
-                                        @elseif($formLink->registration->status === 'rejected')
-                                            <span class="badge bg-danger">Rejected</span>
-                                        @endif
                                     </td>
                                 </tr>
                                 <tr>
