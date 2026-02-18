@@ -9,6 +9,7 @@ use App\Http\Controllers\Public\EmailSubmissionController;
 use App\Http\Controllers\Public\QrViewController;
 use App\Http\Controllers\Public\RegistrationController;
 use Illuminate\Support\Facades\Route;
+use Illuminate\Support\Facades\Log;
 use Illuminate\Http\Request;
 
 Route::prefix('public')->name('public.')->group(function () {
@@ -70,13 +71,34 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
 
     Route::prefix('scanner')->name('scanner.')->middleware(['scanner.permission'])->group(function () {
         Route::get('/', function () {
-            return view('cms.scanner.index');
+            return view('cms.scanner.index-spa');
         })->name('index');
+
+        // Scanner API Endpoints (moved from api.php for session support)
+        Route::get('/api/validate', [\App\Http\Controllers\CMS\ScannerController::class, 'validateQrCode'])->name('api.validate');
+        Route::post('/api/consume', [\App\Http\Controllers\CMS\ScannerController::class, 'consumeQrCode'])->name('api.consume');
 
         Route::get('/scan/{token}', function ($token) {
             $qrCode = \App\Models\QrCode::where('token_qr', $token)
                 ->with(['registration.participants', 'registration.formLink', 'scannedBy'])
-                ->firstOrFail();
+                ->first();
+
+            if (!$qrCode) {
+                // Better error handling with debug info
+                Log::warning('QR Code not found in scanner', [
+                    'token_searched' => $token,
+                    'token_length' => strlen($token),
+                ]);
+
+                return response()->view('errors.qr-not-found', [
+                    'token' => $token,
+                    'message' => 'QR Code tidak ditemukan di database.',
+                    'debug' => [
+                        'token_length' => strlen($token),
+                        'searched_token' => substr($token, 0, 32) . '...',
+                    ]
+                ], 404);
+            }
 
             return view('cms.scanner.scan', [
                 'token' => $token,

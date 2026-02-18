@@ -5,7 +5,7 @@
 
 @section('content')
 <div style="background:white; border-radius:16px; padding:30px;">
-    
+
     <!-- Back Button -->
     <div class="mb-4">
         <a href="{{ route('cms.scanner.index') }}" class="btn btn-secondary">
@@ -146,14 +146,12 @@
     <!-- Action Button -->
     @if($qrCode->canBeScanned())
     <div class="text-center">
-        <form action="{{ route('cms.api.scan.consume') }}" method="POST" id="scanForm">
-            @csrf
-            <input type="hidden" name="token" value="{{ $token }}">
-            <button type="submit" class="btn btn-success btn-lg px-5 py-3" style="border-radius: 12px;">
-                <i class="bi bi-check-circle me-2"></i>
-                <strong>Konfirmasi Scan QR Code</strong>
-            </button>
-        </form>
+        <button type="button" class="btn btn-success btn-lg px-5 py-3"
+                style="border-radius: 12px;"
+                onclick="confirmScan()">
+            <i class="bi bi-check-circle me-2"></i>
+            <strong>Konfirmasi Scan QR Code</strong>
+        </button>
         <p class="text-muted mt-3 small">
             <i class="bi bi-info-circle me-1"></i>
             Pastikan semua data sudah benar sebelum konfirmasi
@@ -173,16 +171,127 @@
     @endif
 
 </div>
+
+<!-- Success Modal -->
+<div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-success text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-check-circle-fill me-2"></i>
+                    Scan Berhasil!
+                </h5>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-4">
+                    <i class="bi bi-check-circle" style="font-size: 80px; color: #4CAF50;"></i>
+                </div>
+                <h5 id="successName" class="mb-3"></h5>
+                <p id="successDetails" class="text-muted mb-0"></p>
+                <div id="successWarning" class="alert alert-warning mt-3" style="display:none;">
+                    <i class="bi bi-exclamation-triangle me-2"></i>
+                    <span id="warningText"></span>
+                </div>
+            </div>
+            <div class="modal-footer">
+                <a href="{{ route('cms.scanner.index') }}" class="btn btn-primary">
+                    <i class="bi bi-arrow-left me-2"></i>Kembali ke Scanner
+                </a>
+            </div>
+        </div>
+    </div>
+</div>
+
+<!-- Error Modal -->
+<div class="modal fade" id="errorModal" tabindex="-1">
+    <div class="modal-dialog modal-dialog-centered">
+        <div class="modal-content">
+            <div class="modal-header bg-danger text-white">
+                <h5 class="modal-title">
+                    <i class="bi bi-x-circle-fill me-2"></i>
+                    Scan Gagal
+                </h5>
+                <button type="button" class="btn-close btn-close-white" data-bs-dismiss="modal"></button>
+            </div>
+            <div class="modal-body text-center py-4">
+                <div class="mb-4">
+                    <i class="bi bi-x-circle" style="font-size: 80px; color: #f44336;"></i>
+                </div>
+                <h5 id="errorMessage" class="text-danger mb-3"></h5>
+                <p id="errorDetails" class="text-muted mb-0"></p>
+            </div>
+            <div class="modal-footer">
+                <button type="button" class="btn btn-secondary" data-bs-dismiss="modal">Tutup</button>
+                <a href="{{ route('cms.scanner.index') }}" class="btn btn-primary">Kembali ke Scanner</a>
+            </div>
+        </div>
+    </div>
+</div>
 @endsection
 
 @push('scripts')
 <script>
-document.getElementById('scanForm')?.addEventListener('submit', function(e) {
-    e.preventDefault();
-    
-    if (confirm('⚠️ Yakin ingin men-scan QR Code ini?\n\nTindakan ini tidak dapat dibatalkan!')) {
-        this.submit();
+const token = '{{ $token }}';
+const csrfToken = '{{ csrf_token() }}';
+
+async function confirmScan() {
+    if (!confirm('⚠️ Yakin ingin men-scan QR Code ini?\n\nTindakan ini tidak dapat dibatalkan!')) {
+        return;
     }
-});
+
+    // Show loading
+    const btn = event.target.closest('button');
+    const originalHTML = btn.innerHTML;
+    btn.disabled = true;
+    btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Processing...';
+
+    try {
+        const response = await fetch('/api/cms/scan/consume', {
+            method: 'POST',
+            headers: {
+                'Content-Type': 'application/json',
+                'X-CSRF-TOKEN': csrfToken,
+                'Accept': 'application/json'
+            },
+            body: JSON.stringify({ token_qr: token })
+        });
+
+        const result = await response.json();
+
+        if (result.success) {
+            showSuccess(result.data);
+        } else {
+            showError(result.message || 'Scan gagal', result.error_details || '');
+        }
+    } catch (error) {
+        console.error('Scan error:', error);
+        showError('Terjadi kesalahan saat melakukan scan', error.message);
+    } finally {
+        btn.disabled = false;
+        btn.innerHTML = originalHTML;
+    }
+}
+
+function showSuccess(data) {
+    document.getElementById('successName').textContent = data.registration.representative_name;
+    document.getElementById('successDetails').textContent =
+        `${data.registration.family_count} orang • KK: ${data.registration.kk_number}`;
+
+    if (data.warnings && data.warnings.length > 0) {
+        document.getElementById('warningText').textContent = data.warnings[0];
+        document.getElementById('successWarning').style.display = 'block';
+    }
+
+    const modal = new bootstrap.Modal(document.getElementById('successModal'));
+    modal.show();
+}
+
+function showError(message, details) {
+    document.getElementById('errorMessage').textContent = message;
+    document.getElementById('errorDetails').textContent = details;
+
+    const modal = new bootstrap.Modal(document.getElementById('errorModal'));
+    modal.show();
+}
 </script>
 @endpush
