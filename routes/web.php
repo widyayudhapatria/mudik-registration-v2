@@ -80,6 +80,7 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
         // Scanner API Endpoints (moved from api.php for session support)
         Route::get('/api/validate', [\App\Http\Controllers\CMS\ScannerController::class, 'validateQrCode'])->name('api.validate');
         Route::post('/api/consume', [\App\Http\Controllers\CMS\ScannerController::class, 'consumeQrCode'])->name('api.consume');
+        Route::get('/api/history', [\App\Http\Controllers\CMS\ScannerController::class, 'scanHistory'])->name('api.history');
         Route::get('/api/statistics', [\App\Http\Controllers\CMS\ScannerDashboardController::class, 'statistics'])->name('api.statistics');
         Route::get('/api/scan-logs', [\App\Http\Controllers\CMS\ScannerDashboardController::class, 'scanLogs'])->name('api.scan-logs');
         Route::get('/api/scan-by-destination', [\App\Http\Controllers\CMS\ScannerDashboardController::class, 'scanByDestination'])->name('api.scan-by-destination');

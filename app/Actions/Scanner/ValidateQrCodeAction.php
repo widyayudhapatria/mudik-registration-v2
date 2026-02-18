@@ -65,6 +65,28 @@ class ValidateQrCodeAction
                 'valid_from' => $qrCode->valid_from->toISOString(),
                 'valid_until' => $qrCode->valid_until->toISOString(),
                 'current_time' => Carbon::now()->toISOString(),
+                'registration' => [
+                    'id' => $qrCode->registration->id,
+                    'representative_name' => $qrCode->registration->representative_name,
+                    'representative_nik' => $qrCode->registration->representative_nik,
+                    'family_count' => $qrCode->registration->family_count,
+                    'kk_number' => $qrCode->registration->kk_number,
+                    'has_child_under_4' => $qrCode->registration->has_child_under_4,
+                    'destination_name' => $qrCode->registration->destination?->name,
+                ],
+                'participants_summary' => [
+                    'total' => $qrCode->registration->participants->count(),
+                    'children_under_4' => $qrCode->registration->participants->where('is_child_under_4', true)->count(),
+                    'adults' => $qrCode->registration->participants->where('is_child_under_4', false)->count(),
+                ],
+                'participants' => $qrCode->registration->participants->map(function ($participant) {
+                    return [
+                        'full_name' => $participant->full_name,
+                        'birth_date' => $participant->birth_date->toIso8601String(),
+                        'age' => $participant->getAge(),
+                        'is_child_under_4' => $participant->is_child_under_4,
+                    ];
+                })->toArray(),
             ];
 
             if ($qrCode->scanned_at) {

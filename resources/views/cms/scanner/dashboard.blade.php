@@ -283,16 +283,16 @@
             </div>
 
             <div class="table-responsive">
-                <table id="scanLogsTable">
+                <table id="scanLogsTable" class="table table-sm table-striped table-hover">
                     <thead>
                         <tr>
                             <th>Waktu</th>
                             <th>Nama Perwakilan</th>
                             <th>Kota</th>
-                            <th>No. KK</th>
                             <th>Jumlah</th>
-                            <th>Petugas</th>
                             <th>Status</th>
+                            <th>Petugas</th>
+                            <th>Log Pesan</th>
                         </tr>
                     </thead>
                     <tbody id="scanLogsBody">
@@ -383,16 +383,22 @@
                                 </td>
                             </tr>`;
                     } else {
-                        tbody.innerHTML = json.data.map(log => `
+                        tbody.innerHTML = json.data.map(log => {
+                            const isFailed = (log.status || '').toLowerCase() === 'failed' || (log.status || '').toLowerCase() === 'gagal';
+                            const badgeClass = isFailed ? 'badge bg-danger' : 'badge bg-success';
+                            const icon = isFailed ? 'x-circle-fill' : 'check-circle-fill';
+                            const statusText = isFailed ? 'Gagal' : 'Berhasil';
+                            return `
                             <tr>
                                 <td>${log.waktu}</td>
                                 <td><strong>${log.nama}</strong></td>
                                 <td>${log.destination ?? 'N/A'}</td>
-                                <td>${log.kk}</td>
-                                <td class="text-center"><span class="badge success">${log.jumlah} orang</span></td>
+                                <td class="text-center"><span class="badge bg-primary">${log.jumlah ?? 'N/A'} orang</span></td>
+                                <td><span class="${badgeClass}"><i class="bi bi-${icon} me-1"></i>${statusText}</span></td>
                                 <td>${log.petugas}</td>
-                                <td><span class="badge success">✓ ${log.status}</span></td>
-                            </tr>`).join('');
+                                <td>${log.failure_reason ?? 'N/A'}</td>
+                            </tr>`;
+                        }).join('');
                     }
 
                     // Update pagination
@@ -430,32 +436,43 @@
                         return;
                     }
 
+                    // Build a responsive Bootstrap table for destination breakdown
                     let html = `
-                        <div class="destination-header">
-                            <div><strong>Kota</strong></div>
-                            <div class="text-center"><strong>Registrasi</strong></div>
-                            <div class="text-center"><strong>Total Peserta</strong></div>
-                            <div class="text-center"><strong>Sudah Scan</strong></div>
-                            <div class="text-center"><strong>Belum Scan</strong></div>
-                            <div class="text-center"><strong>Persentase</strong></div>
-                        </div>`;
+                        <div class="table-responsive">
+                            <table class="table table-sm table-striped table-hover">
+                                <thead>
+                                    <tr>
+                                        <th>Kota</th>
+                                        <th class="text-center">Registrasi</th>
+                                        <th class="text-center">Total Peserta</th>
+                                        <th class="text-center">Sudah Scan</th>
+                                        <th class="text-center">Belum Scan</th>
+                                        <th class="text-center">Persentase</th>
+                                    </tr>
+                                </thead>
+                                <tbody>`;
 
                     json.data.forEach(dest => {
                         html += `
-                            <div class="destination-row">
-                                <div><strong>${dest.kota}</strong></div>
-                                <div class="text-center">${dest.registrasi}</div>
-                                <div class="text-center">${dest.total_peserta}</div>
-                                <div class="text-center"><span class="badge success">${dest.sudah_scan}</span></div>
-                                <div class="text-center"><span class="badge warning">${dest.belum_scan}</span></div>
-                                <div class="text-center">
-                                    <strong>${dest.persentase}%</strong>
-                                    <div class="progress-bar-container" style="margin-top: 6px;">
-                                        <div class="progress-bar" style="width: ${dest.persentase}%"></div>
-                                    </div>
-                                </div>
-                            </div>`;
+                                    <tr>
+                                        <td><strong>${dest.kota}</strong></td>
+                                        <td class="text-center">${dest.registrasi}</td>
+                                        <td class="text-center">${dest.total_peserta}</td>
+                                        <td class="text-center"><span class="badge bg-success">${dest.sudah_scan}</span></td>
+                                        <td class="text-center"><span class="badge bg-warning text-dark">${dest.belum_scan}</span></td>
+                                        <td class="text-center">
+                                            <strong>${dest.persentase}%</strong>
+                                            <div class="progress-bar-container" style="margin-top: 6px;">
+                                                <div class="progress-bar" style="width: ${dest.persentase}%"></div>
+                                            </div>
+                                        </td>
+                                    </tr>`;
                     });
+
+                    html += `
+                                </tbody>
+                            </table>
+                        </div>`;
 
                     container.innerHTML = html;
                     document.getElementById('destUpdateTime').textContent = formatTime(new Date());

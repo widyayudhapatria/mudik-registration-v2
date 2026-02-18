@@ -72,4 +72,47 @@ class ScannerController extends Controller
             return response()->json($e->toArray(), $e->getCode() ?: 400);
         }
     }
+
+    /**
+     * Get last 10 scan logs (success and failed).
+     */
+    public function scanHistory(): JsonResponse
+    {
+        try {
+            // Get current authenticated admin
+            $admin = auth('admin')->user();
+
+            $logs = \App\Models\ScanLog::query()
+                ->with('qrCode.registration', 'admin')
+                ->where('admin_id', $admin->id) // Filter by current logged-in admin
+                ->whereNotNull('scan_result')
+                ->orderByDesc('id')
+                ->limit(10)
+                ->get()
+                ->map(function ($log) {
+                    return [
+                        'id' => $log->id,
+                        'qr_code_id' => $log->qr_code_id,
+                        'status' => $log->scan_result, // already 'success' or 'failed' from model
+                        'failure_reason' => $log->failure_reason ?? '-',
+                        'representative_name' => $log->qrCode?->registration?->representative_name ?? 'Unknown',
+                        'family_count' => $log->qrCode?->registration?->family_count ?? 0,
+                        'admin_name' => $log->admin?->name ?? '-',
+                        'scanned_at' => $log->scanned_at->toIso8601String(),
+                        'formatted_time' => $log->scanned_at->format('d M Y H:i:s'),
+                    ];
+                })
+                ->values();
+
+            return response()->json([
+                'success' => true,
+                'data' => $logs,
+            ]);
+        } catch (\Exception $e) {
+            return response()->json([
+                'success' => false,
+                'message' => 'Failed to fetch scan history',
+            ], 500);
+        }
+    }
 }

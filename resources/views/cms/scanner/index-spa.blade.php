@@ -453,11 +453,6 @@
             if (!token) {
                 showResult('error', '❌ QR Code Tidak Valid',
                     'Format tidak dikenali. Pastikan QR berasal dari sistem Mudik Gratis 2026.');
-                addHistory({
-                    success: false,
-                    name: 'QR Tidak Valid',
-                    detail: 'Format tidak dikenali'
-                });
                 stats.total++;
                 stats.failed++;
                 updateStats();
@@ -504,12 +499,23 @@
                 } else {
                     const msg = json.message || 'QR Code tidak valid.';
                     const extra = buildErrorExtra(json);
-                    showResult('error', '❌ Validasi Gagal', msg + extra);
-                    addHistory({
-                        success: false,
-                        name: 'Validasi Gagal',
-                        detail: msg
-                    });
+                    console.log('Validation failed:', { msg, extra, data: json.data });
+                    // Use raw=true so HTML extra info renders properly
+                    showResult('error', '❌ Validasi Gagal',
+                        `<p class="mb-0" style="font-size:14px;">${msg}</p>${extra}`, true);
+                    // Inject failed scan to history
+                    const d = json.data;
+                    if (d && d.registration) {
+                        console.log('Injecting to history:', d.registration);
+                        injectToHistory({
+                            status: 'failed',
+                            representative_name: d.registration.representative_name,
+                            failure_reason: msg,
+                            scanned_at: new Date().toISOString()
+                        });
+                    } else {
+                        console.log('No data or registration to inject');
+                    }
                     stats.total++;
                     stats.failed++;
                     updateStats();
@@ -545,10 +551,12 @@
                     const d = json.data;
                     const reg = d.registration;
                     showResult('success', '✅ Scan Berhasil!', buildSuccessHTML(d, reg), true);
-                    addHistory({
-                        success: true,
-                        name: reg.representative_name,
-                        detail: `${reg.family_count} tiket`
+                    // Inject successful scan to history
+                    injectToHistory({
+                        status: 'success',
+                        representative_name: reg.representative_name,
+                        family_count: reg.family_count,
+                        scanned_at: d.scanned_at
                     });
                     stats.total++;
                     stats.success++;
@@ -558,11 +566,6 @@
                 } else {
                     const msg = json.message || 'Scan gagal.';
                     showResult('error', '❌ Scan Gagal', msg);
-                    addHistory({
-                        success: false,
-                        name: 'Scan Gagal',
-                        detail: msg
-                    });
                     stats.total++;
                     stats.failed++;
                     updateStats();
@@ -624,14 +627,14 @@
                     </table>
 
                     ${pax.length ? `<div class="mb-3">
-                                                        <p class="small text-muted fw-bold mb-1">DAFTAR PESERTA MUDIK (${data.participants_summary.total} orang)</p>
-                                                        <ul class="participant-list">${pHTML}</ul>
-                                                    </div>` : ''}
+                                                                <p class="small text-muted fw-bold mb-1">DAFTAR PESERTA MUDIK (${data.participants_summary.total} orang)</p>
+                                                                <ul class="participant-list">${pHTML}</ul>
+                                                            </div>` : ''}
 
                     ${reg.has_child_under_4 ? `<div class="alert alert-warning py-2 px-3 small mb-3">
-                                                        <i class="bi bi-exclamation-triangle me-1"></i>
-                                                        <strong>Perhatian:</strong> Anak dibawah 4 tahun wajib dipangku selama perjalanan!
-                                                    </div>` : ''}
+                                                                <i class="bi bi-exclamation-triangle me-1"></i>
+                                                                <strong>Perhatian:</strong> Anak dibawah 4 tahun wajib dipangku selama perjalanan!
+                                                            </div>` : ''}
 
                     <div class="d-flex gap-2 flex-wrap mt-2">
                         <button class="btn btn-confirm" onclick="confirmScan('${token}')">
@@ -667,12 +670,12 @@
             <tr><td>Petugas</td><td>${d.scanned_by?.name ?? '-'}</td></tr>
         </table>
         ${pax.length ? `<div class="mb-3">
-                                            <p class="small text-muted fw-bold mb-1">DAFTAR PESERTA MUDIK (${d.participants_summary.total} orang)</p>
-                                            <ul class="participant-list">${pHTML}</ul>
-                                        </div>` : ''}
+                                                    <p class="small text-muted fw-bold mb-1">DAFTAR PESERTA MUDIK (${d.participants_summary.total} orang)</p>
+                                                    <ul class="participant-list">${pHTML}</ul>
+                                                </div>` : ''}
         ${d.warnings?.length ? `<div class="alert alert-warning py-2 px-3 small mb-2">
-                                            <i class="bi bi-exclamation-triangle me-1"></i> ${d.warnings[0]}
-                                        </div>` : ''}
+                                                    <i class="bi bi-exclamation-triangle me-1"></i> ${d.warnings[0]}
+                                                </div>` : ''}
         <div class="alert alert-success py-2 px-3 small mb-3">
             <i class="bi bi-ticket-perforated me-1"></i> Tiket dapat ditukarkan kepada peserta!
         </div>
@@ -682,13 +685,47 @@
         }
 
         function buildErrorExtra(json) {
-            if (!json.additional_data) return '';
-            const d = json.additional_data;
+            if (!json.data) return '';
+            const d = json.data;
+            const reg = d.registration;
+            const pax = d.participants || [];
+
+            if (!reg) return '';
+
+            // Build participants list for error display
+            const pHTML = pax.length ? pax.map(p => `
+                <li class="${p.is_child_under_4 ? 'child' : ''}">
+                    <i class="bi bi-person-fill text-secondary"></i>
+                    <span>${p.full_name} (${p.age !== undefined ? p.age : calculateAge(p.birth_date)} tahun)</span>
+                    ${p.is_child_under_4 ? '<span class="badge bg-warning text-dark ms-auto small">Anak &lt;4th</span>' : ''}
+                </li>`).join('') : '';
+
             let extra = '';
-            if (d.scanned_at) extra +=
-                `<br><small class="text-muted">Di-scan: ${formatDatetime(d.scanned_at)}${d.scanned_by ? ' oleh ' + d.scanned_by : ''}</small>`;
-            if (d.valid_from) extra +=
-                `<br><small class="text-muted">Berlaku: ${formatDate(d.valid_from)} – ${formatDate(d.valid_until)}</small>`;
+            extra += `<div style="margin-top: 16px; padding-top: 16px; border-top: 2px solid #ccc; background: #f9f9f9; padding: 12px; border-radius: 6px;">`;
+            extra += `<p style="font-weight: 700; margin: 0 0 12px 0; font-size: 14px; color: #333;">📋 Info Pendaftar:</p>`;
+            extra += `<table class="info-table w-100" style="font-size: 13px; margin-bottom: 12px; background: white; padding: 8px; border-radius: 4px;">`;
+            extra += `<tr><td style="padding: 4px 0;">Nama</td><td style="padding: 4px 0;"><strong>${reg.representative_name}</strong></td></tr>`;
+            extra += `<tr><td style="padding: 4px 0;">Tujuan</td><td style="padding: 4px 0;"><strong>${reg.destination_name || '-'}</strong></td></tr>`;
+            extra += `<tr><td style="padding: 4px 0;">No. KK</td><td style="padding: 4px 0;">${reg.kk_number}</td></tr>`;
+            extra += `</table>`;
+
+            if (pax.length) {
+                extra += `<p style="font-weight: 700; margin: 12px 0 8px 0; font-size: 14px; color: #333;">👥 Peserta (${d.participants_summary?.total || pax.length} orang):</p>`;
+                extra += `<ul class="participant-list" style="margin: 0; background: white; padding: 8px; border-radius: 4px;">${pHTML}</ul>`;
+            }
+
+            if (d.scanned_at) {
+                extra += `<p style="font-weight: 700; margin: 12px 0 4px 0; font-size: 14px; color: #333;">📅 Info Waktu Scan:</p>`;
+                extra += `<small class="text-muted" style="display: block; margin-bottom: 4px;">Waktu: ${formatDatetime(d.scanned_at)}</small>`;
+                if (d.scanned_by) {
+                    extra += `<small class="text-muted">Petugas: <strong>${d.scanned_by}</strong></small>`;
+                }
+            }
+            if (d.valid_from) {
+                extra += `<p style="font-weight: 700; margin: 12px 0 4px 0; font-size: 14px; color: #333;">📆 Periode Berlaku:</p>`;
+                extra += `<small class="text-muted">${formatDate(d.valid_from)} – ${formatDate(d.valid_until)}</small>`;
+            }
+            extra += `</div>`;
             return extra;
         }
 
@@ -734,33 +771,81 @@
 
         // ── History ───────────────────────────────────────────
 
-        function addHistory(item) {
-            item.time = new Date().toLocaleTimeString('id-ID', {
-                hour: '2-digit',
-                minute: '2-digit',
-                second: '2-digit'
-            });
-            history.unshift(item);
-            if (history.length > 20) history.pop();
-            renderHistory();
+        async function loadScanHistory() {
+            try {
+                const res = await fetch('/cms/scanner/api/history', {
+                    credentials: 'include',
+                    headers: {
+                        'X-CSRF-TOKEN': CSRF,
+                        'Accept': 'application/json'
+                    }
+                });
+                const json = await res.json();
+                if (json.success && json.data) {
+                    renderRemoteHistory(json.data);
+                }
+            } catch (err) {
+                console.error('Load history error:', err);
+            }
         }
 
-        function renderHistory() {
+        function injectToHistory(item) {
+            console.log('injectToHistory called with:', item);
             const el = document.getElementById('historyList');
-            document.getElementById('historyCount').textContent = history.length;
-            if (!history.length) {
-                el.innerHTML = '<p class="text-muted text-center small my-3">Belum ada riwayat scan</p>';
+            if (!el) {
+                console.error('historyList element not found!');
                 return;
             }
-            el.innerHTML = history.map(h => `
+            // Remove empty state message if exists
+            const emptyMsg = el.querySelector('.text-muted.text-center');
+            if (emptyMsg) {
+                console.log('Removing empty message');
+                emptyMsg.remove();
+            }
+
+            const h = item;
+            const historyItem = document.createElement('div');
+            historyItem.className = 'd-flex align-items-start gap-2 mb-2 p-2 rounded';
+            historyItem.style.cssText =
+                `background:${h.status === 'success' ? '#f1f8e9' : '#fce4ec'}; border-left:3px solid ${h.status === 'success' ? '#66bb6a' : '#ef5350'};`;
+            historyItem.innerHTML = `
+                <i class="bi bi-${h.status === 'success' ? 'check-circle-fill text-success' : 'x-circle-fill text-danger'} mt-1" style="font-size:13px;flex-shrink:0;"></i>
+                <div class="flex-grow-1" style="min-width:0;">
+                    <div class="fw-semibold text-truncate" style="font-size:13px;">${h.representative_name}</div>
+                    <div class="text-muted" style="font-size:11px;">${h.status === 'success' ? h.family_count + ' tiket' : h.failure_reason}</div>
+                </div>
+                <small class="text-muted text-nowrap" style="font-size:11px;">${new Date(h.scanned_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit', second: '2-digit'})}</small>
+            `;
+            // Insert at beginning (newest first)
+            el.insertBefore(historyItem, el.firstChild);
+            console.log('Item injected to history');
+
+            // Update count
+            const countEl = document.getElementById('historyCount');
+            if (countEl) {
+                const currentCount = parseInt(countEl.textContent) || 0;
+                countEl.textContent = currentCount + 1;
+                console.log('History count updated to:', currentCount + 1);
+            }
+        }
+
+        function renderRemoteHistory(logs) {
+            const el = document.getElementById('historyList');
+            if (!logs || logs.length === 0) {
+                el.innerHTML = '<p class="text-muted text-center small my-3">Belum ada riwayat scan</p>';
+                document.getElementById('historyCount').textContent = '0';
+                return;
+            }
+            document.getElementById('historyCount').textContent = logs.length;
+            el.innerHTML = logs.map(h => `
         <div class="d-flex align-items-start gap-2 mb-2 p-2 rounded"
-             style="background:${h.success ? '#f1f8e9' : '#fce4ec'}; border-left:3px solid ${h.success ? '#66bb6a' : '#ef5350'};">
-            <i class="bi bi-${h.success ? 'check-circle-fill text-success' : 'x-circle-fill text-danger'} mt-1" style="font-size:13px;flex-shrink:0;"></i>
+             style="background:${h.status === 'success' ? '#f1f8e9' : '#fce4ec'}; border-left:3px solid ${h.status === 'success' ? '#66bb6a' : '#ef5350'};">
+            <i class="bi bi-${h.status === 'success' ? 'check-circle-fill text-success' : 'x-circle-fill text-danger'} mt-1" style="font-size:13px;flex-shrink:0;"></i>
             <div class="flex-grow-1" style="min-width:0;">
-                <div class="fw-semibold text-truncate" style="font-size:13px;">${h.name}</div>
-                <div class="text-muted" style="font-size:11px;">${h.detail}</div>
+                <div class="fw-semibold text-truncate" style="font-size:13px;">${h.representative_name}</div>
+                <div class="text-muted" style="font-size:11px;">${h.status === 'success' ? h.family_count + ' tiket' : h.failure_reason}</div>
             </div>
-            <small class="text-muted text-nowrap" style="font-size:11px;">${h.time}</small>
+            <small class="text-muted text-nowrap" style="font-size:11px;">${new Date(h.scanned_at).toLocaleTimeString('id-ID', {hour: '2-digit', minute: '2-digit', second: '2-digit'})}</small>
         </div>`).join('');
         }
 
@@ -821,6 +906,11 @@
 
         window.addEventListener('beforeunload', () => {
             if (html5QrCode && isScanning) html5QrCode.stop().catch(() => {});
+        });
+
+        // Load scan history when page loads (only once, no auto-refresh)
+        document.addEventListener('DOMContentLoaded', () => {
+            loadScanHistory();
         });
     </script>
 @endpush

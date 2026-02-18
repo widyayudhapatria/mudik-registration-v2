@@ -27,12 +27,12 @@ class ScannerDashboardController extends Controller
     {
         $data = Cache::remember('cms.scanner.statistics', 15, function () {
             // Total participants from approved registrations
-            $totalParticipants = Registration::approved()->sum('family_count');
+            $totalParticipants = Registration::approved()->withCount('participants')->get()->sum('participants_count');
 
-            // Scanned participants: sum family_count where registration has a scanned QR
+            // Scanned participants: sum participants_count where registration has a scanned QR
             $scannedParticipants = Registration::whereHas('qrCode', function ($q) {
                 $q->whereNotNull('scanned_at');
-            })->approved()->sum('family_count');
+            })->approved()->withCount('participants')->get()->sum('participants_count');
 
             $unscannedParticipants = $totalParticipants - $scannedParticipants;
             $completionPercentage = $totalParticipants > 0
@@ -114,12 +114,15 @@ class ScannerDashboardController extends Controller
         $formatted = $logs->map(function ($log) {
             $reg = $log->qrCode?->registration;
             $destinationName = $reg?->destination?->name ?? null;
+            // family count should be from participants count
+            $jumlah = $reg?->participants?->count() ?? 0;
+
             return [
                 'id' => $log->id,
                 'nama' => $reg?->representative_name ?? ($log->token_scanned ?? 'N/A'),
                 'destination' => $destinationName ?? 'N/A',
                 'kk' => $reg?->kk_number ?? 'N/A',
-                'jumlah' => $reg?->family_count ?? 0,
+                'jumlah' => $jumlah,
                 'petugas' => $log->admin?->name ?? 'System',
                 'waktu' => $log->scanned_at?->format('d M Y H:i') ?? '-',
                 'status' => $log->isFailed() ? 'Gagal' : 'Berhasil',
