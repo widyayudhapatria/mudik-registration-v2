@@ -26,6 +26,11 @@ enum ErrorCode: string
     case QrNotFound = 'QR_NOT_FOUND';
     case QrInvalidDate = 'QR_INVALID_DATE';
     case QrAlreadyScanned = 'QR_ALREADY_SCANNED';
+    case DailyQuotaNotSet = 'DAILY_QUOTA_NOT_SET';
+    case DailyQuotaFull = 'DAILY_QUOTA_FULL';
+    case DestinationQuotaFull = 'DESTINATION_QUOTA_FULL';
+    case QuotaExceededGlobal = 'QUOTA_EXCEEDED_GLOBAL';
+    case QuotaExceededDestination = 'QUOTA_EXCEEDED_DESTINATION';
 
     /**
      * Get error message for the code.
@@ -53,6 +58,11 @@ enum ErrorCode: string
             self::QrNotFound => "QR Code tidak ditemukan.\nPastikan QR Code benar dan coba lagi.",
             self::QrInvalidDate => "QR Code tidak valid untuk hari ini.\nPastikan QR Code digunakan pada tanggal yang sesuai.",
             self::QrAlreadyScanned => "QR Code sudah pernah dipindai.\nTidak dapat digunakan lagi.",
+            self::DailyQuotaNotSet => "Kuota harian untuk tujuan ini belum diatur.\nSilakan kembali lagi nanti atau hubungi admin.",
+            self::DailyQuotaFull => "Kuota harian untuk tujuan ini sudah penuh.\nSilakan coba tujuan lain atau kembali besok.",
+            self::DestinationQuotaFull => "Kuota untuk tujuan ini sudah habis.\nSilakan pilih tujuan lain.",
+            self::QuotaExceededGlobal => "Total alokasi kuota destinasi melebihi kuota global.",
+            self::QuotaExceededDestination => "Total kuota harian melebihi kuota destinasi.",
         };
     }
 }

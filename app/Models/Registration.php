@@ -23,6 +23,7 @@ class Registration extends Model
      */
     protected $fillable = [
         'form_link_id',
+        'destination_id',
         'representative_name',
         'representative_nik',
         'representative_birth_date',
@@ -44,6 +45,7 @@ class Registration extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'destination_id' => 'integer',
         'representative_birth_date' => 'date',
         'has_child_under_4' => 'boolean',
         'family_count' => 'integer',
@@ -57,6 +59,14 @@ class Registration extends Model
     public function formLink(): BelongsTo
     {
         return $this->belongsTo(FormLink::class);
+    }
+
+    /**
+     * Get the destination for this registration.
+     */
+    public function destination(): BelongsTo
+    {
+        return $this->belongsTo(Destination::class);
     }
 
     /**

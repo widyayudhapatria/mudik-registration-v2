@@ -19,16 +19,16 @@ class GetQuotaAction
 
         $currentTime = Carbon::now();
         $endOfDay = $date->copy()->endOfDay();
-        
+
         // Calculate TTL in seconds until end of day
         $ttl = $currentTime->diffInSeconds($endOfDay, false);
-        
+
         if ($ttl <= 0) {
             $ttl = 60; // Fallback to 1 minute if calculation fails
         }
 
         return Cache::remember($cacheKey, $ttl, function () use ($date) {
-            return DailyQuota::whereDate('date', $date)->first();
+            return DailyQuota::where('date', $date->format('Y-m-d'))->first();
         });
     }
 
@@ -40,7 +40,7 @@ class GetQuotaAction
     public function checkAvailability(?Carbon $date = null): bool
     {
         $quota = $this->handle($date);
-        
+
         return $quota && $quota->hasAvailableQuota();
     }
 }

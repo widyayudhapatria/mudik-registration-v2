@@ -45,6 +45,41 @@
                 <div class="col-lg-8 text-left">
                     <form id="registrationForm" enctype="multipart/form-data">
                         @csrf
+
+                        <!-- Pilihan Kota Tujuan -->
+                        <div class="card mb-4">
+                            <div class="card-body">
+                                <h5 class="card-title mb-3">PILIH KOTA TUJUAN</h5>
+
+                                <!-- Loading state -->
+                                <div id="destinationLoading" class="text-center py-4">
+                                    <div class="spinner-border text-primary" role="status">
+                                        <span class="visually-hidden">Loading...</span>
+                                    </div>
+                                    <p class="mt-2 mb-0">Memuat kota tujuan...</p>
+                                </div>
+
+                                <!-- Destinations container -->
+                                <div class="row" id="destinationOptions" style="display: none;">
+                                    <!-- Will be populated by JavaScript -->
+                                </div>
+
+                                <!-- Error state - quota not set -->
+                                <div id="destinationError" class="alert alert-warning text-center" style="display: none;">
+                                    <i class="mdi mdi-alert-circle-outline fs-2"></i>
+                                    <h6 class="mt-2">Kuota Harian Belum Diatur</h6>
+                                    <p class="mb-0">
+                                        Kuota untuk hari ini belum tersedia.
+                                        <br />
+                                        <strong>Silakan kembali lagi dalam 1 jam ke depan</strong> atau kunjungi secara berkala.
+                                    </p>
+                                </div>
+
+                                <!-- Hidden input for destination_id -->
+                                <input type="hidden" name="destination_id" id="destination_id" required>
+                            </div>
+                        </div>
+
                         <!-- Data Perwakilan Keluarga -->
                         <div class="card mb-4">
                             <div class="card-body">
@@ -266,9 +301,103 @@
 
         // Initialize form
         document.addEventListener("DOMContentLoaded", function () {
+            loadDestinations();
             initializeForm();
             setupEventListeners();
         });
+
+        // Load available destinations
+        async function loadDestinations() {
+            const loadingEl = document.getElementById('destinationLoading');
+            const optionsEl = document.getElementById('destinationOptions');
+            const errorEl = document.getElementById('destinationError');
+            const submitBtn = document.getElementById('submitFormBtn');
+
+            try {
+                const response = await fetch('/api/destinations/available');
+                const data = await response.json();
+
+                // Hide loading
+                if (loadingEl) loadingEl.style.display = 'none';
+
+                if (!data.success) {
+                    // Handle error - quota not set
+                    if (data.error_code === 'DAILY_QUOTA_NOT_SET') {
+                        if (errorEl) errorEl.style.display = 'block';
+                        if (submitBtn) submitBtn.disabled = true;
+                    }
+                    return;
+                }
+
+                // Check if there are available destinations
+                if (!data.data || data.data.length === 0) {
+                    if (errorEl) {
+                        errorEl.innerHTML = `
+                            <i class="mdi mdi-alert-circle-outline fs-2"></i>
+                            <h6 class="mt-2">Kuota Tidak Tersedia</h6>
+                            <p class="mb-0">
+                                Maaf, saat ini tidak ada kuota tersedia untuk semua tujuan.
+                                <br />
+                                <strong>Silakan coba lagi besok atau hubungi admin</strong>.
+                            </p>
+                        `;
+                        errorEl.style.display = 'block';
+                    }
+                    if (submitBtn) submitBtn.disabled = true;
+                    return;
+                }
+
+                // Render destinations
+                const html = data.data.map(dest => {
+                    const badgeClass = dest.remaining > 5 ? 'bg-success' : dest.remaining > 2 ? 'bg-warning' : 'bg-danger';
+                    return `
+                        <div class="col-md-6 col-lg-4 mb-3">
+                            <input type="radio" class="btn-check" name="destination_radio"
+                                   id="dest${dest.id}" value="${dest.id}" required>
+                            <label class="btn btn-outline-primary w-100 py-3" for="dest${dest.id}">
+                                <strong>${dest.name}</strong>
+                                <br>
+                                <small>Tersisa: <span class="badge ${badgeClass}">${dest.remaining} orang</span></small>
+                            </label>
+                        </div>
+                    `;
+                }).join('');
+
+                if (optionsEl) {
+                    optionsEl.innerHTML = html;
+                    optionsEl.style.display = 'flex';
+                }
+
+                // Add event listeners for radio buttons
+                document.querySelectorAll('input[name="destination_radio"]').forEach(radio => {
+                    radio.addEventListener('change', function() {
+                        document.getElementById('destination_id').value = this.value;
+                    });
+                });
+
+            } catch (error) {
+                console.error('Error loading destinations:', error);
+
+                // Hide loading
+                if (loadingEl) loadingEl.style.display = 'none';
+
+                // Show error
+                if (errorEl) {
+                    errorEl.innerHTML = `
+                        <i class="mdi mdi-alert-circle-outline fs-2"></i>
+                        <h6 class="mt-2">Gagal Memuat Data</h6>
+                        <p class="mb-0">
+                            Terjadi kesalahan saat memuat daftar kota tujuan.
+                            <br />
+                            <strong>Silakan refresh halaman atau coba lagi nanti</strong>.
+                        </p>
+                    `;
+                    errorEl.style.display = 'block';
+                }
+
+                if (submitBtn) submitBtn.disabled = true;
+            }
+        }
 
         function initializeForm() {
             // Initialize datepicker for representative birth date
@@ -960,6 +1089,20 @@
             // Add CSRF token
             const csrfToken = document.querySelector('input[name="_token"]').value;
             formData.append('_token', csrfToken);
+
+            // Add destination_id (CRITICAL - required for new flow)
+            const destinationId = document.getElementById("destination_id").value;
+            if (!destinationId) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Anda harus memilih kota tujuan terlebih dahulu.",
+                    icon: "warning",
+                    confirmButtonText: "Baik, saya akan memilih.",
+                });
+                resetSubmitButton();
+                return;
+            }
+            formData.append("destination_id", destinationId);
 
             // Add representative data with converted date
             formData.append("representative_name", document.getElementById("representative_name").value);

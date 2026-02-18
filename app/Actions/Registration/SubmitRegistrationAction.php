@@ -7,6 +7,7 @@ use App\Data\RegistrationData;
 use App\Enums\ErrorCode;
 use App\Exceptions\MudikException;
 use App\Models\DailyQuota;
+use App\Models\Destination;
 use App\Models\FormLink;
 use App\Models\Participant;
 use App\Models\Registration;
@@ -34,29 +35,57 @@ class SubmitRegistrationAction
             // 2. Validate form link status using action
             ValidateFormLinkAction::run($formLink);
 
-            // 3. Check daily quota (with lock)
-            $quota = DailyQuota::where('date', Carbon::today())
+            // 3. Validate destination exists and is active
+            $destination = Destination::where('id', $data->destination_id)
+                ->where('is_active', true)
+                ->first();
+
+            if (!$destination) {
+                throw new MudikException(
+                    ErrorCode::ServerError,
+                    'Destination tidak valid atau tidak aktif'
+                );
+            }
+
+            // 4. Check daily quota (with lock) - CRITICAL: Check by destination_id
+            $quota = DailyQuota::where('destination_id', $data->destination_id)
+                ->where('date', Carbon::today()->toDateString())
                 ->lockForUpdate()
                 ->first();
 
-            if (!$quota || $quota->remaining <= 0) {
-                throw new MudikException(ErrorCode::QuotaFull);
+            if (!$quota) {
+                throw new MudikException(
+                    ErrorCode::DailyQuotaNotSet,
+                    'Kuota harian untuk tujuan ini belum diset. Silakan coba lagi nanti.'
+                );
             }
 
-            // 4. Check duplicates
+            // CRITICAL: Check if remaining quota >= family_count (not just > 0)
+            if ($quota->remaining_daily < $data->family_count) {
+                throw new MudikException(
+                    ErrorCode::DailyQuotaFull,
+                    sprintf(
+                        'Kuota harian tidak mencukupi. Tersisa: %d orang, Dibutuhkan: %d orang',
+                        $quota->remaining_daily,
+                        $data->family_count
+                    )
+                );
+            }
+
+            // 5. Check duplicates
             $this->checkDuplicates($data);
 
-            // 5. Upload KK document
+            // 6. Upload KK document
             $kkPath = $this->uploadKKDocument($data->kk_document);
 
-            // 6. Create registration
+            // 7. Create registration
             $registration = Registration::create([
                 ...$data->toModelArray(),
                 'form_link_id' => $formLink->id,
                 'kk_document_path' => $kkPath,
             ]);
 
-            // 7. Create participants
+            // 8. Create participants
             foreach ($data->getParticipantsArray() as $participantData) {
                 Participant::create([
                     'registration_id' => $registration->id,
@@ -64,18 +93,23 @@ class SubmitRegistrationAction
                 ]);
             }
 
-            // 8. Update form link & quota
+            // 9. Update form link & quota
             $formLink->markAsUsed();
-            $quota->incrementUsed();
 
-            // 9. Clear quota cache
-            Cache::forget('quota:' . Carbon::today()->toDateString());
+            // CRITICAL: Deduct by family_count (not -1)
+            $quota->incrementUsed($data->family_count);
+
+            // 10. Clear quota cache
+            Cache::forget('destinations:available:' . Carbon::today()->toDateString());
 
             DB::commit();
 
             Log::info('Registration submitted successfully', [
                 'registration_id' => $registration->id,
                 'form_link_id' => $formLink->id,
+                'destination_id' => $data->destination_id,
+                'destination_name' => $destination->name,
+                'family_count' => $data->family_count,
                 'email' => $formLink->email,
             ]);
 

@@ -2,7 +2,7 @@
 
 namespace App\Actions\Quota;
 
-use App\Data\SetQuotaData;
+use App\Data\EditQuotaData;
 use App\Enums\ErrorCode;
 use App\Exceptions\MudikException;
 use App\Models\DailyQuota;
@@ -13,17 +13,24 @@ use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Lorisleiva\Actions\Concerns\AsAction;
 
-class SetQuotaAction
+class EditQuotaAction
 {
     use AsAction;
 
-    public function handle(SetQuotaData $data): DailyQuota
+    public function handle(EditQuotaData $data): DailyQuota
     {
         return DB::transaction(function () use ($data) {
-            $dateString = $data->date->format('Y-m-d');
+            // Lock quota for update to prevent race condition
+            $quota = DailyQuota::lockForUpdate()->findOrFail($data->id);
+
+            // Get immutable fields from database
+            $destination_id = $quota->destination_id;
+            $dateString = $quota->date instanceof \Carbon\Carbon
+                ? $quota->date->toDateString()
+                : (string)$quota->date;
 
             // Lock destination for update
-            $destination = Destination::lockForUpdate()->findOrFail($data->destination_id);
+            $destination = Destination::lockForUpdate()->findOrFail($destination_id);
 
             // Check if destination is active
             if (!$destination->is_active) {
@@ -34,9 +41,10 @@ class SetQuotaAction
             }
 
             // Validate: daily quota should not exceed destination total quota
-            // Calculate total daily quota from today onwards (exclude past dates)
+            // Calculate total daily scheduled (excluding current quota)
             $today = Carbon::today()->toDateString();
-            $totalNotPassedQuota = DailyQuota::where('destination_id', $data->destination_id)
+            $totalNotPassedQuota = DailyQuota::where('destination_id', $destination_id)
+                ->where('id', '!=', $quota->id)
                 ->where('date', '>=', $today)
                 ->sum('quota_daily');
 
@@ -61,35 +69,20 @@ class SetQuotaAction
                 );
             }
 
-            // Find or create daily quota
-            $quota = DailyQuota::where('destination_id', $data->destination_id)
-                ->where('date', $dateString)
-                ->first();
-
-            if ($quota) {
-                // Prevent accidental update via create path - require explicit Edit flow
-                throw new \Exception('Kuota untuk tanggal ini sudah ada. Silahkan gunakan tombol "Edit" pada listing untuk memperbarui kuota.');
-            } else {
-                // Create new quota
-                $quota = DailyQuota::create([
-                    'destination_id' => $data->destination_id,
-                    'date' => $dateString,
-                    'quota_daily' => $data->quota_daily,
-                    'used_daily' => 0,
-                    'remaining_daily' => $data->quota_daily,
-                ]);
-                $action = 'created';
-            }
+            // Update quota - preserve 'used_daily' value
+            $quota->updateQuota($data->quota_daily);
 
             // Clear cache
             Cache::forget('destinations:available:' . $dateString);
 
-            Log::info('Quota set successfully', [
-                'destination_id' => $data->destination_id,
+            Log::info('Quota updated successfully', [
+                'quota_id' => $quota->id,
+                'destination_id' => $destination_id,
                 'destination_name' => $destination->name,
                 'date' => $dateString,
-                'quota_daily' => $data->quota_daily,
-                'action' => $action,
+                'old_quota_daily' => $quota->getOriginal('quota_daily'),
+                'new_quota_daily' => $data->quota_daily,
+                'used_daily' => $quota->used_daily,
             ]);
 
             return $quota->fresh();

@@ -5,11 +5,11 @@
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
     <meta name="csrf-token" content="{{ csrf_token() }}">
     <title>@yield('title', 'CMS Admin - Mudik Gratis')</title>
-    
+
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.11.1/font/bootstrap-icons.css">
     <link href="https://fonts.googleapis.com/css2?family=Poppins:wght@300;400;500;600;700&display=swap" rel="stylesheet">
-    
+
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body { font-family: 'Poppins', sans-serif; background: #f5f5f5; }
@@ -39,24 +39,12 @@
             <h4 class="heading-font">MUDIK ADMIN</h4>
             <small>Lebaran 2026</small>
         </div>
-        
+
         <ul class="sidebar-menu">
             <li class="sidebar-menu-item">
                 <a href="{{ route('cms.dashboard') }}" class="sidebar-menu-link {{ request()->routeIs('cms.dashboard') ? 'active' : '' }}">
                     <i class="bi bi-speedometer2"></i>
                     <span>Dashboard</span>
-                </a>
-            </li>
-            <li class="sidebar-menu-item">
-                <a href="{{ route('cms.registrations.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.registrations.*') ? 'active' : '' }}">
-                    <i class="bi bi-file-text"></i>
-                    <span>Pendaftaran</span>
-                </a>
-            </li>
-            <li class="sidebar-menu-item">
-                <a href="{{ route('cms.quotas.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.quotas.*') ? 'active' : '' }}">
-                    <i class="bi bi-calendar3"></i>
-                    <span>Kuota Harian</span>
                 </a>
             </li>
             @if(auth('admin')->user()->isSuperAdmin())
@@ -67,6 +55,24 @@
                 </a>
             </li>
             @endif
+            <li class="sidebar-menu-item">
+                <a href="{{ route('cms.registrations.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.registrations.*') ? 'active' : '' }}">
+                    <i class="bi bi-file-text"></i>
+                    <span>Pendaftaran</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ route('cms.destinations.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.destinations.*') ? 'active' : '' }}">
+                    <i class="bi bi-calendar3"></i>
+                    <span>Kuota Tujuan</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ route('cms.quotas.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.quotas.*') ? 'active' : '' }}">
+                    <i class="bi bi-calendar3"></i>
+                    <span>Kuota Harian</span>
+                </a>
+            </li>
             @can('scan', App\Models\QrCode::class)
             <li class="sidebar-menu-item">
                 <a href="{{ route('cms.scanner.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.scanner.*') ? 'active' : '' }}">
@@ -77,7 +83,7 @@
             @endcan
         </ul>
     </aside>
-    
+
     <!-- Main Content -->
     <main class="main-content">
         <!-- Topbar -->
@@ -107,19 +113,19 @@
                 </ul>
             </div>
         </div>
-        
+
         <!-- Page Content -->
         <div class="page-content">
             @yield('content')
         </div>
     </main>
-    
+
     <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
     <script src="https://cdn.jsdelivr.net/npm/axios/dist/axios.min.js"></script>
     <script>
         axios.defaults.headers.common['X-Requested-With'] = 'XMLHttpRequest';
         axios.defaults.headers.common['X-CSRF-TOKEN'] = document.querySelector('meta[name="csrf-token"]').content;
-        
+
         // Sidebar toggle for mobile
         document.getElementById('sidebarToggle')?.addEventListener('click', () => {
             document.getElementById('sidebar').classList.toggle('show');
