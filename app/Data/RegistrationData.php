@@ -21,6 +21,9 @@ use Spatie\LaravelData\DataCollection;
 class RegistrationData extends Data
 {
     public function __construct(
+        #[Required, Integer, Min(1)]
+        public int $destination_id,
+
         #[Required, StringType, Min(3), Max(255)]
         public string $representative_name,
 
@@ -50,6 +53,7 @@ class RegistrationData extends Data
     public function toModelArray(): array
     {
         return [
+            'destination_id' => $this->destination_id,
             'representative_name' => $this->representative_name,
             'representative_nik' => $this->representative_nik,
             'representative_birth_date' => Carbon::parse($this->representative_birth_date)->format('Y-m-d'),

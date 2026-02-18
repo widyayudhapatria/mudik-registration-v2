@@ -1,9 +1,15 @@
 <?php
 
+use App\Http\Controllers\Api\DestinationController;
 use App\Http\Controllers\CMS\DashboardController;
 use App\Http\Controllers\CMS\ScannerController;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Route;
+
+// Public API Routes
+Route::prefix('destinations')->name('destinations.')->group(function () {
+    Route::get('/available', [DestinationController::class, 'available'])->name('available');
+});
 
 Route::prefix('cms')->name('cms.api.')->middleware(['auth:admin'])->group(function () {
 
@@ -11,7 +17,7 @@ Route::prefix('cms')->name('cms.api.')->middleware(['auth:admin'])->group(functi
         Route::get('/validate', [ScannerController::class, 'validateQrCode'])->name('validate');
         Route::post('/consume', [ScannerController::class, 'consumeQrCode'])->name('consume');
     });
-    
+
     Route::get('/statistics', [DashboardController::class, 'statistics'])->name('statistics');
 });
 
