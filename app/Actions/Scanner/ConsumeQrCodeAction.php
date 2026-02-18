@@ -5,7 +5,7 @@ namespace App\Actions\Scanner;
 use App\Data\ScanQrData;
 use App\Enums\ErrorCode;
 use App\Enums\ScanResult;
-use App\Events\ScanPerformed;
+//use App\Events\ScanPerformed;
 use App\Exceptions\MudikException;
 use App\Models\Admin;
 use App\Models\QrCode;
@@ -13,6 +13,7 @@ use App\Models\ScanLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Throwable;
 
@@ -55,8 +56,13 @@ class ConsumeQrCodeAction
 
             DB::commit();
 
-            // Broadcast scan event
-            broadcast(new ScanPerformed($this->prepareScanData($scanLog, $qrCode)));
+            // Invalidate related dashboard caches
+            Cache::forget('cms.scanner.statistics');
+            Cache::forget('cms.scanner.scan_by_destination');
+            Cache::forget('cms.scanner.scan_logs.page.1');
+
+            // broadcasting disabled (no Pusher configured)
+            //broadcast(new ScanPerformed($this->prepareScanData($scanLog, $qrCode)));
 
             Log::info('QR Code scanned successfully', [
                 'qr_code_id' => $qrCode->id,
@@ -92,12 +98,11 @@ class ConsumeQrCodeAction
                             'is_child_under_4' => $participant->is_child_under_4,
                         ];
                     })->toArray(),
-                    'warnings' => $qrCode->registration->has_child_under_4 
+                    'warnings' => $qrCode->registration->has_child_under_4
                         ? ['Anak dibawah 4 tahun wajib dipangku selama perjalanan']
                         : [],
                 ],
             ];
-
         } catch (MudikException $e) {
             DB::rollBack();
             throw $e;
@@ -132,7 +137,7 @@ class ConsumeQrCodeAction
         // Check valid date
         $now = Carbon::now();
         if (!$now->between($qrCode->valid_from, $qrCode->valid_until)) {
-            $reason = $now->isBefore($qrCode->valid_from) 
+            $reason = $now->isBefore($qrCode->valid_from)
                 ? 'QR Code is not yet valid'
                 : 'QR Code has expired';
 
