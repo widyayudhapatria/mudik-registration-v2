@@ -323,14 +323,6 @@
 
                 if (result.success) {
                     bootstrap.Modal.getInstance(document.getElementById('destinationModal')).hide();
-
-                    // Show warning if exists
-                    if (result.warning && result.warning_details) {
-                        alert(
-                            `PERINGATAN:\n\n${result.warning_details.message}\n\nTotal terjadwal: ${result.warning_details.total_scheduled}\nTotal baru: ${result.warning_details.new_total}\nSelisih: ${result.warning_details.difference}`
-                            );
-                    }
-
                     location.reload();
                 } else {
                     alert('Error: ' + result.message);

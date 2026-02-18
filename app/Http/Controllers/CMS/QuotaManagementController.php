@@ -64,8 +64,8 @@ class QuotaManagementController extends Controller
             return $quota->date->toDateString();
         });
 
-        // Get all active destinations for filter
-        $destinations = Destination::active()->ordered()->get();
+        // Get all destinations (include inactive) for filter and summary
+        $destinations = Destination::ordered()->get();
 
         if ($request->wantsJson()) {
             return response()->json([

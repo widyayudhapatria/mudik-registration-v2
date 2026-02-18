@@ -150,17 +150,6 @@ class DestinationManagementController extends Controller
                 'display_order' => $updated->display_order,
             ];
 
-            // Check if there's a warning (quota mismatch)
-            if (isset($updated->warning)) {
-                return response()->json([
-                    'success' => true,
-                    'warning' => true,
-                    'message' => 'Destination berhasil diupdate, tetapi ada peringatan:',
-                    'warning_details' => $updated->warning,
-                    'data' => $response,
-                ]);
-            }
-
             return $this->responseSuccess(
                 'Destination berhasil diupdate',
                 $response

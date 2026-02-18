@@ -60,19 +60,16 @@ class UpdateDestinationAction
                 ->whereDate('date', '>=', today())
                 ->sum('quota_daily');
 
-            $warning = null;
+            // Hard validation: throw exception if scheduled quotas exceed new total
             if ($totalDailyScheduled > $data->total_quota) {
-                $warning = [
-                    'type' => 'quota_mismatch',
-                    'message' => sprintf(
-                        'Total daily quota terjadwal (%d) melebihi total quota destination baru (%d). Silakan adjust daily quota untuk tanggal-tanggal berikutnya.',
+                throw new MudikException(
+                    ErrorCode::QuotaExceededDestination,
+                    sprintf(
+                        'Tidak dapat mengurangi quota. Total daily quota sudah terjadwal (%d) melebihi total quota baru (%d). Hapus atau reduce daily quotas terlebih dahulu sebelum edit.',
                         $totalDailyScheduled,
                         $data->total_quota
-                    ),
-                    'total_scheduled' => $totalDailyScheduled,
-                    'new_total' => $data->total_quota,
-                    'difference' => $totalDailyScheduled - $data->total_quota,
-                ];
+                    )
+                );
             }
 
             // Update destination
@@ -91,13 +88,7 @@ class UpdateDestinationAction
                 'total_quota' => $data->total_quota,
                 'used_quota' => $destination->used_quota,
                 'remaining_quota' => $destination->remaining_quota,
-                'warning' => $warning,
             ]);
-
-            // Attach warning to response if exists
-            if ($warning) {
-                $destination->warning = $warning;
-            }
 
             return $destination->fresh();
         });
