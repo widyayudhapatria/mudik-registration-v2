@@ -86,6 +86,7 @@ class SeatAllocationMail extends Mailable implements ShouldQueue
                 'destination' => $this->registration->destination,
                 'email' => $this->registration->formLink->email,
                 'qrCodePath' => $this->qrCodePath,
+                'qrCode' => $this->qrCode,
                 'mudikConfig' => $this->mudikConfig,
             ],
         );

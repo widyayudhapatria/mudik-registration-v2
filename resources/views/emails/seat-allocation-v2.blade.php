@@ -393,7 +393,7 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: left;">
-                                                                            <img align="left" alt="Mudik Gratis Lebaran 2026 Logo" src="images/285x114.png" height="65" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 65px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;">
+                                                                            <img align="left" alt="Mudik Gratis 2026" src="https://i.postimg.cc/JhrmSNq3/285x114.png"  height="65" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 65px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;">
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -453,19 +453,27 @@
                                                 </tbody>
                                             </table>
                                             <!-- Main Message -->
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%">
                                                 <tbody class="mcnTextBlockOuter">
                                                     <tr>
-                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px;">
-                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%;" width="100%" class="mcnTextContentContainer">
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px">
+                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%" width="100%" class="mcnTextContentContainer">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td valign="top" class="mcnTextContent" style="padding: 0px 18px 9px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding: 0px 18px 9px; color: #333333; font-family: &quot;Roboto&quot;, Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%"
+                                                                            >
                                                                             <p>
-                                                                                Selamat! QR Code Anda telah berhasil di-scan. Pendaftaran mudik Anda telah final dan Anda <strong>siap untuk berangkat pada tanggal yang telah ditentukan</strong>.
+                                                                                Selamat! QR Code Anda telah berhasil di-scan. Pendaftaran mudik Anda telah final dan Anda
+                                                                                <strong>siap untuk berangkat pada tanggal yang telah ditentukan</strong>
+                                                                                .
                                                                             </p>
                                                                             <p>
-                                                                                Email ini adalah <strong>bukti final</strong> dari pendaftaran mudik gratis Anda. Simpan email ini dengan baik sebagai referensi.
+                                                                                Email ini adalah
+                                                                                <strong>bukti final</strong>
+                                                                                dari pendaftaran mudik gratis Anda. Simpan email ini dengan baik sebagai referensi.
                                                                             </p>
                                                                         </td>
                                                                     </tr>
@@ -476,20 +484,26 @@
                                                 </tbody>
                                             </table>
                                             <!-- Success Info Box -->
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%">
                                                 <tbody class="mcnTextBlockOuter">
                                                     <tr>
-                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px;">
-                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%;" width="100%" class="mcnTextContentContainer">
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px">
+                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%" width="100%" class="mcnTextContentContainer">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td valign="top" class="mcnTextContent" style="padding: 0px 18px 18px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
-                                                                            <table width="100%" cellpadding="15" cellspacing="0" border="0" class="info-box" style="background-color: #ecfdf5; border-left: 4px solid #10b981;">
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding: 0px 18px 18px; color: #333333; font-family: &quot;Roboto&quot;, Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%"
+                                                                            >
+                                                                            <table width="100%" cellpadding="15" cellspacing="0" border="0" class="info-box" style="background-color: #ecfdf5; border-left: 4px solid #10b981">
                                                                                 <tr>
-                                                                                    <td style="color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
-                                                                                        <h4 style="margin: 0 0 10px 0; color: #047857; font-size: 18px; font-weight: bold;">Status Pendaftaran: FINAL</h4>
-                                                                                        <p style="margin: 0;">
-                                                                                            Anda telah terdaftar dengan <strong>4 orang peserta</strong> dan siap berangkat menuju tujuan mudik Anda.
+                                                                                    <td style="color: #333333; font-family: &quot;Roboto&quot;, Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%">
+                                                                                        <h4 style="margin: 0 0 10px 0; color: #047857; font-size: 18px; font-weight: bold">Status Pendaftaran: FINAL</h4>
+                                                                                        <p style="margin: 0">
+                                                                                            Anda telah terdaftar dengan
+                                                                                            <strong>{{ $registration->participants->count() }} orang peserta</strong>
+                                                                                            dan siap berangkat menuju tujuan mudik Anda.
                                                                                         </p>
                                                                                     </td>
                                                                                 </tr>
@@ -502,89 +516,97 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <!-- Destination Info -->
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
+                                            <!-- Passenger & Destination Info -->
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%">
                                                 <tbody class="mcnTextBlockOuter">
                                                     <tr>
-                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px;">
-                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%;" width="100%" class="mcnTextContentContainer">
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px">
+                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%" width="100%" class="mcnTextContentContainer">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td valign="top" class="mcnTextContent" style="padding: 0px 18px 18px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
-                                                                            <table width="100%" cellpadding="15" cellspacing="0" border="0" class="destination-box">
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="padding: 0px 18px 18px; color: #333333; font-family: &quot;Roboto&quot;, Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%"
+                                                                            >
+                                                                            <h4 style="color: #047857; margin-bottom: 15px; font-size: 18px; font-weight: bold">DAFTAR PESERTA MUDIK & KEBERANGKATAN</h4>
+                                                                            <!-- Combined info table (destination + bus + participants) -->
+                                                                            <table
+                                                                                width="100%"
+                                                                                cellpadding="10"
+                                                                                cellspacing="0"
+                                                                                border="0"
+                                                                                style="border-collapse: collapse; border: 1px solid #e5e7eb; border-radius: 6px; overflow: hidden"
+                                                                                >
+                                                                                <tr style="background-color: #f8fafc">
+                                                                                    <td colspan="2" style="padding: 12px 14px"><strong style="color: #0c4a6e; font-size: 16px">📍 Tujuan & Jadwal</strong></td>
+                                                                                </tr>
                                                                                 <tr>
-                                                                                    <td style="color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
-                                                                                        <h4 style="margin: 0 0 10px 0; color: #0c4a6e; font-size: 18px; font-weight: bold;">📍 TUJUAN MUDIK</h4>
-                                                                                        <p style="margin: 5px 0;"><strong>Provinsi:</strong> Jawa Tengah</p>
-                                                                                        <p style="margin: 5px 0;"><strong>Kota/Kabupaten:</strong> Semarang</p>
-                                                                                        <p style="margin: 0;"><strong>Keberangkatan:</strong> 30 Mei 2026 - 08:00 WIB</p>
+                                                                                    <td style="padding: 10px 14px; width: 60%; font-size: 15px; color: #374151">
+                                                                                        <div>
+                                                                                            <span style="font-weight: 700; color: #1f2937; font-size: 18px">Kota Tujuan:</span>
+                                                                                            <br />
+                                                                                            <span style="font-weight: bold; font-size: 27px">{{ $destination->name }}</span>
+                                                                                        </div>
+                                                                                    </td>
+                                                                                    <td style="padding: 10px 14px; width: 40%; font-size: 15px; color: #374151; text-align: right">
+                                                                                        <div>
+                                                                                            <span style="font-weight: 700; color: #1f2937; font-size: 18px">Keberangkatan:</span>
+                                                                                            <br />
+                                                                                            <span style="font-weight: bold; font-size: 14px">{{ $mudikConfig['departure_date'] }}</span>
+                                                                                        </div>
+                                                                                        <div style="font-size: 14px; color: #6b7280">Jam: {{ $mudikConfig['departure_time'] }} WIB</div>
                                                                                     </td>
                                                                                 </tr>
-                                                                            </table>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <!-- Passenger List -->
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
-                                                <tbody class="mcnTextBlockOuter">
-                                                    <tr>
-                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px;">
-                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%;" width="100%" class="mcnTextContentContainer">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td valign="top" class="mcnTextContent" style="padding: 0px 18px 18px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
-                                                                            <h4 style="color: #047857; margin-bottom: 15px; font-size: 18px; font-weight: bold;">👥 DAFTAR PESERTA MUDIK</h4>
-                                                                            <table width="100%" cellpadding="0" cellspacing="0" border="0" class="passenger-list" style="background-color: transparent; padding: 0; margin: 0;">
+                                                                                <tr style="background-color: #ffffff">
+                                                                                    <td style="padding: 10px 14px; font-weight: 700; color: #1f2937; font-size: 18px">Peserta</td>
+                                                                                    <td style="padding: 10px 14px; text-align: right; font-weight: 700; color: #1f2937; font-size: 18px">Bus / Kursi</td>
+                                                                                </tr>
+                                                                                @php
+                                                                                    // Group seats by bus_number
+                                                                                    $grouped = $seatAllocations->groupBy(function($seat) {
+                                                                                        return $seat->bus_number ?? 'no-seat';
+                                                                                    });
+                                                                                @endphp
+                                                                                @foreach($grouped as $busNumber => $seats)
+                                                                                    @if($busNumber !== 'no-seat')
+                                                                                        @foreach($seats as $seat)
+                                                                                            <tr>
+                                                                                                <td style="padding: 8px 14px; vertical-align: middle; color: #374151">
+                                                                                                    {{ $seat->participant->full_name }}
+                                                                                                    @if($seat->participant->is_child_under_4)
+                                                                                                        <em style="font-size: 13px; color: #666">👶 (Anak &lt;4)</em>
+                                                                                                    @endif
+                                                                                                </td>
+                                                                                                <td style="padding: 8px 14px; vertical-align: middle; text-align: right">
+                                                                                                    <span style="display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-weight: 700">
 
-                                                                                <tr>
-                                                                                    <td style="color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
-                                                                                        @php
-                                                                                            // Group seats by bus_number
-                                                                                            $grouped = $seatAllocations->groupBy(function($seat) {
-                                                                                                return $seat->bus_number ?? 'no-seat';
-                                                                                            });
-                                                                                        @endphp
-
-                                                                                        @foreach($grouped as $busNumber => $seats)
-                                                                                            @if($busNumber !== 'no-seat')
-                                                                                                <div class="passenger-seat" style="margin-bottom: 10px;">
-                                                                                                    <span class="seat-badge" style="background-color:#e0f2fe;color:#0584c7;">🚌 Bus {{ $busNumber }} - {{ $destination->name }}</span>
-                                                                                                </div>
-                                                                                                @foreach($seats as $seat)
-                                                                                                    <div class="passenger-item">
-                                                                                                        <div class="passenger-name">{{ $seat->participant->full_name }}</div>
-                                                                                                        <div class="passenger-seat">
-                                                                                                            <span class="seat-badge">Kursi: {{ $seat->seat_code }}</span>
-                                                                                                        </div>
-                                                                                                    </div>
-                                                                                                @endforeach
-                                                                                            @endif
+                                                                                                        @if($seat->participant->is_child_under_4)
+                                                                                                            Dipangku ({{ $seat->seat_code }})
+                                                                                                        @else
+                                                                                                            {{ $seat->seat_code }}
+                                                                                                        @endif
+                                                                                                    </span>
+                                                                                                </td>
+                                                                                            </tr>
                                                                                         @endforeach
-
-                                                                                        @if(isset($grouped['no-seat']) && $grouped['no-seat']->isNotEmpty())
-                                                                                            <div class="bus-group">
-                                                                                                <div class="bus-header" style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%);">
-                                                                                                    👶 Anak Dibawah 4 Tahun (Dipangku)
-                                                                                                </div>
-                                                                                                <ul class="seat-list">
-                                                                                                    @foreach($grouped['no-seat'] as $seat)
-                                                                                                        <div class="passenger-item">
-                                                                                                            <div class="passenger-name">{{ $seat->participant->full_name }} ({{ $seat->participant->getAge() }} tahun)</div>
-                                                                                                            <div class="passenger-seat">
-                                                                                                                <span class="seat-badge">DIPANGKU</span>
-                                                                                                            </div>
-                                                                                                        </div>
-                                                                                                    @endforeach
-                                                                                                </ul>
-                                                                                            </div>
-                                                                                        @endif
-                                                                                    </td>
-                                                                                </tr>
+                                                                                    @endif
+                                                                                @endforeach
+                                                                                @if(isset($grouped['no-seat']) && $grouped['no-seat']->isNotEmpty())
+                                                                                    @foreach($grouped['no-seat'] as $seat)
+                                                                                        <tr>
+                                                                                            <td style="padding: 8px 14px; vertical-align: middle; color: #374151">
+                                                                                                {{ $seat->participant->full_name }}
+                                                                                                <em style="font-size: 13px; color: #666">👶 ({{ $seat->participant->getAge() }} tahun)</em>
+                                                                                            </td>
+                                                                                            <td style="padding: 8px 14px; vertical-align: middle; text-align: right">
+                                                                                                <span style="display: inline-block; background: #d1fae5; color: #065f46; padding: 4px 8px; border-radius: 4px; font-weight: 700">
+                                                                                                    DIPANGKU
+                                                                                                </span>
+                                                                                            </td>
+                                                                                        </tr>
+                                                                                    @endforeach
+                                                                                @endif
                                                                             </table>
                                                                         </td>
                                                                     </tr>
@@ -594,6 +616,7 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+
                                             <!-- QR Code Section -->
                                             <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                                                 <tbody class="mcnTextBlockOuter">
@@ -610,17 +633,48 @@
                                                                                             <h3 style="margin: 0 0 15px 0; color: #047857; font-size: 18px; font-weight: bold;">QR CODE REFERENSI FINAL</h3>
                                                                                             @if($qrCodePath && file_exists($qrCodePath))
                                                                                                 <img src="{{ $message->embed($qrCodePath) }}" alt="QR Code Final" class="qr-code" style="max-width: 250px; height: auto; margin: 15px auto; display: block; border: 0;">
-                                                                                            @else
-                                                                                                <img src="https://goqr.me/_Resources/Static/Packages/GoQrMe.Ui/Images/qr_default.png" alt="QR Code Final" class="qr-code" style="max-width: 250px; height: auto; margin: 15px auto; display: block; border: 0;">
                                                                                             @endif
-                                                                                            <table width="100%" cellpadding="10" cellspacing="0" border="0" style="background-color: #d1f4e0; margin-top: 10px;">
+                                                                                            <table width="100%" cellpadding="10" cellspacing="0" border="0" style="background-color: #d1f4e0; margin-top: 10px">
                                                                                                 <tr>
-                                                                                                    <td style="color: #065f46; font-weight: bold; text-align: center; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 15px;">
+                                                                                                    <td style="color: #065f46; font-weight: bold; text-align: center; font-family: &quot;Roboto&quot;, Arial, Helvetica, sans-serif; font-size: 15px">
                                                                                                         ✓ Data Pendaftaran Telah Final
                                                                                                     </td>
                                                                                                 </tr>
+                                                                                                <tr style="background-color: #f8f9fa !important">
+                                                                                                    <td style="font-size: 13px; color: #6b7280; margin: 15px 0; font-weight: 300; text-align: center">
+                                                                                                        Simpan QR Code atau email ini sebagai bukti pendaftaran final
+                                                                                                    </td>
+                                                                                                </tr>
                                                                                             </table>
-                                                                                            <p style="font-size: 14px; color: #6b7280; margin: 15px 0; font-weight: 700;">Simpan QR Code atau email ini sebagai bukti pendaftaran final</p>
+                                                                                            <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto">
+                                                                                                <tr>
+                                                                                                    <td align="center" style="border-radius: 6px; background-color: #10b981">
+                                                                                                        <a
+                                                                                                            href="{{ url('/scan/entry?t=' . $qrCode->token_qr) }}"
+                                                                                                            target="_blank"
+                                                                                                            style="
+                                                                                                            display: inline-block;
+                                                                                                            padding: 12px 24px;
+                                                                                                            font-family: &quot;Roboto&quot;, Arial, Helvetica, sans-serif;
+                                                                                                            font-size: 15px;
+                                                                                                            font-weight: bold;
+                                                                                                            color: #ffffff;
+                                                                                                            text-decoration: none;
+                                                                                                            border-radius: 6px;
+                                                                                                            "
+                                                                                                            >
+                                                                                                        Lihat Status Tiket Online
+                                                                                                        </a>
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            </table>
+                                                                                            <p style="margin: 12px 0 0; font-size: 13px; color: #6b7280; font-weight: 300">
+                                                                                                Atau buka link berikut di browser:
+                                                                                                <br />
+                                                                                                <a href="{{ url('/scan/entry?t=' . $qrCode->token_qr) }}" style="color: #10b981; word-break: break-all">
+                                                                                                {{ url('/scan/entry?t=' . $qrCode->token_qr) }}
+                                                                                                </a>
+                                                                                            </p>
                                                                                         </td>
                                                                                     </tr>
                                                                                 </tbody>
@@ -633,44 +687,35 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
-                                            <!-- Important Notes -->
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
-                                                <tbody class="mcnTextBlockOuter">
-                                                    <tr>
-                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px;">
-                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%;" width="100%" class="mcnTextContentContainer">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td valign="top" class="mcnTextContent" style="padding: 0px 18px 18px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
-                                                                            <h4 style="color: #047857; margin-bottom: 10px; font-size: 18px; font-weight: bold;">📋 INFORMASI PENTING SEBELUM KEBERANGKATAN</h4>
-                                                                            <ul style="margin: 0; padding-left: 20px;">
-                                                                                <li style="margin-bottom: 10px;"><strong>Waktu Berkumpul:</strong> 07:00 WIB (1 jam sebelum keberangkatan)</li>
-                                                                                <li style="margin-bottom: 10px;"><strong>Lokasi Berkumpul:</strong> Lapangan Parkir Kantor Pemerintah Provinsi Banten</li>
-                                                                                <li style="margin-bottom: 10px;"><strong>Bawa Identitas:</strong> KTP Asli dan Kartu Keluarga (KK) untuk semua peserta</li>
-                                                                                <li style="margin-bottom: 10px;"><strong>Persiapan Sebelum Keberangkatan:</strong> Istirahat yang cukup dan siapkan kebutuhan pribadi</li>
-                                                                                <li style="margin-bottom: 10px;"><strong>Durasi Perjalanan:</strong> Kurang lebih 6-7 jam (tanpa hambatan lalu lintas)</li>
-                                                                                <li style="margin-bottom: 10px;"><strong>Anak Dibawah 4 Tahun:</strong> Wajib dipangku selama perjalanan</li>
-                                                                                <li style="margin-bottom: 10px;"><strong>Hubungi Kami:</strong> Jika ada perubahan data atau pertanyaan, segera hubungi support</li>
-                                                                            </ul>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
+
                                             <!-- Closing Message -->
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%">
                                                 <tbody class="mcnTextBlockOuter">
                                                     <tr>
-                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px;">
-                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%;" width="100%" class="mcnTextContentContainer">
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px">
+                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%" width="100%" class="mcnTextContentContainer">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td valign="top" class="mcnTextContent" style="padding: 0px 18px 18px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 18px; line-height: 150%; text-align: center;">
-                                                                            <p style="font-weight: bold; color: #000000; margin-bottom: 10px;">Selamat Mudik dan Berkumpul dengan Keluarga! 🙏</p>
-                                                                            <p style="color: #666666; font-size: 16px;">Terima kasih telah mempercayai Program Mudik Gratis Lebaran Kabupaten Tangerang 2026.<br>Semoga perjalanan Anda aman, nyaman, dan penuh berkah.</p>
+                                                                        <td
+                                                                            valign="top"
+                                                                            class="mcnTextContent"
+                                                                            style="
+                                                                            padding: 0px 18px 18px;
+                                                                            color: #333333;
+                                                                            font-family: &quot;Roboto&quot;, Arial, Helvetica, sans-serif;
+                                                                            font-size: 18px;
+                                                                            line-height: 150%;
+                                                                            text-align: center;
+                                                                            "
+                                                                            >
+                                                                            <p style="font-weight: bold; color: #000000; margin-bottom: 10px">Selamat Mudik dan Berkumpul dengan Keluarga! 🙏</p>
+                                                                            <p style="color: #666666; font-size: 16px">
+                                                                                Terima kasih telah mempercayai Program Mudik Gratis
+                                                                                <br />
+                                                                                Kabupaten Tangerang tahun 2026.
+                                                                                <br />
+                                                                                Semoga perjalanan Anda aman, nyaman, dan penuh berkah.
+                                                                            </p>
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
