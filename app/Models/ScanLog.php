@@ -80,7 +80,7 @@ class ScanLog extends Model
      * Create a failed scan log.
      */
     public static function logFailure(
-        int $qrCodeId,
+        ?int $qrCodeId,
         int $adminId,
         string $reason,
         ?string $ipAddress = null,

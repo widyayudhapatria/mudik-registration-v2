@@ -75,12 +75,18 @@
             </li>
             @can('scan', App\Models\QrCode::class)
             <li class="sidebar-menu-item">
-                <a href="{{ route('cms.scanner.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.scanner.*') ? 'active' : '' }}">
+                <a href="{{ route('cms.scanner.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.scanner.index') ? 'active' : '' }}">
                     <i class="bi bi-qr-code-scan"></i>
                     <span>Scanner QR</span>
                 </a>
             </li>
             @endcan
+            <li class="sidebar-menu-item">
+                <a href="{{ route('cms.scanner.dashboard') }}" class="sidebar-menu-link {{ request()->routeIs('cms.scanner.dashboard') ? 'active' : '' }}">
+                    <i class="bi bi-bar-chart"></i>
+                    <span>Scan Dashboard</span>
+                </a>
+            </li>
         </ul>
     </aside>
 

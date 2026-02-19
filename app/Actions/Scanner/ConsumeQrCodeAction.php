@@ -5,7 +5,7 @@ namespace App\Actions\Scanner;
 use App\Data\ScanQrData;
 use App\Enums\ErrorCode;
 use App\Enums\ScanResult;
-use App\Events\ScanPerformed;
+//use App\Events\ScanPerformed;
 use App\Exceptions\MudikException;
 use App\Models\Admin;
 use App\Models\QrCode;
@@ -13,6 +13,7 @@ use App\Models\ScanLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Cache;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Throwable;
 
@@ -35,7 +36,6 @@ class ConsumeQrCodeAction
                 ->first();
 
             if (!$qrCode) {
-                $this->logFailedScan(null, $admin, 'QR Code not found');
                 throw new MudikException(ErrorCode::QrNotFound, null, [], 404);
             }
 
@@ -55,8 +55,13 @@ class ConsumeQrCodeAction
 
             DB::commit();
 
-            // Broadcast scan event
-            broadcast(new ScanPerformed($this->prepareScanData($scanLog, $qrCode)));
+            // Invalidate related dashboard caches
+            Cache::forget('cms.scanner.statistics');
+            Cache::forget('cms.scanner.scan_by_destination');
+            Cache::forget('cms.scanner.scan_logs.page.1');
+
+            // broadcasting disabled (no Pusher configured)
+            //broadcast(new ScanPerformed($this->prepareScanData($scanLog, $qrCode)));
 
             Log::info('QR Code scanned successfully', [
                 'qr_code_id' => $qrCode->id,
@@ -83,23 +88,66 @@ class ConsumeQrCodeAction
                         'family_count' => $qrCode->registration->family_count,
                         'kk_number' => $qrCode->registration->kk_number,
                         'has_child_under_4' => $qrCode->registration->has_child_under_4,
+                        'destination_name' => $qrCode->registration->destination?->name,
+                    ],
+                    'participants_summary' => [
+                        'total' => $qrCode->registration->participants->count(),
+                        'children_under_4' => $qrCode->registration->participants->where('is_child_under_4', true)->count(),
+                        'adults' => $qrCode->registration->participants->where('is_child_under_4', false)->count(),
                     ],
                     'email' => $qrCode->registration->formLink->email,
                     'participants' => $qrCode->registration->participants->map(function ($participant) {
                         return [
                             'full_name' => $participant->full_name,
+                            'birth_date' => $participant->birth_date->toIso8601String(),
                             'age' => $participant->getAge(),
                             'is_child_under_4' => $participant->is_child_under_4,
                         ];
                     })->toArray(),
-                    'warnings' => $qrCode->registration->has_child_under_4 
+                    'warnings' => $qrCode->registration->has_child_under_4
                         ? ['Anak dibawah 4 tahun wajib dipangku selama perjalanan']
                         : [],
                 ],
             ];
-
         } catch (MudikException $e) {
             DB::rollBack();
+            // Persist failed scan log AFTER rollback so it isn't rolled back.
+            try {
+                // Prefer a detailed failure reason when available
+                $failureReason = $e->getMessage();
+                try {
+                    $code = $e->getErrorCode();
+                    $additional = $e->getAdditionalData();
+
+                    if (isset($qrCode) && $qrCode && $code === ErrorCode::QrAlreadyScanned) {
+                        $scannedAt = $qrCode->scanned_at?->toDateTimeString() ?? ($additional['scanned_at'] ?? 'unknown');
+                        $scannedBy = $qrCode->scannedBy?->name ?? ($additional['scanned_by'] ?? 'unknown');
+                        $failureReason = sprintf('Already scanned at %s by %s', $scannedAt, $scannedBy);
+                    } elseif ($code === ErrorCode::QrInvalidDate) {
+                        $failureReason = $additional['reason'] ?? $failureReason;
+                    } elseif ($code === ErrorCode::QrNotFound) {
+                        $failureReason = sprintf('QR not found: %s', $data->token_qr);
+                    }
+                } catch (Throwable $_ignore) {
+                    // fallback to exception message
+                }
+
+                $qrCodeId = isset($qrCode) && $qrCode ? $qrCode->id : null;
+
+                ScanLog::logFailure(
+                    $qrCodeId,
+                    $admin->id,
+                    $failureReason,
+                    request()->ip(),
+                    request()->userAgent()
+                );
+            } catch (Throwable $logEx) {
+                Log::warning('Failed to persist scan failure log', [
+                    'error' => $logEx->getMessage(),
+                    'original_error' => $e->getMessage(),
+                ]);
+            }
+
             throw $e;
         } catch (Throwable $e) {
             DB::rollBack();
@@ -117,7 +165,6 @@ class ConsumeQrCodeAction
     {
         // Check if already scanned
         if ($qrCode->isScanned()) {
-            $this->logFailedScan($qrCode, $admin, 'QR Code already scanned');
             throw new MudikException(
                 ErrorCode::QrAlreadyScanned,
                 null,
@@ -132,11 +179,9 @@ class ConsumeQrCodeAction
         // Check valid date
         $now = Carbon::now();
         if (!$now->between($qrCode->valid_from, $qrCode->valid_until)) {
-            $reason = $now->isBefore($qrCode->valid_from) 
+            $reason = $now->isBefore($qrCode->valid_from)
                 ? 'QR Code is not yet valid'
                 : 'QR Code has expired';
-
-            $this->logFailedScan($qrCode, $admin, $reason);
 
             throw new MudikException(
                 ErrorCode::QrInvalidDate,

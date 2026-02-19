@@ -8,6 +8,7 @@ use App\Models\QrCode;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\Log;
 
 class QrViewController extends Controller
 {
@@ -16,7 +17,7 @@ class QrViewController extends Controller
      *
      * GET /scan/entry
      */
-    public function entry(Request $request): View
+    public function entry(Request $request): View|RedirectResponse
     {
         $token = $request->query('t');
 
@@ -25,7 +26,8 @@ class QrViewController extends Controller
             return redirect()->route('scan.view', ['token' => $token]);
         }
 
-        return view('public.qr.entry');
+        // return 404
+        abort(404, ErrorCode::InvalidQR->getMessage());
     }
 
     /**
@@ -35,17 +37,31 @@ class QrViewController extends Controller
      */
     public function view(string $token): View|RedirectResponse
     {
+        // Validate token format (should be 64 chars alphanumeric)
+        if (!preg_match('/^[a-zA-Z0-9]{64}$/', $token)) {
+            Log::warning('Invalid token format', [
+                'token' => substr($token, 0, 32) . '...',
+                'length' => strlen($token),
+            ]);
+            abort(404, ErrorCode::InvalidQR->getMessage());
+        }
+
+        // Find QR code by token
         $qrCode = QrCode::where('token_qr', $token)
             ->with(['registration.participants', 'registration.formLink'])
             ->first();
 
         if (!$qrCode) {
+            Log::warning('QR Code not found in database', [
+                'searched_token' => substr($token, 0, 32) . '...',
+                'token_length' => strlen($token),
+            ]);
             abort(404, ErrorCode::InvalidQR->getMessage());
         }
 
-        // Redirect admin to scanner CMS
+        // Redirect admin to scanner CMS with proper token_qr
         if (auth('admin')->check()) {
-            return redirect()->route('cms.scanner.scan', ['token' => $token]);
+            return redirect()->route('cms.scanner.scan', ['token' => $qrCode->token_qr]);
         }
 
         // Public view

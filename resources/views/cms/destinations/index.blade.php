@@ -158,12 +158,16 @@
                                 </div>
 
                                 <div class="row mt-3">
-                                    <div class="col-6">
+                                    <div class="col-4">
                                         <small class="text-muted d-block">Daily Quotas</small>
                                         <strong>{{ $destination['daily_quotas_count'] }}</strong> terjadwal
                                     </div>
-                                    <div class="col-6">
-                                        <small class="text-muted d-block">Registrations</small>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Peserta mudik</small>
+                                        <strong>{{ $destination['total_participants'] }}</strong> peserta
+                                    </div>
+                                    <div class="col-4">
+                                        <small class="text-muted d-block">Registrant</small>
                                         <strong>{{ $destination['registrations_count'] }}</strong> pendaftar
                                     </div>
                                 </div>
