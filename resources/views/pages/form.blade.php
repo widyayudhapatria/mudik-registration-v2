@@ -350,10 +350,23 @@
                 // Render destinations
                 const html = data.data.map(dest => {
                     const badgeClass = dest.remaining > 5 ? 'bg-success' : dest.remaining > 2 ? 'bg-warning' : 'bg-danger';
+                    
+                    if (!dest.is_available) {
+                        return `
+                            <div class="col-md-6 col-lg-4 mb-3">
+                                <div class="btn btn-outline-secondary w-100 py-3 disabled" style="cursor: not-allowed; opacity: 0.6;">
+                                    <strong>${dest.name}</strong>
+                                    <br>
+                                    <small>Tersisa: <span class="badge bg-danger">0 orang</span></small>
+                                </div>
+                            </div>
+                        `;
+                    }
+
                     return `
                         <div class="col-md-6 col-lg-4 mb-3">
                             <input type="radio" class="btn-check" name="destination_radio"
-                                   id="dest${dest.id}" value="${dest.id}" required>
+                                id="dest${dest.id}" value="${dest.id}" required>
                             <label class="btn btn-outline-primary w-100 py-3" for="dest${dest.id}">
                                 <strong>${dest.name}</strong>
                                 <br>

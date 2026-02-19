@@ -31,8 +31,8 @@ class GetAvailableDestinationsAction
             }])
             ->get();
 
-        $available = [];
         $hasAnyQuota = false;
+        $result = [];
 
         foreach ($destinations as $destination) {
             $dailyQuota = $destination->dailyQuotas->first();
@@ -44,16 +44,14 @@ class GetAvailableDestinationsAction
 
             $hasAnyQuota = true;
 
-            // Only include destinations with remaining quota
-            if ($dailyQuota->remaining_daily > 0) {
-                $available[] = [
-                    'id' => $destination->id,
-                    'name' => $destination->name,
-                    'code' => $destination->code,
-                    'daily_quota' => $dailyQuota->quota_daily,
-                    'remaining' => $dailyQuota->remaining_daily,
-                ];
-            }
+            $result[] = [
+                'id'          => $destination->id,
+                'name'        => $destination->name,
+                'code'        => $destination->code,
+                'daily_quota' => $dailyQuota->quota_daily,
+                'remaining'   => $dailyQuota->remaining_daily,
+                'is_available' => $dailyQuota->remaining_daily > 0, 
+            ];
         }
 
         // If no destinations have daily quota set
@@ -64,6 +62,6 @@ class GetAvailableDestinationsAction
             );
         }
 
-        return $available;
+        return $result;
     }
 }

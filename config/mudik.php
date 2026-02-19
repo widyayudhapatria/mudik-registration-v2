@@ -101,4 +101,12 @@ return [
         'qr_code_valid_until' => env('QR_CODE_VALID_UNTIL', '2026-03-01 23:00:00'),
         'ticket_exchange' => env('TICKET_EXCHANGE_SCHEDULE', 'Tanggal 1-5 April 2026'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Departure Days Configuration
+    |--------------------------------------------------------------------------
+    */
+    'departure_date' => '2026-05-30',
+    'departure_time' => '08:00',
 ];
