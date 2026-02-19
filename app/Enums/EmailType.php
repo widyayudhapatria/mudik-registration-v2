@@ -9,4 +9,5 @@ enum EmailType: string
     case FormLink = 'form_link';
     case QrCode = 'qr_code';
     case Rejection = 'rejection';
+    case SeatAllocation = 'seat_allocation';
 }

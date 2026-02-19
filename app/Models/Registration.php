@@ -86,6 +86,14 @@ class Registration extends Model
     }
 
     /**
+     * Get the seat allocations for the registration.
+     */
+    public function seatAllocations(): HasMany
+    {
+        return $this->hasMany(SeatAllocation::class);
+    }
+
+    /**
      * Get the admin who approved the registration.
      */
     public function approvedBy(): BelongsTo

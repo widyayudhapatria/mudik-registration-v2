@@ -7,10 +7,10 @@ use App\Enums\ErrorCode;
 use App\Enums\ScanResult;
 //use App\Events\ScanPerformed;
 use App\Exceptions\MudikException;
+use App\Jobs\SendSeatAllocationEmailJob;
 use App\Models\Admin;
 use App\Models\QrCode;
 use App\Models\ScanLog;
-use App\Jobs\SendQrScannedEmail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -32,7 +32,8 @@ class ConsumeQrCodeAction
                 ->lockForUpdate()
                 ->with([
                     'registration.formLink',
-                    'registration.participants'
+                    'registration.participants',
+                    'registration.destination'
                 ])
                 ->first();
 
@@ -54,9 +55,20 @@ class ConsumeQrCodeAction
                 request()->userAgent()
             );
 
+            // 🆕 Allocate seats for participants
+            $seatAllocations = AllocateSeatsAction::run(
+                $qrCode->registration,
+                $scanLog,
+                $admin
+            );
+
             DB::commit();
 
-            dispatch(new SendQrScannedEmail($qrCode->registration_id));
+            // 🆕 Send email with seat allocations (outside transaction)
+            dispatch(new SendSeatAllocationEmailJob(
+                $qrCode->registration,
+                $seatAllocations
+            ));
 
             // Invalidate related dashboard caches
             Cache::forget('cms.scanner.statistics');
@@ -70,6 +82,7 @@ class ConsumeQrCodeAction
                 'qr_code_id' => $qrCode->id,
                 'admin_id' => $admin->id,
                 'registration_id' => $qrCode->registration_id,
+                'seats_allocated' => $seatAllocations->filter(fn($s) => !$s->isNoSeat())->count(),
             ]);
 
             // Prepare response
@@ -92,6 +105,7 @@ class ConsumeQrCodeAction
                         'kk_number' => $qrCode->registration->kk_number,
                         'has_child_under_4' => $qrCode->registration->has_child_under_4,
                         'destination_name' => $qrCode->registration->destination?->name,
+                        'destination_code' => $qrCode->registration->destination?->code,
                     ],
                     'participants_summary' => [
                         'total' => $qrCode->registration->participants->count(),
@@ -105,6 +119,16 @@ class ConsumeQrCodeAction
                             'birth_date' => $participant->birth_date->toIso8601String(),
                             'age' => $participant->getAge(),
                             'is_child_under_4' => $participant->is_child_under_4,
+                        ];
+                    })->toArray(),
+                    'seat_allocations' => $seatAllocations->map(function ($seat) {
+                        return [
+                            'participant_name' => $seat->participant->full_name,
+                            'participant_age' => $seat->participant->getAge(),
+                            'seat_code' => $seat->seat_code,
+                            'bus_number' => $seat->bus_number,
+                            'seat_number' => $seat->seat_number,
+                            'is_no_seat' => $seat->isNoSeat(),
                         ];
                     })->toArray(),
                     'warnings' => $qrCode->registration->has_child_under_4

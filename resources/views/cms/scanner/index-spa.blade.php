@@ -654,12 +654,71 @@
 
         function buildSuccessHTML(d, reg) {
             const pax = d.participants || [];
-            const pHTML = pax.map(p => `
-        <li class="${p.is_child_under_4 ? 'child' : ''}">
-            <i class="bi bi-person-check-fill text-success"></i>
-            ${p.full_name}, ${p.birth_date} (${p.age} tahun)
-            ${p.is_child_under_4 ? '<span class="badge bg-warning text-dark ms-auto small">Anak &lt;4th</span>' : ''}
-        </li>`).join('');
+            const seats = d.seat_allocations || [];
+
+            // Group seats by bus_number
+            const seatsByBus = {};
+            const noSeats = [];
+
+            seats.forEach(seat => {
+                if (seat.is_no_seat) {
+                    noSeats.push(seat);
+                } else {
+                    const busNum = seat.bus_number || 0;
+                    if (!seatsByBus[busNum]) {
+                        seatsByBus[busNum] = [];
+                    }
+                    seatsByBus[busNum].push(seat);
+                }
+            });
+
+            // Build seat allocation HTML
+            let seatsHTML = '';
+
+            // Display seats by bus
+            Object.keys(seatsByBus).sort((a, b) => a - b).forEach(busNum => {
+                const busSeats = seatsByBus[busNum];
+                seatsHTML += `
+                    <div class="mb-3">
+                        <div class="alert alert-info py-2 px-3 small mb-2" style="background: linear-gradient(135deg, #1976D2 0%, #0D47A1 100%); color: white; border: none;">
+                            <i class="bi bi-bus-front-fill me-1"></i> <strong>Bus ${busNum} - ${reg.destination_code || reg.destination_name}</strong>
+                        </div>
+                        <ul class="participant-list">
+                            ${busSeats.map(seat => `
+                                <li style="display: flex; justify-content: space-between; align-items: center; background: #f0f8ff; border-left: 3px solid #2E7D32;">
+                                    <span>
+                                        <i class="bi bi-person-check-fill text-success"></i>
+                                        ${seat.participant_name} <span class="text-muted small">(${seat.participant_age} th)</span>
+                                    </span>
+                                    <span class="badge" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); font-size: 13px; padding: 6px 12px; letter-spacing: 1px;">
+                                        ${seat.seat_code}
+                                    </span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            });
+
+            // Display children without seats
+            if (noSeats.length > 0) {
+                seatsHTML += `
+                    <div class="mb-3">
+                        <div class="alert alert-warning py-2 px-3 small mb-2" style="background: linear-gradient(135deg, #FF9800 0%, #F57C00 100%); color: white; border: none;">
+                            <i class="bi bi-info-circle-fill me-1"></i> <strong>Anak Dibawah 4 Tahun (Dipangku)</strong>
+                        </div>
+                        <ul class="participant-list">
+                            ${noSeats.map(seat => `
+                                <li class="child" style="background: #fff3e0; border-left: 3px solid #FF9800;">
+                                    <i class="bi bi-person-fill text-warning"></i>
+                                    ${seat.participant_name} <span class="text-muted small">(${seat.participant_age} th)</span>
+                                    <span class="badge bg-warning text-dark ms-auto">DIPANGKU</span>
+                                </li>
+                            `).join('')}
+                        </ul>
+                    </div>
+                `;
+            }
 
             return `
         <table class="info-table w-100 mb-3">
@@ -669,16 +728,24 @@
             <tr><td>Waktu Scan</td><td>${formatDatetime(d.scanned_at)}</td></tr>
             <tr><td>Petugas</td><td>${d.scanned_by?.name ?? '-'}</td></tr>
         </table>
-        ${pax.length ? `<div class="mb-3">
-                                                    <p class="small text-muted fw-bold mb-1">DAFTAR PESERTA MUDIK (${d.participants_summary.total} orang)</p>
-                                                    <ul class="participant-list">${pHTML}</ul>
-                                                </div>` : ''}
+
+        ${seatsHTML ? `
+            <div class="mb-3">
+                <p class="small fw-bold mb-2" style="color: #2E7D32;">
+                    <i class="bi bi-ticket-perforated-fill me-1"></i> ALOKASI NOMOR KURSI
+                </p>
+                ${seatsHTML}
+            </div>
+        ` : ''}
+
+        <div class="alert alert-success py-2 px-3 small mb-3">
+            <i class="bi bi-envelope-check-fill me-1"></i> Email dengan detail kursi telah dikirim ke: <strong>${d.email || '-'}</strong>
+        </div>
+
         ${d.warnings?.length ? `<div class="alert alert-warning py-2 px-3 small mb-2">
                                                     <i class="bi bi-exclamation-triangle me-1"></i> ${d.warnings[0]}
                                                 </div>` : ''}
-        <div class="alert alert-success py-2 px-3 small mb-3">
-            <i class="bi bi-ticket-perforated me-1"></i> Tiket dapat ditukarkan kepada peserta!
-        </div>
+
         <button class="scan-again-btn btn" onclick="cancelScan()">
             <i class="bi bi-arrow-repeat me-1"></i> Scan Lagi
         </button>`;
