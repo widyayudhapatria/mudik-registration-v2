@@ -11,6 +11,7 @@ use App\Models\Destination;
 use App\Models\FormLink;
 use App\Models\Participant;
 use App\Models\Registration;
+use App\Jobs\SendRegistrationSubmittedEmail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\Cache;
 use Illuminate\Support\Facades\DB;
@@ -103,6 +104,8 @@ class SubmitRegistrationAction
             Cache::forget('destinations:available:' . Carbon::today()->toDateString());
 
             DB::commit();
+
+            SendRegistrationSubmittedEmail::dispatch($registration);
 
             Log::info('Registration submitted successfully', [
                 'registration_id' => $registration->id,

@@ -24,7 +24,7 @@ class RegistrationFilters extends QueryFilters
     ];
 
     /**
-     * Filter by status.
+     * Filter by status (via formLink relation).
      */
     protected function status(?string $value): void
     {
@@ -35,6 +35,18 @@ class RegistrationFilters extends QueryFilters
         $this->builder->whereHas('formLink', function ($query) use ($value) {
             $query->where('status', $value);
         });
+    }
+
+    /**
+     * Filter by destination.
+     */
+    protected function destination_id(?string $value): void
+    {
+        if (blank($value)) {
+            return;
+        }
+
+        $this->builder->where('destination_id', $value);
     }
 
     /**

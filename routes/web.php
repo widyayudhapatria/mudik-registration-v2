@@ -111,7 +111,7 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
                 'token' => $token,
                 'qrCode' => $qrCode,
             ]);
-        })->name('scan');
+        })->name('scan')->where('token', '.+'); ;
     });
 });
 

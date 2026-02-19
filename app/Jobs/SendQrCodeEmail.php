@@ -32,7 +32,7 @@ class SendQrCodeEmail implements ShouldQueue
     public function handle(QrCodeService $qrCodeService): void
     {
         // Load fresh data dari database dengan relationships
-        $registration = Registration::with(['qrCode', 'formLink'])->findOrFail($this->registrationId);
+        $registration = Registration::with(['qrCode', 'formLink', 'participants', 'destination'])->findOrFail($this->registrationId);
 
         // Validasi QR code exists
         if (!$registration->qrCode) {

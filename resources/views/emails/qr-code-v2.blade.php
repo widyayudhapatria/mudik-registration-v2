@@ -344,6 +344,33 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            <!-- Tujuan -->
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px;">
+                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%;" width="100%" class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td valign="top" class="mcnTextContent" style="padding: 0px 18px 18px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
+                                                                            <table width="100%" cellpadding="15" cellspacing="0" border="0" style="background-color: #f9fafb;">
+                                                                                <tr>
+                                                                                    <td style="color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
+                                                                                        <h4 style="margin: 0 0 10px 0; color: #f58514; font-size: 18px; font-weight: bold;">TUJUAN MUDIK:</h4>
+                                                                                        <p style="margin: 0; font-size: 16px; font-weight: 600;">
+                                                                                            {{ $registration->destination->name ?? '-' }}
+                                                                                        </p>
+                                                                                    </td>
+                                                                                </tr>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                             <!-- Participant List -->
                                             <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                                                 <tbody class="mcnTextBlockOuter">
@@ -409,7 +436,7 @@
                                                                             <h4 style="color: #f58514; margin-bottom: 10px; font-size: 18px; font-weight: bold;">WAJIB DIBAWA SAAT PENUKARAN :</h4>
                                                                             <ul style="margin: 0; padding-left: 20px;">
                                                                                 <li style="margin-bottom: 10px;">QR Code ini (cetak atau tunjukkan di smartphone)</li>
-                                                                                <li style="margin-bottom: 10px;">KTP Asli perwakilan NAUFAL FARRAS HILMY</li>
+                                                                                <li style="margin-bottom: 10px;">KTP Asli perwakilan <strong>{{ strtoupper($registration->representative_name) }}</strong></li>
                                                                                 <li style="margin-bottom: 10px;">Kartu Keluarga (KK) Asli</li>
                                                                                 <li style="margin-bottom: 10px;">Dokumen pendukung lainnya jika diminta</li>
                                                                             </ul>

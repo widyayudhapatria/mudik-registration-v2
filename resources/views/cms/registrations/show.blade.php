@@ -163,6 +163,11 @@
                     <div class="detail-label">Nomor Kartu Keluarga</div>
                     <div class="detail-value">{{ $registration->kk_number }}</div>
                 </div>
+
+                <div class="col-md-6 mb-3">
+                    <div class="detail-label">Tujuan</div>
+                    <div class="detail-value">{{ $registration->destination->name }}</div>
+                </div>
             </div>
         </div>
 
