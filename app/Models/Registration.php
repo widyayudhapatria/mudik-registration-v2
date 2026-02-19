@@ -213,10 +213,26 @@ class Registration extends Model
     }
 
     /**
-     * Scope to filter rejected registrations.
+     * Scope to filter rejected registrations (including soft-deleted).
      */
     public function scopeRejected($query)
     {
         return $query->status('rejected');
+    }
+
+    /**
+     * Scope to filter registrations by approved_at timestamp.
+     */
+    public function scopeApprovedByTimestamp($query)
+    {
+        return $query->whereNotNull('approved_at');
+    }
+
+    /**
+     * Scope to filter registrations by rejected_at timestamp (including soft-deleted).
+     */
+    public function scopeRejectedByTimestamp($query)
+    {
+        return $query->withTrashed()->whereNotNull('rejected_at');
     }
 }
