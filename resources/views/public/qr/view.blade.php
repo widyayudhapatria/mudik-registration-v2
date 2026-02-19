@@ -1,413 +1,329 @@
-@extends('layouts.app')
+<!DOCTYPE html>
+<html lang="id">
+<head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+    <meta name="description" content="Status Pendaftaran Mudik Gratis 2026" />
+    <title>Status Pendaftaran | Mudik Gratis 2026</title>
 
-@section('title', 'QR Code Tiket Mudik - Mudik Gratis Lebaran 2026')
+    <link href="https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,700|Roboto:400,500,700" rel="stylesheet" />
+    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('css/materialdesignicons.min.css') }}" rel="stylesheet" />
 
-@push('styles')
-<style>
-    .qr-header {
-        background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%);
-        padding: 40px 20px;
-        color: white;
-        text-align: center;
-    }
-    
-    .qr-card {
-        background: white;
-        border-radius: 24px;
-        padding: 40px;
-        box-shadow: 0 8px 32px rgba(0,0,0,0.12);
-        max-width: 600px;
-        margin: -60px auto 40px;
-        position: relative;
-        z-index: 10;
-    }
-    
-    .qr-code-container {
-        background: white;
-        padding: 30px;
-        border-radius: 20px;
-        box-shadow: 0 4px 16px rgba(0,0,0,0.08);
-        text-align: center;
-        margin-bottom: 30px;
-    }
-    
-    .qr-code-img {
-        max-width: 300px;
-        width: 100%;
-        height: auto;
-        margin: 0 auto;
-        display: block;
-    }
-    
-    .status-badge {
-        display: inline-block;
-        padding: 12px 24px;
-        border-radius: 50px;
-        font-weight: 600;
-        font-size: 1.1rem;
-        margin-bottom: 20px;
-    }
-    
-    .status-valid {
-        background: linear-gradient(135deg, #4CAF50 0%, #2E7D32 100%);
-        color: white;
-    }
-    
-    .status-scanned {
-        background: linear-gradient(135deg, #F57C00 0%, #E65100 100%);
-        color: white;
-    }
-    
-    .status-expired {
-        background: linear-gradient(135deg, #D32F2F 0%, #B71C1C 100%);
-        color: white;
-    }
-    
-    .info-section {
-        background: #f8f9fa;
-        border-radius: 16px;
-        padding: 25px;
-        margin-bottom: 20px;
-    }
-    
-    .info-title {
-        font-weight: 700;
-        color: var(--primary-dark);
-        margin-bottom: 15px;
-        font-size: 1.2rem;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    .info-item {
-        display: flex;
-        justify-content: space-between;
-        padding: 12px 0;
-        border-bottom: 1px solid #dee2e6;
-    }
-    
-    .info-item:last-child {
-        border-bottom: none;
-    }
-    
-    .info-label {
-        color: var(--gray-text);
-        font-weight: 500;
-    }
-    
-    .info-value {
-        font-weight: 600;
-        color: var(--dark-text);
-        text-align: right;
-    }
-    
-    .participant-list {
-        list-style: none;
-        padding: 0;
-        margin: 0;
-    }
-    
-    .participant-item {
-        background: white;
-        padding: 15px;
-        border-radius: 12px;
-        margin-bottom: 10px;
-        box-shadow: var(--shadow-sm);
-    }
-    
-    .important-note {
-        background: linear-gradient(135deg, #FFF3E0 0%, #FFE0B2 100%);
-        border-left: 4px solid var(--secondary-color);
-        padding: 20px;
-        border-radius: 12px;
-        margin-top: 30px;
-    }
-    
-    .note-title {
-        font-weight: 700;
-        color: var(--secondary-dark);
-        margin-bottom: 15px;
-        display: flex;
-        align-items: center;
-        gap: 10px;
-    }
-    
-    @media (max-width: 768px) {
-        .qr-card {
-            padding: 25px 20px;
-            margin: -40px 15px 30px;
-        }
-        
-        .qr-code-container {
-            padding: 20px;
-        }
-    }
+    <style>
+        * { margin: 0; padding: 0; box-sizing: border-box; }
 
-    @media (max-width: 768px) {
-        .qr-header {
-            padding: 30px 16px;
+        body {
+            font-family: "Roboto", Arial, Helvetica, sans-serif;
+            background-color: #f5f5f5;
+            overflow-x: hidden;
         }
-        
-        .qr-card {
-            padding: 25px 20px;
-            margin: -40px 15px 30px;
+
+        .page-wrapper {
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 40px 20px;
         }
-        
-        .qr-code-container {
-            padding: 20px;
+
+        .page-wrapper.status-approved { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
+        .page-wrapper.status-scanned  { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
+
+        .card {
+            background: white;
+            border-radius: 8px;
+            box-shadow: 0 4px 20px rgba(0,0,0,.08);
+            padding: 30px;
+            max-width: 650px;
+            width: 100%;
         }
-        
-        .qr-code-img {
-            max-width: 250px;
-        }
-        
+
+        .status-header { text-align: center; margin-bottom: 25px; }
+
         .status-badge {
-            font-size: 0.95rem;
-            padding: 10px 20px;
+            display: inline-block;
+            padding: 8px 18px;
+            border-radius: 25px;
+            font-weight: 600;
+            font-size: 13px;
+            margin-bottom: 12px;
+            text-transform: uppercase;
+            letter-spacing: .5px;
         }
-        
-        .info-section {
-            padding: 20px;
+
+        .status-badge.approved { background-color: #fcd34d; color: #78350f; }
+        .status-badge.scanned  { background-color: #86efac; color: #15803d; }
+
+        .status-title    { font-size: 26px; font-weight: 700; color: #1f2937; margin-bottom: 5px; }
+        .status-subtitle { font-size: 15px; color: #6b7280; }
+
+        .divider { height: 1px; background-color: #e5e7eb; margin: 20px 0; }
+
+        .section-title {
+            font-size: 16px;
+            font-weight: 700;
+            color: #1f2937;
+            margin-bottom: 15px;
+            padding-bottom: 8px;
+            border-bottom: 2px solid #f59e0b;
+            display: inline-block;
         }
-        
-        .info-title {
-            font-size: 1.1rem;
+
+        .destination-banner {
+            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+            color: white;
+            border-radius: 6px;
+            padding: 18px;
+            margin-bottom: 20px;
         }
-        
-        .info-item {
-            flex-direction: column;
-            align-items: flex-start;
-            gap: 5px;
-            padding: 10px 0;
+
+        .destination-banner h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
+
+        .destination-grid        { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; margin-bottom: 10px; }
+        .destination-grid:last-child { margin-bottom: 0; }
+        .destination-grid.single { grid-template-columns: 1fr; }
+
+        .destination-item label { font-size: 11px; text-transform: uppercase; opacity: .9; display: block; margin-bottom: 3px; }
+        .destination-item p     { font-size: 20px; font-weight: 600; margin: 0; }
+
+        .info-card {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
+            padding: 15px;
+            margin-bottom: 15px;
         }
-        
-        .info-value {
-            text-align: left;
+
+        .info-row {
+            display: grid;
+            grid-template-columns: 110px 1fr;
+            gap: 12px;
+            margin-bottom: 12px;
+            align-items: start;
         }
-        
-        .participant-item {
+        .info-row:last-child { margin-bottom: 0; }
+
+        .info-label { color: #f59e0b; font-size: 13px; font-weight: 600; text-transform: uppercase; }
+        .info-value { color: #374151; font-size: 15px; }
+
+        .passenger-list { margin-top: 12px; }
+
+        .passenger-item {
+            border: 1px solid #e5e7eb;
+            border-radius: 6px;
             padding: 12px;
+            margin-bottom: 8px;
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
         }
-        
-        .important-note {
-            padding: 16px;
-        }
-        
-        .note-title {
-            font-size: 1rem;
-        }
-        
-        .important-note ul {
-            font-size: 0.9rem;
-        }
-    }
+        .passenger-item:last-child { margin-bottom: 0; }
 
-    @media (max-width: 576px) {
-        .qr-header h1 {
-            font-size: 1.75rem;
-        }
-        
-        .qr-card {
-            padding: 20px 16px;
-        }
-        
-        .qr-code-img {
-            max-width: 220px;
-        }
-        
-        .status-badge {
-            font-size: 0.9rem;
-            padding: 8px 16px;
-        }
-        
-        .info-section {
-            padding: 16px;
-        }
-        
-        .participant-item .fw-semibold {
-            font-size: 0.95rem;
-        }
-        
-        .participant-item .small {
-            font-size: 0.8rem;
-        }
-    }
+        .passenger-name { font-weight: 600; color: #1f2937; font-size: 15px; margin-bottom: 2px; }
+        .passenger-meta { font-size: 12px; color: #9ca3af; }
 
-</style>
-@endpush
+        .seat-badge {
+            padding: 6px 10px;
+            border-radius: 4px;
+            font-weight: 600;
+            font-size: 13px;
+            text-align: right;
+            min-width: 110px;
+            white-space: nowrap;
+        }
+        .seat-badge.reserved { background-color: #fef3c7; color: #92400e; }
+        .seat-badge.scanned  { background-color: #bbf7d0; color: #15803d; }
+        .seat-badge.lap      { background-color: #e0e7ff; color: #3730a3; }
 
-@section('content')
-<div class="qr-header">
-    <div class="container">
-        <h1 class="heading-font mb-2" style="font-size: clamp(2rem, 5vw, 3rem);">
-            TIKET MUDIK GRATIS 2026
-        </h1>
-        <p class="mb-0">QR Code Penukaran Tiket</p>
-    </div>
-</div>
+        .action-box {
+            background-color: #eff6ff;
+            border-left: 4px solid #f59e0b;
+            padding: 15px;
+            border-radius: 6px;
+            margin-top: 20px;
+        }
+        .action-box h5           { color: #1f2937; font-weight: 700; margin-bottom: 8px; font-size: 15px; }
+        .action-box p            { color: #374151; margin-bottom: 8px; font-size: 14px; }
+        .action-box p:last-child { margin-bottom: 0; }
+        .action-box ul           { margin: 0; padding-left: 18px; }
+        .action-box li           { color: #374151; margin-bottom: 6px; font-size: 14px; }
+        .action-box .note        { font-size: 13px; margin-top: 10px; margin-bottom: 0; }
+        .action-box.scanned      { background-color: #f0fdf4; border-left-color: #22c55e; }
+        .scan-timestamp          { font-size: 13px; color: #6b7280; margin-top: 8px; margin-bottom: 0; }
 
-<div class="container" style="padding-top: 80px; padding-bottom: 60px;">
-    <div class="qr-card">
-        <!-- Status Badge -->
-        <div class="text-center">
-            @if($qrCode->isScanned())
-                <div class="status-badge status-scanned">
-                    <i class="bi bi-check-circle-fill me-2"></i>Sudah Digunakan
-                </div>
-            @elseif($qrCode->isExpired())
-                <div class="status-badge status-expired">
-                    <i class="bi bi-x-circle-fill me-2"></i>Expired
-                </div>
-            @elseif($qrCode->isValid())
-                <div class="status-badge status-valid">
-                    <i class="bi bi-shield-check-fill me-2"></i>Valid
-                </div>
+        @media (max-width: 768px) {
+            .card             { padding: 20px; }
+            .status-title     { font-size: 22px; }
+            .info-row         { grid-template-columns: 95px 1fr; }
+            .destination-grid { grid-template-columns: 1fr; }
+            .passenger-item   { flex-direction: column; align-items: flex-start; }
+            .seat-badge       { width: 100%; text-align: left; margin-top: 8px; }
+        }
+
+        @media (max-width: 480px) {
+            .card         { padding: 15px; }
+            .status-title { font-size: 20px; }
+        }
+    </style>
+</head>
+<body>
+
+@php
+    $isScanned   = $qrCode->is_scanned;
+    $reg         = $registration;
+    $destination = $reg->destination;   
+    $formLink    = $reg->formLink;      
+    $statusClass = $isScanned ? 'status-scanned' : 'status-approved';
+    $departureDate = \Carbon\Carbon::parse(config('mudik.departure_date', '2026-05-30'));
+    $departureTime = \Carbon\Carbon::parse(config('mudik.departure_time', '08:00'));
+@endphp
+
+<div class="page-wrapper {{ $statusClass }}">
+    <div class="card">
+
+        {{-- ── Status Header ── --}}
+        <div class="status-header">
+            @if ($isScanned)
+                <span class="status-badge scanned">
+                    <i class="mdi mdi-check-circle me-1"></i> TIKET SUDAH DIGUNAKAN
+                </span>
             @else
-                <div class="status-badge status-expired">
-                    <i class="bi bi-exclamation-triangle-fill me-2"></i>Tidak Valid
-                </div>
+                <span class="status-badge approved">
+                    <i class="mdi mdi-check-circle me-1"></i> PENDAFTARAN APPROVED
+                </span>
             @endif
+
+            <h1 class="status-title">Status Pendaftaran Anda</h1>
+            <p class="status-subtitle">Keluarga {{ $reg->representative_name }}</p>
         </div>
-        
-        <!-- QR Code -->
-        <div class="qr-code-container">
-            {!! QrCode::size(300)->generate($qrCode->token_qr) !!}
-            <p class="small text-muted mt-3 mb-0">
-                <i class="bi bi-info-circle me-1"></i>
-                Simpan atau screenshot QR Code ini
-            </p>
-        </div>
-        
-        <!-- Registration Info -->
-        <div class="info-section">
-            <div class="info-title">
-                <i class="bi bi-person-badge-fill"></i>
-                Informasi Perwakilan
+
+        <div class="divider"></div>
+
+        {{-- ── Destination Banner ── --}}
+        <div class="destination-banner">
+            <h3><i class="mdi mdi-map-marker me-1"></i> Tujuan Perjalanan Mudik</h3>
+
+            <div class="destination-grid single">
+                <div class="destination-item">
+                    <label>Kota / Kabupaten</label>
+                    <p>{{ $destination->name }}</p>
+                </div>
             </div>
-            <div class="info-item">
-                <span class="info-label">Nama:</span>
-                <span class="info-value">{{ $registration->representative_name }}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">NIK:</span>
-                <span class="info-value">{{ $registration->representative_nik }}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Nomor KK:</span>
-                <span class="info-value">{{ $registration->kk_number }}</span>
+
+            <div class="destination-grid">
+                <div class="destination-item">
+                    <label>Tanggal Keberangkatan</label>
+                    <p>{{ $departureDate->translatedFormat('d F Y') }}</p>
+                </div>
+                <div class="destination-item">
+                    <label>Jam Keberangkatan</label>
+                    <p>{{ $departureTime->format('H:i') }} WIB</p>
+                </div>
             </div>
         </div>
-        
-        <!-- Participants -->
-        <div class="info-section">
-            <div class="info-title">
-                <i class="bi bi-people-fill"></i>
-                Daftar Peserta Mudik ({{ $participants->count() }} orang)
+
+        {{-- ── Representative Data ── --}}
+        <div>
+            <h6 class="section-title">
+                <i class="mdi mdi-account-multiple me-1"></i> Data Perwakilan Keluarga
+            </h6>
+            <div class="info-card">
+                <div class="info-row">
+                    <span class="info-label">Nama</span>
+                    <span class="info-value">{{ $reg->representative_name }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">NIK</span>
+                    <span class="info-value">{{ $reg->representative_nik }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Nomor KK</span>
+                    <span class="info-value">{{ $reg->kk_number }}</span>
+                </div>
+                <div class="info-row">
+                    <span class="info-label">Email</span>
+                    <span class="info-value">{{ $formLink->email }}</span>
+                </div>
             </div>
-            <ul class="participant-list">
-                @foreach($participants as $index => $participant)
-                <li class="participant-item">
-                    <div class="d-flex justify-content-between align-items-start">
+        </div>
+
+        {{-- ── Participant List ── --}}
+        <div style="margin-top: 25px">
+            <h6 class="section-title">
+                <i class="mdi mdi-account-group me-1"></i> Daftar Peserta Mudik
+            </h6>
+            <div class="passenger-list">
+                @foreach ($participants as $index => $participant)
+                    @php
+                        $isLap      = $participant->is_child_under_4;
+                        $badgeClass = $isScanned ? 'scanned' : ($isLap ? 'lap' : 'reserved');
+                        $badgeLabel = $isScanned ? 'Sudah Scan' : ($isLap ? 'Dipangku' : 'Reserved');
+                    @endphp
+                    <div class="passenger-item">
                         <div>
-                            <div class="fw-semibold">{{ $index + 1 }}. {{ $participant->full_name }}</div>
-                            <div class="small text-muted">NIK/KIA: {{ $participant->nik_kia }}</div>
-                            <div class="small text-muted">
-                                Lahir: {{ $participant->birth_date->format('d/m/Y') }}
-                                @if($participant->is_child_under_4)
-                                    <span class="badge bg-warning text-dark ms-2">Anak < 4 tahun</span>
+                            <div class="passenger-name">{{ $index + 1 }}. {{ $participant->full_name }}</div>
+                            <div class="passenger-meta">
+                                @if ($isLap)
+                                    Anak (Dibawah 4 Tahun)
+                                @else
+                                    ({{ $participant->getAge() }} tahun)
                                 @endif
                             </div>
                         </div>
+                        <div class="seat-badge {{ $badgeClass }}">
+                            <i class="mdi mdi-ticket-confirmation me-1"></i>{{ $badgeLabel }}
+                        </div>
                     </div>
-                </li>
                 @endforeach
-            </ul>
+            </div>
         </div>
-        
-        <!-- QR Info -->
-        <div class="info-section">
-            <div class="info-title">
-                <i class="bi bi-qr-code"></i>
-                Informasi QR Code
-            </div>
-            <div class="info-item">
-                <span class="info-label">Berlaku Dari:</span>
-                <span class="info-value">{{ $qrCode->valid_from->format('d/m/Y H:i') }}</span>
-            </div>
-            <div class="info-item">
-                <span class="info-label">Berlaku Sampai:</span>
-                <span class="info-value">{{ $qrCode->valid_until->format('d/m/Y H:i') }}</span>
-            </div>
-            @if($qrCode->scanned_at)
-            <div class="info-item">
-                <span class="info-label">Di-scan Pada:</span>
-                <span class="info-value">{{ $qrCode->scanned_at->format('d/m/Y H:i') }}</span>
-            </div>
-            @endif
-        </div>
-        
-        <!-- Important Notes -->
-        <div class="important-note">
-            <div class="note-title">
-                <i class="bi bi-exclamation-triangle-fill"></i>
-                INFORMASI PENTING
-            </div>
-            <ul class="mb-0">
-                <li class="mb-2">
-                    <strong>QR Code One-Time:</strong> QR Code hanya dapat digunakan sekali untuk penukaran tiket
-                </li>
-                <li class="mb-2">
-                    <strong>Dokumen yang Harus Dibawa:</strong>
-                    <ul class="mt-2">
-                        <li>QR Code ini (cetak atau screenshot)</li>
-                        <li>KTP Asli perwakilan</li>
-                        <li>Kartu Keluarga (KK) Asli</li>
-                    </ul>
-                </li>
-                @if($registration->has_child_under_4)
-                <li class="mb-2">
-                    <strong>Anak Dibawah 4 Tahun:</strong> Wajib dipangku selama perjalanan
-                </li>
+
+        {{-- ── Action Box ── --}}
+        @if ($isScanned)
+            <div class="action-box scanned">
+                <h5><i class="mdi mdi-check-all me-1"></i> Tiket Telah Digunakan</h5>
+                <p>QR Code ini sudah di-scan dan tiket telah dikonfirmasi ✓</p>
+                @if ($qrCode->scanned_at)
+                    <p class="scan-timestamp">
+                        <i class="mdi mdi-clock-outline me-1"></i>
+                        Di-scan pada: {{ \Carbon\Carbon::parse($qrCode->scanned_at)->translatedFormat('d F Y, H:i') }} WIB
+                    </p>
                 @endif
-                <li class="mb-0">
-                    <strong>Datang Tepat Waktu:</strong> Keterlambatan dapat menyebabkan pembatalan
-                </li>
-            </ul>
-        </div>
-        
-        <!-- Action Buttons -->
-        <div class="d-grid gap-2 mt-4">
-            <button class="btn btn-primary btn-lg" onclick="window.print()" style="border-radius: 12px;">
-                <i class="bi bi-printer-fill me-2"></i>Cetak QR Code
-            </button>
-            <a href="{{ route('public.landing') }}" class="btn btn-outline-primary btn-lg" style="border-radius: 12px;">
-                <i class="bi bi-house-fill me-2"></i>Ke Beranda
-            </a>
-        </div>
+            </div>
+        @else
+            <div class="action-box">
+                <h5><i class="mdi mdi-information-outline me-1"></i> Langkah Selanjutnya</h5>
+                <p>Pendaftaran Anda telah disetujui ✓</p>
+                <ul>
+                    <li>
+                        Tukar QR Code ini dengan tiket pada
+                        <strong>
+                            {{ $departureDate->copy()->subDay()->translatedFormat('d F') }}
+                            –
+                            {{ $departureDate->translatedFormat('d F Y') }}
+                        </strong>
+                    </li>
+                    <li>
+                        Berkumpul pukul
+                        <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong>
+                    </li>
+                    <li>
+                        Berangkat pukul
+                        <strong>{{ $departureTime->format('H:i') }} WIB</strong>
+                    </li>
+                </ul>
+                <p class="note">
+                    <i class="mdi mdi-alert-circle me-1"></i>
+                    Wajib membawa <strong>KTP</strong> dan <strong>Kartu Keluarga</strong> saat penukaran tiket.
+                </p>
+            </div>
+        @endif
+
     </div>
 </div>
 
-@push('styles')
-<style>
-    @media print {
-        .qr-header,
-        .btn,
-        .important-note {
-            display: none !important;
-        }
-        
-        .qr-card {
-            box-shadow: none !important;
-            margin: 0 !important;
-            padding: 20px !important;
-        }
-        
-        body {
-            print-color-adjust: exact;
-            -webkit-print-color-adjust: exact;
-        }
-    }
-</style>
-@endpush
-@endsection
+<script src="{{ asset('js/jquery.min.js') }}"></script>
+<script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+
+</body>
+</html>
