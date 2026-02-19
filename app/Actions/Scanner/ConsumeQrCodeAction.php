@@ -10,6 +10,7 @@ use App\Exceptions\MudikException;
 use App\Models\Admin;
 use App\Models\QrCode;
 use App\Models\ScanLog;
+use App\Jobs\SendQrScannedEmail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
@@ -54,6 +55,8 @@ class ConsumeQrCodeAction
             );
 
             DB::commit();
+
+            dispatch(new SendQrScannedEmail($qrCode->registration_id));
 
             // Invalidate related dashboard caches
             Cache::forget('cms.scanner.statistics');

@@ -27,6 +27,7 @@
             padding: 40px 20px;
         }
 
+        /* Approved = kuning, Scanned = hijau */
         .page-wrapper.status-approved { background: linear-gradient(135deg, #fef3c7 0%, #fde68a 100%); }
         .page-wrapper.status-scanned  { background: linear-gradient(135deg, #dcfce7 0%, #bbf7d0 100%); }
 
@@ -39,6 +40,7 @@
             width: 100%;
         }
 
+        /* ── Status Header ── */
         .status-header { text-align: center; margin-bottom: 25px; }
 
         .status-badge {
@@ -60,6 +62,7 @@
 
         .divider { height: 1px; background-color: #e5e7eb; margin: 20px 0; }
 
+        /* ── Section Titles ── */
         .section-title {
             font-size: 16px;
             font-weight: 700;
@@ -70,13 +73,20 @@
             display: inline-block;
         }
 
+        /* Scanned state = green accent */
+        .status-scanned .section-title { border-bottom-color: #22c55e; }
+
+        /* ── Destination Banner ── */
         .destination-banner {
-            background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
-            color: white;
             border-radius: 6px;
             padding: 18px;
             margin-bottom: 20px;
+            color: white;
         }
+
+        /* Approved = orange gradient, Scanned = green gradient (sesuai template) */
+        .status-approved .destination-banner { background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%); }
+        .status-scanned  .destination-banner { background: linear-gradient(135deg, #1f7a3e 0%, #145a32 100%); }
 
         .destination-banner h3 { font-size: 16px; font-weight: 700; margin-bottom: 12px; }
 
@@ -87,12 +97,8 @@
         .destination-item label { font-size: 11px; text-transform: uppercase; opacity: .9; display: block; margin-bottom: 3px; }
         .destination-item p     { font-size: 20px; font-weight: 600; margin: 0; }
 
-        .info-card {
-            border: 1px solid #e5e7eb;
-            border-radius: 6px;
-            padding: 15px;
-            margin-bottom: 15px;
-        }
+        /* ── Info Card ── */
+        .info-card { border: 1px solid #e5e7eb; border-radius: 6px; padding: 15px; margin-bottom: 15px; }
 
         .info-row {
             display: grid;
@@ -103,9 +109,13 @@
         }
         .info-row:last-child { margin-bottom: 0; }
 
-        .info-label { color: #f59e0b; font-size: 13px; font-weight: 600; text-transform: uppercase; }
+        .info-label { font-size: 13px; font-weight: 600; text-transform: uppercase; }
+        .status-approved .info-label { color: #f59e0b; }
+        .status-scanned  .info-label { color: #1f7a3e; }
+
         .info-value { color: #374151; font-size: 15px; }
 
+        /* ── Passenger List ── */
         .passenger-list { margin-top: 12px; }
 
         .passenger-item {
@@ -135,26 +145,32 @@
         .seat-badge.scanned  { background-color: #bbf7d0; color: #15803d; }
         .seat-badge.lap      { background-color: #e0e7ff; color: #3730a3; }
 
+        /* ── Action Box ── */
         .action-box {
-            background-color: #eff6ff;
-            border-left: 4px solid #f59e0b;
             padding: 15px;
             border-radius: 6px;
             margin-top: 20px;
+            border-left-width: 4px;
+            border-left-style: solid;
         }
+
+        .status-approved .action-box { background-color: #eff6ff; border-left-color: #f59e0b; }
+        .status-scanned  .action-box { background-color: #f0fdf4; border-left-color: #22c55e; }
+
         .action-box h5           { color: #1f2937; font-weight: 700; margin-bottom: 8px; font-size: 15px; }
         .action-box p            { color: #374151; margin-bottom: 8px; font-size: 14px; }
         .action-box p:last-child { margin-bottom: 0; }
         .action-box ul           { margin: 0; padding-left: 18px; }
         .action-box li           { color: #374151; margin-bottom: 6px; font-size: 14px; }
         .action-box .note        { font-size: 13px; margin-top: 10px; margin-bottom: 0; }
-        .action-box.scanned      { background-color: #f0fdf4; border-left-color: #22c55e; }
-        .scan-timestamp          { font-size: 13px; color: #6b7280; margin-top: 8px; margin-bottom: 0; }
 
+        .scan-timestamp { font-size: 13px; color: #6b7280; margin-top: 8px; margin-bottom: 0; }
+
+        /* ── Responsive ── */
         @media (max-width: 768px) {
             .card             { padding: 20px; }
             .status-title     { font-size: 22px; }
-            .info-row         { grid-template-columns: 95px 1fr; }
+            .info-row         { grid-template-columns: 90px 1fr; }
             .destination-grid { grid-template-columns: 1fr; }
             .passenger-item   { flex-direction: column; align-items: flex-start; }
             .seat-badge       { width: 100%; text-align: left; margin-top: 8px; }
@@ -169,11 +185,12 @@
 <body>
 
 @php
-    $isScanned   = $qrCode->is_scanned;
+    $isScanned   = $qrCode->isScanned(); // pakai method, bukan property (tidak ada accessor is_scanned)
     $reg         = $registration;
-    $destination = $reg->destination;   
-    $formLink    = $reg->formLink;      
+    $destination = $reg->destination;
+    $formLink    = $reg->formLink;
     $statusClass = $isScanned ? 'status-scanned' : 'status-approved';
+
     $departureDate = \Carbon\Carbon::parse(config('mudik.departure_date', '2026-05-30'));
     $departureTime = \Carbon\Carbon::parse(config('mudik.departure_time', '08:00'));
 @endphp
@@ -185,7 +202,7 @@
         <div class="status-header">
             @if ($isScanned)
                 <span class="status-badge scanned">
-                    <i class="mdi mdi-check-circle me-1"></i> TIKET SUDAH DIGUNAKAN
+                    <i class="mdi mdi-ticket-confirmation me-1"></i> FINAL (SIAP BERANGKAT)
                 </span>
             @else
                 <span class="status-badge approved">
@@ -216,7 +233,7 @@
                     <p>{{ $departureDate->translatedFormat('d F Y') }}</p>
                 </div>
                 <div class="destination-item">
-                    <label>Jam Keberangkatan</label>
+                    <label>Jam {{ $isScanned ? 'Berangkat' : 'Keberangkatan' }}</label>
                     <p>{{ $departureTime->format('H:i') }} WIB</p>
                 </div>
             </div>
@@ -250,7 +267,8 @@
         {{-- ── Participant List ── --}}
         <div style="margin-top: 25px">
             <h6 class="section-title">
-                <i class="mdi mdi-account-group me-1"></i> Daftar Peserta Mudik
+                <i class="mdi mdi-account-group me-1"></i>
+                {{ $isScanned ? 'Daftar Peserta & Nomor Kursi' : 'Daftar Peserta Mudik' }}
             </h6>
             <div class="passenger-list">
                 @foreach ($participants as $index => $participant)
@@ -279,19 +297,23 @@
         </div>
 
         {{-- ── Action Box ── --}}
-        @if ($isScanned)
-            <div class="action-box scanned">
-                <h5><i class="mdi mdi-check-all me-1"></i> Tiket Telah Digunakan</h5>
-                <p>QR Code ini sudah di-scan dan tiket telah dikonfirmasi ✓</p>
+        <div class="action-box">
+            @if ($isScanned)
+                <h5><i class="mdi mdi-check-circle me-1"></i> Status: SIAP BERANGKAT!</h5>
+                <p>QR Code Anda telah di-scan dengan sukses ✓</p>
+                <ul>
+                    <li>Berkumpul: <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong> ({{ $departureDate->translatedFormat('d F') }})</li>
+                    <li>Lokasi: <strong>{{ config('mudik.departure_location', 'Lapangan Parkir Kantor Pemerintah') }}</strong></li>
+                    <li>Berangkat: <strong>{{ $departureTime->format('H:i') }} WIB</strong></li>
+                    <li>Bawa KTP dan KK asli (semua peserta)</li>
+                </ul>
                 @if ($qrCode->scanned_at)
                     <p class="scan-timestamp">
                         <i class="mdi mdi-clock-outline me-1"></i>
                         Di-scan pada: {{ \Carbon\Carbon::parse($qrCode->scanned_at)->translatedFormat('d F Y, H:i') }} WIB
                     </p>
                 @endif
-            </div>
-        @else
-            <div class="action-box">
+            @else
                 <h5><i class="mdi mdi-information-outline me-1"></i> Langkah Selanjutnya</h5>
                 <p>Pendaftaran Anda telah disetujui ✓</p>
                 <ul>
@@ -299,25 +321,18 @@
                         Tukar QR Code ini dengan tiket pada
                         <strong>
                             {{ $departureDate->copy()->subDay()->translatedFormat('d F') }}
-                            –
-                            {{ $departureDate->translatedFormat('d F Y') }}
+                            – {{ $departureDate->translatedFormat('d F Y') }}
                         </strong>
                     </li>
-                    <li>
-                        Berkumpul pukul
-                        <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong>
-                    </li>
-                    <li>
-                        Berangkat pukul
-                        <strong>{{ $departureTime->format('H:i') }} WIB</strong>
-                    </li>
+                    <li>Berkumpul pukul <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong></li>
+                    <li>Berangkat pukul <strong>{{ $departureTime->format('H:i') }} WIB</strong></li>
                 </ul>
                 <p class="note">
                     <i class="mdi mdi-alert-circle me-1"></i>
                     Wajib membawa <strong>KTP</strong> dan <strong>Kartu Keluarga</strong> saat penukaran tiket.
                 </p>
-            </div>
-        @endif
+            @endif
+        </div>
 
     </div>
 </div>
