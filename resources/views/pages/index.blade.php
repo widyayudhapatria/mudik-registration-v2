@@ -3,12 +3,47 @@
 @section('title', 'Homepage - ' . config('mudik.website.name'))
 @push('styles')
     <style>
-     html {
-        scroll-behavior: smooth;
-      }
+        .back-to-top {
+            position: fixed;
+            bottom: 30px;
+            right: 30px;
+            width: 50px;
+            height: 50px;
+            background: linear-gradient(135deg, #de5d00 0%, #ff9634 100%);
+            color: white;
+            border: none;
+            border-radius: 50%;
+            font-size: 1.3rem;
+            box-shadow: 0 4px 16px rgba(0,0,0,0.2);
+            cursor: pointer;
+            opacity: 0;
+            visibility: hidden;
+            transition: all 0.3s ease;
+            z-index: 999;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+
+        .back-to-top.show {
+            opacity: 1;
+            visibility: visible;
+        }
+
+        .back-to-top:hover {
+            transform: translateY(-4px);
+            box-shadow: 0 8px 24px rgba(0,0,0,0.3);
+        }
+
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 @endpush
 @section('header')
+    <button class="back-to-top" id="backToTop" title="Kembali ke atas">
+        <i class="mdi mdi-arrow-up"></i>
+    </button>
     @include('components.header', [
       'menuItems' => [
         ['label' => 'Beranda', 'href' => '#home', 'active' => true],
@@ -304,4 +339,20 @@
 
     <!-- Registration Modal -->
     @include('components.registration-modal')
+
+    @push('scripts')
+    <script>
+    (function () {
+        const backToTop = document.getElementById('backToTop');
+
+        window.addEventListener('scroll', () => {
+            backToTop.classList.toggle('show', window.scrollY > 300);
+        });
+
+        backToTop.addEventListener('click', () => {
+            window.scrollTo({ top: 0, behavior: 'smooth' });
+        });
+    })();
+    </script>
+    @endpush
 @endsection
