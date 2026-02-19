@@ -54,6 +54,22 @@ class Destination extends Model
     }
 
     /**
+     * Get the seat counter for this destination.
+     */
+    public function seatCounter(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(SeatCounter::class);
+    }
+
+    /**
+     * Get seat allocations for this destination.
+     */
+    public function seatAllocations(): HasMany
+    {
+        return $this->hasMany(SeatAllocation::class);
+    }
+
+    /**
      * Scope for active destinations.
      */
     public function scopeActive($query)

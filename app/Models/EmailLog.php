@@ -53,7 +53,7 @@ class EmailLog extends Model
     {
         $this->status = 'sent';
         $this->sent_at = now();
-        
+
         return $this->save();
     }
 
@@ -65,7 +65,7 @@ class EmailLog extends Model
         $this->status = 'failed';
         $this->failed_at = now();
         $this->error_message = $errorMessage;
-        
+
         return $this->save();
     }
 
@@ -76,7 +76,7 @@ class EmailLog extends Model
     {
         $this->retry_count++;
         $this->status = 'pending';
-        
+
         return $this->save();
     }
 
@@ -164,6 +164,23 @@ class EmailLog extends Model
     }
 
     /**
+     * Create a seat allocation email log.
+     */
+    public static function logSeatAllocationEmail(
+        int $formLinkId,
+        string $emailTo,
+        string $subject
+    ): self {
+        return self::create([
+            'form_link_id' => $formLinkId,
+            'email_to' => $emailTo,
+            'email_type' => 'seat_allocation',
+            'subject' => $subject,
+            'status' => 'pending',
+        ]);
+    }
+
+    /**
      * Scope to filter by status.
      */
     public function scopeStatus($query, string $status)
@@ -193,6 +210,6 @@ class EmailLog extends Model
     public function scopeCanRetry($query, int $maxRetries = 3)
     {
         return $query->where('status', 'failed')
-                     ->where('retry_count', '<', $maxRetries);
+            ->where('retry_count', '<', $maxRetries);
     }
 }

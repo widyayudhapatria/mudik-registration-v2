@@ -45,6 +45,14 @@ class Participant extends Model
     }
 
     /**
+     * Get the seat allocation for this participant.
+     */
+    public function seatAllocation(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(SeatAllocation::class);
+    }
+
+    /**
      * Calculate participant's age.
      */
     public function getAge(): int
