@@ -7,10 +7,10 @@ use App\Actions\Quota\UpdateDestinationAction;
 use App\Data\DestinationData;
 use App\Http\Controllers\Controller;
 use App\Models\Destination;
-use App\Models\GlobalQuotaConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Support\Facades\DB;
 
 class DestinationManagementController extends Controller
 {
@@ -26,11 +26,49 @@ class DestinationManagementController extends Controller
     {
         $this->authorize('viewAny', Destination::class);
 
+        // $destinations = Destination::withCount(['dailyQuotas', 'registrations'])
+        //     ->orderBy('display_order', 'asc')
+        //     ->orderBy('name', 'asc')
+        //     ->get()
+        //     ->map(function ($destination) {
+        //         return [
+        //             'id' => $destination->id,
+        //             'name' => $destination->name,
+        //             'code' => $destination->code,
+        //             'total_quota' => $destination->total_quota,
+        //             'used_quota' => $destination->used_quota,
+        //             'remaining_quota' => $destination->remaining_quota,
+        //             'is_active' => $destination->is_active,
+        //             'display_order' => $destination->display_order,
+        //             'description' => $destination->description,
+        //             'daily_quotas_count' => $destination->daily_quotas_count,
+        //             'registrations_count' => $destination->registrations_count,
+        //             'created_at' => $destination->created_at,
+        //             'updated_at' => $destination->updated_at,
+        //         ];
+        //     });
+
+
+
         $destinations = Destination::withCount(['dailyQuotas', 'registrations'])
+            ->addSelect('destinations.*')
+            ->selectSub(function ($query) {
+                $query->from('participants')
+                    ->join('registrations', 'participants.registration_id', '=', 'registrations.id')
+                    ->whereColumn('registrations.destination_id', 'destinations.id')
+                    ->whereNotNull('registrations.approved_at')
+                    ->whereNull('registrations.deleted_at')
+                    ->whereNull('participants.deleted_at')
+                    ->selectRaw('COUNT(participants.id)');
+            }, 'total_participants')
             ->orderBy('display_order', 'asc')
             ->orderBy('name', 'asc')
             ->get()
             ->map(function ($destination) {
+
+                $participants = (int) $destination->total_participants;
+                $remaining = $destination->total_quota - $participants;
+
                 return [
                     'id' => $destination->id,
                     'name' => $destination->name,
@@ -45,6 +83,9 @@ class DestinationManagementController extends Controller
                     'registrations_count' => $destination->registrations_count,
                     'created_at' => $destination->created_at,
                     'updated_at' => $destination->updated_at,
+                    'total_participants' => $participants,
+                    'used_quota_based_on_participants' => $participants,
+                    'remaining_quota_based_on_participants' => max(0, $remaining),
                 ];
             });
 
@@ -55,17 +96,8 @@ class DestinationManagementController extends Controller
             ]);
         }
 
-        $globalConfig = GlobalQuotaConfig::getCurrentYear();
-
-        $globalInfo = [
-            'total_quota' => $globalConfig?->total_quota ?? 0,
-            'allocated_quota' => $globalConfig?->allocated_quota ?? 0,
-            'remaining_global_quota' => $globalConfig?->remaining_global_quota ?? 0,
-        ];
-
         return view('cms.destinations.index', [
             'destinations' => $destinations,
-            'globalInfo' => $globalInfo,
         ]);
     }
 
@@ -149,6 +181,17 @@ class DestinationManagementController extends Controller
                 'is_active' => $updated->is_active,
                 'display_order' => $updated->display_order,
             ];
+
+            // Check if there's a warning (quota mismatch)
+            if (isset($updated->warning)) {
+                return response()->json([
+                    'success' => true,
+                    'warning' => true,
+                    'message' => 'Destination berhasil diupdate, tetapi ada peringatan:',
+                    'warning_details' => $updated->warning,
+                    'data' => $response,
+                ]);
+            }
 
             return $this->responseSuccess(
                 'Destination berhasil diupdate',
