@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Mail\SeatAllocationMail;
 use App\Models\EmailLog;
 use App\Models\Registration;
+use App\Services\QrCodeService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
 use Illuminate\Foundation\Bus\Dispatchable;
@@ -48,7 +49,7 @@ class SendSeatAllocationEmailJob implements ShouldQueue
     /**
      * Execute the job.
      */
-    public function handle(): void
+    public function handle(QrCodeService $qrCodeService): void
     {
         $email = $this->registration->formLink->email;
         $subject = '🎫 E-Ticket Mudik Gratis 2026 - ' . $this->registration->destination->name;
@@ -61,10 +62,11 @@ class SendSeatAllocationEmailJob implements ShouldQueue
         );
 
         try {
-            // Send email
+            // Send email with QR code service
             Mail::to($email)->send(new SeatAllocationMail(
                 $this->registration,
-                $this->seatAllocations
+                $this->seatAllocations,
+                $qrCodeService
             ));
 
             // Mark as sent

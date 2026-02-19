@@ -60,7 +60,7 @@ class QrCodeMail extends Mailable
 
     public function build()
     {
-        return $this->subject('QR Code Tiket - ' . config('app.name'))
+        return $this->subject('QR Code - ' . config('app.name'))
             ->view('emails.qr-code-v2')
             ->with([
                 'registration' => $this->registration,
