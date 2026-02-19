@@ -52,7 +52,7 @@ class QrCodeService
     public function saveQrCodeAsPng(QrCode $qrCode): ?string
     {
         $size = config('mudik.qr_code.size', 300);
-        $filename = "qr-codes/{$qrCode->id}.png";
+        $filename = "qr-codes/{$qrCode->token_qr}.png";
 
         try {
             if (!Storage::exists('qr-codes')) {
@@ -107,7 +107,7 @@ class QrCodeService
     public function generateBase64Image(QrCode $qrCode): string
     {
         // Try to use saved file first
-        $filename = "qr-codes/{$qrCode->id}.png";
+        $filename = "qr-codes/{$qrCode->token_qr}.png";
 
         if (Storage::exists($filename)) {
             $pngData = Storage::get($filename);
