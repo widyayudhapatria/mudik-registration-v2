@@ -107,6 +107,6 @@ return [
     | Departure Days Configuration
     |--------------------------------------------------------------------------
     */
-    'departure_date' => '30 Mei 2026',
+    'departure_date' => '2026-05-30',
     'departure_time' => '08:00',
 ];

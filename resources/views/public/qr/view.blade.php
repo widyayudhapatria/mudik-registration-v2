@@ -191,8 +191,8 @@
     $formLink    = $reg->formLink;
     $statusClass = $isScanned ? 'status-scanned' : 'status-approved';
 
-    $departureDate = \Carbon\Carbon::parse(config('mudik.departure_date', '2026-05-30'));
-    $departureTime = \Carbon\Carbon::parse(config('mudik.departure_time', '08:00'));
+    $departureDate = \Carbon\Carbon::parse(config('mudik.departure_date'));
+    $departureTime = \Carbon\Carbon::parse(config('mudik.departure_time'));
 @endphp
 
 <div class="page-wrapper {{ $statusClass }}">
@@ -302,7 +302,7 @@
                 <h5><i class="mdi mdi-check-circle me-1"></i> Status: SIAP BERANGKAT!</h5>
                 <p>QR Code Anda telah di-scan dengan sukses ✓</p>
                 <ul>
-                    <li>Berkumpul: <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong> ({{ $departureDate->translatedFormat('d F') }})</li>
+                    <li>Berkumpul: <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong> ({{ $departureDate->translatedFormat('d F Y') }})</li>
                     <li>Lokasi: <strong>{{ config('mudik.departure_location', 'Lapangan Parkir Kantor Pemerintah') }}</strong></li>
                     <li>Berangkat: <strong>{{ $departureTime->format('H:i') }} WIB</strong></li>
                     <li>Bawa KTP dan KK asli (semua peserta)</li>
@@ -320,7 +320,7 @@
                     <li>
                         Tukar QR Code ini dengan tiket pada
                         <strong>
-                            {{ $departureDate->copy()->subDay()->translatedFormat('d F') }}
+                            {{ $departureDate->copy()->subDay()->translatedFormat('d F Y') }}
                             – {{ $departureDate->translatedFormat('d F Y') }}
                         </strong>
                     </li>

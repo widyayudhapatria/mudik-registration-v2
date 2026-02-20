@@ -34,7 +34,7 @@ class QrCodeMail extends Mailable
         $this->mudikConfig = $mudikConfig ?: config('mudik');
 
         // Generate/get PNG file path
-        $filename = "qr-codes/{$this->qrCode->id}.png";
+        $filename = "qr-codes/{$this->qrCode->token_qr}.png";
 
         // Generate if not exists
         if (!Storage::exists($filename)) {
