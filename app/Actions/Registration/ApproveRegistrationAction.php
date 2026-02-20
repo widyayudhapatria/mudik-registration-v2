@@ -45,7 +45,7 @@ class ApproveRegistrationAction
                 throw new MudikException(
                     ErrorCode::DestinationQuotaFull,
                     sprintf(
-                        'Quota destination %s tidak mencukupi. Tersisa: %d orang, Dibutuhkan: %d orang',
+                        'Quota destination %s tidak mencukupi. Tersisa: %d orang, Yang Diinputkan: %d orang',
                         $destination->name,
                         $destination->remaining_quota,
                         $registration->family_count

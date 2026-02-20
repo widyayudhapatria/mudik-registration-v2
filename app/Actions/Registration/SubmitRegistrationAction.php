@@ -66,7 +66,7 @@ class SubmitRegistrationAction
                 throw new MudikException(
                     ErrorCode::DailyQuotaFull,
                     sprintf(
-                        'Kuota harian tidak mencukupi. Tersisa: %d orang, Dibutuhkan: %d orang',
+                        'Kuota harian tidak mencukupi. Tersisa: %d orang, Yang Diinputkan: %d orang',
                         $quota->remaining_daily,
                         $data->family_count
                     )

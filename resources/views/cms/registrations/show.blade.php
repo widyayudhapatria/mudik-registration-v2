@@ -234,7 +234,7 @@
 
             @if($registration->isBypass())
             <div class="alert alert-info mb-3">
-                <i class="bi bi-upload me-2"></i>
+                <i class="bi bi-bookmark-check me-2"></i>
                 <strong>Import Bypass</strong>
             </div>
             @endif
