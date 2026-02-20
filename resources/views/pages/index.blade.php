@@ -3,6 +3,91 @@
 @section('title', 'Homepage - ' . config('mudik.website.name'))
 @push('styles')
     <style>
+        /* Registration Period Alert */
+        .alert-period {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            padding: 12px 20px;
+            transform: translateY(-100%);
+            animation: slideDown 0.5s ease 0.8s forwards;
+        }
+
+        .alert-period--success {
+            background: linear-gradient(135deg, rgba(26,122,74,0.55), rgba(40,167,69,0.55));
+            backdrop-filter: blur(4px);
+        }
+        .alert-period--warning { 
+            background: linear-gradient(135deg, rgba(197,124,0,0.55), rgba(255,193,7,0.55));
+            backdrop-filter: blur(4px);
+        }
+        .alert-period--danger  { 
+            background: linear-gradient(135deg, rgba(167,29,42,0.55), rgba(220,53,69,0.55));
+            backdrop-filter: blur(4px);
+        }
+
+        .alert-period__inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+
+        .alert-period--warning .alert-period__inner { color: #1a1a1a; }
+
+        .alert-period__icon { font-size: 1.3rem; flex-shrink: 0; }
+
+        .alert-period__text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 0.9rem;
+        }
+
+        .alert-period__text strong:first-child { font-size: 1rem; }
+
+        .alert-period__close {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            color: inherit;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .alert-period__close:hover { background: rgba(255,255,255,0.4); }
+
+        .alert-period.hide {
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to   { transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(0); }
+            to   { transform: translateY(-100%); }
+        }
+
+        @media (max-width: 576px) {
+            .alert-period__text { font-size: 0.8rem; }
+            .alert-period__text strong:first-child { font-size: 0.9rem; }
+        }
+
         .back-to-top {
             position: fixed;
             bottom: 30px;
@@ -54,6 +139,48 @@
     ])
 @endsection
 @section('content')
+    {{-- Registration Period Alert --}}
+    @php
+        $regStart = \Carbon\Carbon::parse(config('mudik.registration.start_date'));
+        $regEnd   = \Carbon\Carbon::parse(config('mudik.registration.end_date'));
+        $now      = \Carbon\Carbon::now();
+    @endphp
+
+    @if($now->lt($regStart))
+        <div class="alert-period alert-period--warning" id="registrationAlert">
+            <div class="alert-period__inner">
+                <span class="alert-period__icon">🕐</span>
+                <div class="alert-period__text">
+                    <strong>Pendaftaran Belum Dibuka</strong>
+                    <span>Pendaftaran akan dibuka pada <strong>{{ $regStart->translatedFormat('d F Y, H:i') }} WIB</strong></span>
+                </div>
+                <button class="alert-period__close" onclick="closeAlert()">&times;</button>
+            </div>
+        </div>
+    @elseif($now->gt($regEnd))
+        <div class="alert-period alert-period--danger" id="registrationAlert">
+            <div class="alert-period__inner">
+                <span class="alert-period__icon">🔴</span>
+                <div class="alert-period__text">
+                    <strong>Pendaftaran Telah Ditutup</strong>
+                    <span>Periode pendaftaran telah berakhir pada <strong>{{ $regEnd->translatedFormat('d F Y, H:i') }} WIB</strong></span>
+                </div>
+                <button class="alert-period__close" onclick="closeAlert()">&times;</button>
+            </div>
+        </div>
+    @else
+        <div class="alert-period alert-period--success" id="registrationAlert">
+            <div class="alert-period__inner">
+                <span class="alert-period__icon">🟢</span>
+                <div class="alert-period__text">
+                    <strong>Pendaftaran Sedang Dibuka</strong>
+                    <span>Daftarkan diri Anda sebelum <strong>{{ $regEnd->translatedFormat('d F Y, H:i') }} WIB</strong></span>
+                </div>
+                <button class="alert-period__close" onclick="closeAlert()">&times;</button>
+            </div>
+        </div>
+    @endif
+
     <!-- Hero Section -->
     @include('components.hero', [
         'sectionId' => 'home',
@@ -342,6 +469,18 @@
 
     @push('scripts')
     <script>
+
+    function closeAlert() {
+        const alert = document.getElementById('registrationAlert');
+        if (!alert) return;
+        alert.classList.add('hide');
+        alert.addEventListener('animationend', () => alert.remove(), { once: true });
+    }
+
+    @if($now->between($regStart, $regEnd))
+        setTimeout(closeAlert, 8000);
+    @endif
+
     (function () {
         const backToTop = document.getElementById('backToTop');
 

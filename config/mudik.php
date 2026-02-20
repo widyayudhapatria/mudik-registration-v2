@@ -109,4 +109,14 @@ return [
     */
     'departure_date' => '2026-05-30',
     'departure_time' => '08:00',
+
+    /*
+    |--------------------------------------------------------------------------
+    | Registration Period Configuration
+    |--------------------------------------------------------------------------
+    */
+    'registration' => [
+        'start_date' => env('REGISTRATION_START_DATE', '2025-02-21 00:00:00'),
+        'end_date'   => env('REGISTRATION_END_DATE', '2025-03-21 23:59:59'),
+    ],
 ];
