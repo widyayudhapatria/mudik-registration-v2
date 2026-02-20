@@ -273,9 +273,18 @@
             <div class="passenger-list">
                 @foreach ($participants as $index => $participant)
                     @php
-                        $isLap      = $participant->is_child_under_4;
-                        $badgeClass = $isScanned ? 'scanned' : ($isLap ? 'lap' : 'reserved');
-                        $badgeLabel = $isScanned ? 'Sudah Scan' : ($isLap ? 'Dipangku' : 'Reserved');
+                        $isLap = $participant->is_child_under_4;
+                        $seat  = $seatAllocations->get($participant->id);
+
+                        if ($isScanned) {
+                            $badgeClass = $isLap ? 'lap' : 'scanned';
+                            $badgeLabel = $isLap
+                                ? 'Dipangku'
+                                : ($seat ? $seat->seat_code : '-');
+                        } else {
+                            $badgeClass = $isLap ? 'lap' : 'reserved';
+                            $badgeLabel = $isLap ? 'Dipangku' : 'Reserved';
+                        }
                     @endphp
                     <div class="passenger-item">
                         <div>
@@ -289,7 +298,8 @@
                             </div>
                         </div>
                         <div class="seat-badge {{ $badgeClass }}">
-                            <i class="mdi mdi-ticket-confirmation me-1"></i>{{ $badgeLabel }}
+                            <i class="mdi mdi-{{ $isScanned && !$isLap ? 'seat' : 'ticket-confirmation' }} me-1"></i>
+                            {{ $badgeLabel }}
                         </div>
                     </div>
                 @endforeach

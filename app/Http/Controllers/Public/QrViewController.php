@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Enums\ErrorCode;
 use App\Http\Controllers\Controller;
 use App\Models\QrCode;
+use App\Models\SeatAllocation;
 use App\Services\QrCodeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
@@ -66,11 +67,19 @@ class QrViewController extends Controller
             return redirect()->route('cms.scanner.scan', ['token' => $qrCode->token_qr]);
         }
 
+        $seatAllocations = $qrCode->isScanned()
+            ? SeatAllocation::where('registration_id', $qrCode->registration_id)
+                ->with('participant')
+                ->get()
+                ->keyBy('participant_id') 
+            : collect();
+
         // Public view
         return view('public.qr.view', [
             'qrCode'       => $qrCode,
             'registration' => $qrCode->registration,
             'participants' => $qrCode->registration->participants,
+            'seatAllocations' => $seatAllocations,
             'qrBase64'     => !$qrCode->isScanned()
                                 ? $this->qrCodeService->generateBase64Image($qrCode)
                                 : null,
