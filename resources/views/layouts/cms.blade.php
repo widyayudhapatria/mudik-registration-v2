@@ -87,6 +87,12 @@
                     <span>Scan Dashboard</span>
                 </a>
             </li>
+            <li class="sidebar-menu-item">
+                <a href="{{ route('cms.bypass-registrations.form') }}" class="sidebar-menu-link {{ request()->routeIs('cms.bypass-registrations.*') ? 'active' : '' }}">
+                    <i class="bi bi-person-plus"></i>
+                    <span>Bypass Registration</span>
+                </a>
+            </li>
         </ul>
     </aside>
 

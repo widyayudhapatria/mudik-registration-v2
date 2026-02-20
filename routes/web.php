@@ -5,11 +5,13 @@ use App\Http\Controllers\CMS\DestinationManagementController;
 use App\Http\Controllers\CMS\EmailRequestController;
 use App\Http\Controllers\CMS\QuotaManagementController;
 use App\Http\Controllers\CMS\RegistrationManagementController;
+use App\Http\Controllers\CMS\BypassRegistrationController;
 use App\Http\Controllers\Public\EmailSubmissionController;
 use App\Http\Controllers\Public\QrViewController;
 use App\Http\Controllers\Public\RegistrationController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\Auth;
 use Illuminate\Http\Request;
 
 Route::prefix('public')->name('public.')->group(function () {
@@ -45,6 +47,16 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
         Route::get('/{registration}', [RegistrationManagementController::class, 'show'])->withTrashed()->name('show');
         Route::post('/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('approve');
         Route::post('/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('reject');
+    });
+
+    Route::prefix('bypass-registrations')->name('bypass-registrations.')->group(function () {
+        Route::get('/form', [BypassRegistrationController::class, 'showForm'])->name('form');
+        Route::post('/validate', [BypassRegistrationController::class, 'validateFile'])->name('validate');
+        Route::get('/preview', [BypassRegistrationController::class, 'showPreview'])->name('preview');
+        Route::post('/confirm', [BypassRegistrationController::class, 'confirmImport'])->name('confirm');
+        Route::get('/results/{importId}', [BypassRegistrationController::class, 'showResults'])->name('results');
+        Route::get('/history', [BypassRegistrationController::class, 'history'])->name('history');
+        Route::get('/download-template', [BypassRegistrationController::class, 'downloadTemplate'])->name('download-template');
     });
 
     Route::prefix('destinations')->name('destinations.')->group(function () {
@@ -111,7 +123,7 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
                 'token' => $token,
                 'qrCode' => $qrCode,
             ]);
-        })->name('scan')->where('token', '.+'); ;
+        })->name('scan')->where('token', '.+');;
     });
 });
 
@@ -126,7 +138,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
             'password' => 'required',
         ]);
 
-        if (auth('admin')->attempt($credentials, $request->boolean('remember'))) {
+        if (Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
             return redirect()->intended(route('cms.dashboard'));
         }
@@ -137,7 +149,7 @@ Route::prefix('auth')->name('auth.')->group(function () {
     })->name('login.process')->middleware('guest:admin');
 
     Route::post('/logout', function (Request $request) {
-        auth('admin')->logout();
+        Auth::logout();
         $request->session()->invalidate();
         $request->session()->regenerateToken();
 

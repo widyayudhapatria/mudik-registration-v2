@@ -232,6 +232,13 @@
         <div class="detail-card">
             <h6 class="fw-bold mb-3">Status Pendaftaran</h6>
 
+            @if($registration->isBypass())
+            <div class="alert alert-info mb-3">
+                <i class="bi bi-upload me-2"></i>
+                <strong>Import Bypass</strong>
+            </div>
+            @endif
+
             @if($registration->isApproved())
             <div class="alert alert-success mb-3">
                 <i class="bi bi-check-circle-fill me-2"></i>
