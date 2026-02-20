@@ -22,7 +22,7 @@
         width: 14px;
         height: 14px;
     }
-    
+
     .filter-card {
         background: white;
         border-radius: 12px;
@@ -41,7 +41,7 @@
     .status-badge {
         padding: 6px 12px;
         border-radius: 20px;
-        font-size: 0.85rem;
+        font-size: 12px;
         font-weight: 600;
         white-space: nowrap;
     }
@@ -316,8 +316,8 @@
                             </span>
                             @endif
                             @if($registration->isBypass())
-                            <span class="status-badge bg-info text-white ms-2">
-                                <i class="bi bi-upload me-1"></i>BYPASS
+                            <span class="status-badge badge bg-info text-dark ms-1">
+                                <i class="bi bi-bookmark-check me-1"></i>Bypass
                             </span>
                             @endif
                         </td>
@@ -327,6 +327,8 @@
                                     <i class="bi bi-eye"></i>
                                 </a>
 
+
+                                {{-- DISABLED QUICK ACTIONS FOR NOW, REQUIRES DETAIL VIEW TO HANDLE NOTES INPUT
                                 @if($registration->isPending())
                                 @can('approve', $registration)
                                 <button type="button" class="btn btn-sm btn-success btn-action" onclick="quickApprove({{ $registration->id }})">
@@ -339,7 +341,7 @@
                                     <i class="bi bi-x-lg"></i>
                                 </button>
                                 @endcan
-                                @endif
+                                @endif --}}
                             </div>
                         </td>
                     </tr>
@@ -381,7 +383,7 @@
                     @endif
                     @if($registration->isBypass())
                     <span class="status-badge bg-info text-white ms-2">
-                        <i class="bi bi-upload"></i> BYPASS
+                        <i class="bi bi-upload"></i> Bypass
                     </span>
                     @endif
                 </div>

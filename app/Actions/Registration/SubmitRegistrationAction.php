@@ -61,12 +61,21 @@ class SubmitRegistrationAction
                 );
             }
 
-            // CRITICAL: Check if remaining quota >= family_count (not just > 0)
+            // CRITICAL: Use actual participant count for quota check (not family_count)
+            // family_count should match participant count, but we verify against actual participants
+            $participantCount = count($data->participants);
+
+            // Double-check: family_count should equal actual participants
+            if ($data->family_count !== $participantCount) {
+                // Auto-correct to actual participant count
+                $data->family_count = $participantCount;
+            }
+
             if ($quota->remaining_daily < $data->family_count) {
                 throw new MudikException(
                     ErrorCode::DailyQuotaFull,
                     sprintf(
-                        'Kuota harian tidak mencukupi. Tersisa: %d orang, Dibutuhkan: %d orang',
+                        'Kuota harian tidak mencukupi. Tersisa: %d orang, Yang Diinputkan: %d orang',
                         $quota->remaining_daily,
                         $data->family_count
                     )
