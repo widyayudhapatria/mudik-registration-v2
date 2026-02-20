@@ -5,6 +5,24 @@
 
 @push('styles')
 <style>
+    .pagination {
+        margin: 0;
+        flex-wrap: wrap;
+        gap: 4px;
+    }
+
+    .pagination .page-item .page-link {
+        padding: 6px 12px;
+        font-size: 0.875rem;
+        border-radius: 6px !important;
+        line-height: 1.5;
+    }
+
+    .pagination .page-item .page-link svg {
+        width: 14px;
+        height: 14px;
+    }
+    
     .filter-card {
         background: white;
         border-radius: 12px;
