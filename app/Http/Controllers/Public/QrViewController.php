@@ -5,6 +5,7 @@ namespace App\Http\Controllers\Public;
 use App\Enums\ErrorCode;
 use App\Http\Controllers\Controller;
 use App\Models\QrCode;
+use App\Services\QrCodeService;
 use Illuminate\Http\Request;
 use Illuminate\Http\RedirectResponse;
 use Illuminate\View\View;
@@ -12,6 +13,7 @@ use Illuminate\Support\Facades\Log;
 
 class QrViewController extends Controller
 {
+    public function __construct(private QrCodeService $qrCodeService) {}
     /**
      * Show QR code entry page.
      *
@@ -48,7 +50,7 @@ class QrViewController extends Controller
 
         // Find QR code by token
         $qrCode = QrCode::where('token_qr', $token)
-            ->with(['registration.participants', 'registration.formLink'])
+            ->with(['registration.participants', 'registration.formLink', 'registration.destination'])
             ->first();
 
         if (!$qrCode) {
@@ -66,9 +68,12 @@ class QrViewController extends Controller
 
         // Public view
         return view('public.qr.view', [
-            'qrCode' => $qrCode,
+            'qrCode'       => $qrCode,
             'registration' => $qrCode->registration,
             'participants' => $qrCode->registration->participants,
+            'qrBase64'     => !$qrCode->isScanned()
+                                ? $this->qrCodeService->generateBase64Image($qrCode)
+                                : null,
         ]);
     }
 }

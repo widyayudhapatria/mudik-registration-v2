@@ -334,6 +334,48 @@
             @endif
         </div>
 
+        {{-- ── QR Code Image (approved only) ── --}}
+        @if (!$isScanned)
+            <div style="margin-top: 25px; text-align: center;">
+                <h6 style="font-size: 16px; font-weight: 700; color: #1f2937; margin-bottom: 15px;
+                        padding-bottom: 8px; border-bottom: 2px solid #f59e0b; display: block;">
+                    <i class="mdi mdi-qrcode me-1"></i> QR Code Anda
+                </h6>
+                <div style="display: inline-block; padding: 16px; border: 2px dashed #f59e0b;
+                            border-radius: 8px; background: #fffbeb; margin-bottom: 8px;">
+                    <img src="{{ $qrBase64 }}"
+                        alt="QR Code {{ $reg->representative_name }}"
+                        style="width: 200px; height: 200px; display: block;">
+                </div>
+                <p style="font-size: 12px; color: #9ca3af; margin: 0;">
+                    Screenshot atau simpan QR ini untuk penukaran tiket
+                </p>
+            </div>
+        @endif
+
+        {{-- ── Navigation Buttons ── --}}
+        <div style="display: flex; gap: 12px; margin-top: 24px; flex-wrap: wrap;">
+            {{-- Kembali ke Beranda (selalu tampil) --}}
+            <a href="{{ route('public.landing') }}"
+            style="flex: 1; min-width: 140px; padding: 12px 16px; border-radius: 6px; text-align: center;
+                    background: #f3f4f6; color: #374151; font-weight: 600; text-decoration: none;
+                    border: 1px solid #e5e7eb; font-size: 14px;">
+                <i class="mdi mdi-home me-1"></i> Kembali ke Beranda
+            </a>
+
+            {{-- Save QR (approved only) --}}
+            @if (!$isScanned)
+                <a href="{{ $qrBase64 }}"
+                download="qr-mudik-{{ $reg->representative_name }}.png"
+                id="btn-save-qr"
+                style="flex: 1; min-width: 140px; padding: 12px 16px; border-radius: 6px; text-align: center;
+                        background: linear-gradient(135deg, #f59e0b 0%, #f97316 100%);
+                        color: white; font-weight: 600; text-decoration: none; font-size: 14px;">
+                    <i class="mdi mdi-download me-1"></i> Simpan QR Code
+                </a>
+            @endif
+        </div>
+
     </div>
 </div>
 
