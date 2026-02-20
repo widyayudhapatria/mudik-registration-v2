@@ -56,7 +56,6 @@ class ApproveRegistrationAction
             // Approve registration and fallback null admin notes
             $notes = $data->admin_notes ?? null;
             $registration->approve($admin->id, $notes);
-            $registration->formLink->markAsApproved();
 
             // CRITICAL: Update destination used_quota (confirmed booking)
             $destination->used_quota += $registration->family_count;

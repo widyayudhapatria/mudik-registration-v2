@@ -19,35 +19,29 @@ class SubmitEmailAction
 {
     use AsAction;
 
-    private const BLOCKED_STATUSES = [
-        FormLinkStatus::Pending->value,
-        FormLinkStatus::Submitted->value,
-        FormLinkStatus::Approved->value,
-    ];
-
     public function handle(SubmitEmailData $data): FormLink
     {
-        $existing = FormLink::where('email', $data->email)->get();
-        Log::info('DEBUG submit email', [
-            'email' => $data->email,
-            'all_records' => $existing->toArray(),
-            'eligible_check' => FormLink::where('email', $data->email)
-                ->whereIn('status', [
-                    FormLinkStatus::Submitted->value,
-                    FormLinkStatus::Approved->value,
-                ])
-                ->exists(),
-        ]);
-        
         try {
             DB::beginTransaction();
 
-            $this->ensureEmailEligible($data->email);
+            // Check if email already exists
+            $existingLink = FormLink::where('email', $data->email)->first();
 
-            $formLink = $this->resolveFormLink($data->email);
+            // Check if email already has form_link with submitted/approved (sedang direview atau sudah disetujui)
+            if ($existingLink && in_array($existingLink->status, [FormLinkStatus::Submitted->value, FormLinkStatus::Approved->value])) {
+                throw new MudikException(ErrorCode::EmailExists);
+            }
+
+            // Check if status pending -- Update (recreate) karena belum ada registration
+            if ($existingLink && $existingLink->status === FormLinkStatus::Pending->value) {
+                $formLink = $this->recreateLink($existingLink);
+            } else {
+                // Create new form_link -- Status rejected atau tidak ada form_link sama sekali
+                // Rejected -- Create new karena form_link_id sudah punya registration (unique constraint)
+                $formLink = $this->createNewLink($data->email);
+            }
 
             DB::commit();
-
             Log::info('Before dispatching email job', [
                 'form_link_id' => $formLink->id,
                 'token' => $formLink->token,
@@ -55,6 +49,7 @@ class SubmitEmailAction
                 'expired_at' => $formLink->expired_at,
             ]);
 
+            // Queue email job
             dispatch(new SendFormLinkEmail($formLink));
 
             return $formLink;
@@ -72,50 +67,29 @@ class SubmitEmailAction
         }
     }
 
-    private function ensureEmailEligible(string $email): void
+    protected function createNewLink(string $email): FormLink
     {
-        $hasBlockedStatus = FormLink::where('email', $email)
-            ->whereIn('status', self::BLOCKED_STATUSES)
-            ->exists();
-
-        if ($hasBlockedStatus) {
-            throw new MudikException(ErrorCode::EmailExists);
-        }
-    }
-
-    private function resolveFormLink(string $email): FormLink
-    {
-        $pendingLink = FormLink::where('email', $email)
-            ->where('status', FormLinkStatus::Pending->value)
-            ->latest()
-            ->first();
-
-        return $pendingLink
-            ? $this->recreateLink($pendingLink)
-            : $this->createNewLink($email);
-    }
-
-    private function createNewLink(string $email): FormLink
-    {
+        $expiryDays = config('mudik.form_link_expiry_days', 3);
         $token = Str::random(64);
 
         return FormLink::create([
             'email' => $email,
             'token' => $token,
             'generated_link' => route('public.registration.form', ['token' => $token]),
-            'expired_at' => Carbon::now()->addDays(config('mudik.form_link_expiry_days', 3)),
+            'expired_at' => Carbon::now()->addDays($expiryDays),
             'status' => FormLinkStatus::Pending->value,
         ]);
     }
 
-    private function recreateLink(FormLink $formLink): FormLink
+    protected function recreateLink(FormLink $formLink): FormLink
     {
+        $expiryDays = config('mudik.form_link_expiry_days', 3);
         $token = Str::random(64);
 
         $formLink->update([
             'token' => $token,
             'generated_link' => route('public.registration.form', ['token' => $token]),
-            'expired_at' => Carbon::now()->addDays(config('mudik.form_link_expiry_days', 3)),
+            'expired_at' => Carbon::now()->addDays($expiryDays),
             'used_at' => null,
             'status' => FormLinkStatus::Pending->value,
             'resend_count' => $formLink->resend_count + 1,
