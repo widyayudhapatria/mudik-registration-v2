@@ -6,10 +6,12 @@ use Carbon\Carbon;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Participant extends Model
 {
     use HasFactory;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -40,6 +42,14 @@ class Participant extends Model
     public function registration(): BelongsTo
     {
         return $this->belongsTo(Registration::class);
+    }
+
+    /**
+     * Get the seat allocation for this participant.
+     */
+    public function seatAllocation(): \Illuminate\Database\Eloquent\Relations\HasOne
+    {
+        return $this->hasOne(SeatAllocation::class);
     }
 
     /**

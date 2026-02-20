@@ -3,14 +3,18 @@
 namespace App\Models;
 
 use Illuminate\Database\Eloquent\Factories\HasFactory;
+use Essa\APIToolKit\Filters\Filterable;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\BelongsTo;
 use Illuminate\Database\Eloquent\Relations\HasMany;
 use Illuminate\Database\Eloquent\Relations\HasOne;
+use Illuminate\Database\Eloquent\SoftDeletes;
 
 class Registration extends Model
 {
     use HasFactory;
+    use Filterable;
+    use SoftDeletes;
 
     /**
      * The attributes that are mass assignable.
@@ -19,6 +23,7 @@ class Registration extends Model
      */
     protected $fillable = [
         'form_link_id',
+        'destination_id',
         'representative_name',
         'representative_nik',
         'representative_birth_date',
@@ -32,6 +37,7 @@ class Registration extends Model
         'rejected_by',
         'rejected_at',
         'rejection_reason',
+        'is_bypass',
     ];
 
     /**
@@ -40,9 +46,11 @@ class Registration extends Model
      * @var array<string, string>
      */
     protected $casts = [
+        'destination_id' => 'integer',
         'representative_birth_date' => 'date',
         'has_child_under_4' => 'boolean',
         'family_count' => 'integer',
+        'is_bypass' => 'boolean',
         'approved_at' => 'datetime',
         'rejected_at' => 'datetime',
     ];
@@ -53,6 +61,14 @@ class Registration extends Model
     public function formLink(): BelongsTo
     {
         return $this->belongsTo(FormLink::class);
+    }
+
+    /**
+     * Get the destination for this registration.
+     */
+    public function destination(): BelongsTo
+    {
+        return $this->belongsTo(Destination::class);
     }
 
     /**
@@ -69,6 +85,14 @@ class Registration extends Model
     public function qrCode(): HasOne
     {
         return $this->hasOne(QrCode::class);
+    }
+
+    /**
+     * Get the seat allocations for the registration.
+     */
+    public function seatAllocations(): HasMany
+    {
+        return $this->hasMany(SeatAllocation::class);
     }
 
     /**
@@ -120,6 +144,26 @@ class Registration extends Model
     }
 
     /**
+     * Check if registration is from bypass import.
+     */
+    public function isBypass(): bool
+    {
+        return $this->is_bypass === true;
+    }
+
+    /**
+     * Get display status with bypass indicator.
+     */
+    public function getDisplayStatus(): string
+    {
+        $status = $this->getStatus();
+        if ($this->isBypass()) {
+            return $status . ' [BYPASS]';
+        }
+        return $status;
+    }
+
+    /**
      * Approve the registration.
      */
     public function approve(int $adminId, ?string $notes = null): bool
@@ -127,13 +171,13 @@ class Registration extends Model
         $this->approved_by = $adminId;
         $this->approved_at = now();
         $this->admin_notes = $notes;
-        
+
         $saved = $this->save();
-        
+
         if ($saved) {
             $this->formLink->markAsApproved();
         }
-        
+
         return $saved;
     }
 
@@ -146,13 +190,13 @@ class Registration extends Model
         $this->rejected_at = now();
         $this->rejection_reason = $reason;
         $this->admin_notes = $notes;
-        
+
         $saved = $this->save();
-        
+
         if ($saved) {
             $this->formLink->markAsRejected();
         }
-        
+
         return $saved;
     }
 
@@ -191,10 +235,26 @@ class Registration extends Model
     }
 
     /**
-     * Scope to filter rejected registrations.
+     * Scope to filter rejected registrations (including soft-deleted).
      */
     public function scopeRejected($query)
     {
         return $query->status('rejected');
+    }
+
+    /**
+     * Scope to filter registrations by approved_at timestamp.
+     */
+    public function scopeApprovedByTimestamp($query)
+    {
+        return $query->whereNotNull('approved_at');
+    }
+
+    /**
+     * Scope to filter registrations by rejected_at timestamp (including soft-deleted).
+     */
+    public function scopeRejectedByTimestamp($query)
+    {
+        return $query->withTrashed()->whereNotNull('rejected_at');
     }
 }

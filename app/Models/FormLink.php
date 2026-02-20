@@ -3,6 +3,7 @@
 namespace App\Models;
 
 use Carbon\Carbon;
+use Essa\APIToolKit\Filters\Filterable;
 use Illuminate\Database\Eloquent\Factories\HasFactory;
 use Illuminate\Database\Eloquent\Model;
 use Illuminate\Database\Eloquent\Relations\HasOne;
@@ -10,7 +11,7 @@ use Illuminate\Database\Eloquent\Relations\HasMany;
 
 class FormLink extends Model
 {
-    use HasFactory;
+    use HasFactory, Filterable;
 
     /**
      * The attributes that are mass assignable.
@@ -20,10 +21,12 @@ class FormLink extends Model
     protected $fillable = [
         'email',
         'token',
+        'generated_link',
         'expired_at',
         'used_at',
         'resend_count',
         'status',
+        'is_synthetic',
     ];
 
     /**
@@ -35,6 +38,7 @@ class FormLink extends Model
         'expired_at' => 'datetime',
         'used_at' => 'datetime',
         'resend_count' => 'integer',
+        'is_synthetic' => 'boolean',
     ];
 
     /**
@@ -86,7 +90,7 @@ class FormLink extends Model
     {
         $this->used_at = Carbon::now();
         $this->status = 'submitted';
-        
+
         return $this->save();
     }
 
@@ -96,7 +100,7 @@ class FormLink extends Model
     public function markAsApproved(): bool
     {
         $this->status = 'approved';
-        
+
         return $this->save();
     }
 
@@ -106,7 +110,7 @@ class FormLink extends Model
     public function markAsRejected(): bool
     {
         $this->status = 'rejected';
-        
+
         return $this->save();
     }
 
@@ -116,7 +120,7 @@ class FormLink extends Model
     public function incrementResendCount(): bool
     {
         $this->resend_count++;
-        
+
         return $this->save();
     }
 
@@ -126,7 +130,7 @@ class FormLink extends Model
     public function hasReachedMaxResend(): bool
     {
         $maxResend = config('mudik.form_link_max_resend', 5);
-        
+
         return $this->resend_count >= $maxResend;
     }
 
@@ -137,7 +141,7 @@ class FormLink extends Model
     {
         $expiryDays = config('mudik.form_link_expiry_days', 3);
         $this->expired_at = Carbon::now()->addDays($expiryDays);
-        
+
         return $this->save();
     }
 
@@ -163,6 +167,6 @@ class FormLink extends Model
     public function scopeActive($query)
     {
         return $query->where('expired_at', '>', Carbon::now())
-                     ->whereNull('used_at');
+            ->whereNull('used_at');
     }
 }

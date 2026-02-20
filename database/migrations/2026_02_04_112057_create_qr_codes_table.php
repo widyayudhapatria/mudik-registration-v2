@@ -15,14 +15,12 @@ return new class extends Migration
             $table->id();
             $table->foreignId('registration_id')->unique()->constrained()->onDelete('cascade');
             $table->string('token_qr', 64)->unique();
-            $table->timestamp('valid_from');
-            $table->timestamp('valid_until');
+            $table->timestamp('valid_from')->nullable();
+            $table->timestamp('valid_until')->nullable();
             $table->timestamp('scanned_at')->nullable();
             $table->foreignId('scanned_by')->nullable()->constrained('admins')->onDelete('set null');
             $table->timestamps();
 
-            $table->unique('registration_id');
-            $table->unique('token_qr');
             $table->index('scanned_at');
             $table->index(['valid_from', 'valid_until']);
         });

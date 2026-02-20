@@ -20,6 +20,7 @@ class QrCode extends Model
     protected $fillable = [
         'registration_id',
         'token_qr',
+        'qr_data',
         'valid_from',
         'valid_until',
         'scanned_at',
@@ -67,7 +68,7 @@ class QrCode extends Model
     public function isValid(): bool
     {
         $now = Carbon::now();
-        
+
         return $now->between($this->valid_from, $this->valid_until);
     }
 
@@ -94,7 +95,7 @@ class QrCode extends Model
     {
         $this->scanned_at = Carbon::now();
         $this->scanned_by = $adminId;
-        
+
         return $this->save();
     }
 
@@ -122,19 +123,19 @@ class QrCode extends Model
         if ($this->isScanned()) {
             return 'QR Code sudah pernah digunakan';
         }
-        
+
         if ($this->isExpired()) {
             return 'QR Code sudah expired';
         }
-        
+
         if ($this->isNotYetValid()) {
             return 'QR Code belum dapat digunakan';
         }
-        
+
         if ($this->isValid()) {
             return 'QR Code valid';
         }
-        
+
         return 'QR Code tidak valid';
     }
 
@@ -144,10 +145,10 @@ class QrCode extends Model
     public function scopeValid($query)
     {
         $now = Carbon::now();
-        
+
         return $query->where('valid_from', '<=', $now)
-                     ->where('valid_until', '>=', $now)
-                     ->whereNull('scanned_at');
+            ->where('valid_until', '>=', $now)
+            ->whereNull('scanned_at');
     }
 
     /**

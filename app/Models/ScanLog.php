@@ -58,6 +58,14 @@ class ScanLog extends Model
     }
 
     /**
+     * Get seat allocations created by this scan.
+     */
+    public function seatAllocations(): \Illuminate\Database\Eloquent\Relations\HasMany
+    {
+        return $this->hasMany(SeatAllocation::class);
+    }
+
+    /**
      * Create a success scan log.
      */
     public static function logSuccess(
@@ -80,7 +88,7 @@ class ScanLog extends Model
      * Create a failed scan log.
      */
     public static function logFailure(
-        int $qrCodeId,
+        ?int $qrCodeId,
         int $adminId,
         string $reason,
         ?string $ipAddress = null,
