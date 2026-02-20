@@ -344,6 +344,55 @@
                                                     </tr>
                                                 </tbody>
                                             </table>
+                                            {{-- ── Lihat Status Online ── --}}
+                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
+                                                <tbody class="mcnTextBlockOuter">
+                                                    <tr>
+                                                        <td valign="top" class="mcnTextBlockInner" style="padding-top: 9px;">
+                                                            <table align="left" border="0" cellpadding="0" cellspacing="0" style="max-width: 100%; min-width: 100%;" width="100%" class="mcnTextContentContainer">
+                                                                <tbody>
+                                                                    <tr>
+                                                                        <td valign="top" class="mcnTextContent" style="padding: 0px 18px 18px;">
+                                                                            <table align="center" border="0" cellspacing="0" cellpadding="0" width="100%" style="min-width: 100%; background-color: #fffbeb; border: 2px dashed #f59e0b;">
+                                                                                <tbody>
+                                                                                    <tr>
+                                                                                        <td style="padding: 20px; text-align: center; font-family: 'Roboto', Arial, Helvetica, sans-serif;">
+                                                                                            <p style="margin: 0 0 15px 0; color: #78350f; font-size: 15px; font-weight: 600;">
+                                                                                                Cek status pendaftaran Anda secara online kapan saja
+                                                                                            </p>
+                                                                                            <table border="0" cellpadding="0" cellspacing="0" style="margin: 0 auto 12px auto;">
+                                                                                                <tr>
+                                                                                                    <td align="center" style="border-radius: 6px; background-color: #f59e0b;">
+                                                                                                        <a href="{{ url('/scan/entry?t=' . $qrCode->token_qr) }}"
+                                                                                                        target="_blank"
+                                                                                                        style="display: inline-block; padding: 12px 24px;
+                                                                                                                font-family: 'Roboto', Arial, Helvetica, sans-serif;
+                                                                                                                font-size: 15px; font-weight: bold;
+                                                                                                                color: #ffffff; text-decoration: none; border-radius: 6px;">
+                                                                                                            Lihat Status Pendaftaran Online
+                                                                                                        </a>
+                                                                                                    </td>
+                                                                                                </tr>
+                                                                                            </table>
+                                                                                            <p style="margin: 0; font-size: 13px; color: #6b7280; font-weight: 300;">
+                                                                                                Atau buka link berikut di browser:<br>
+                                                                                                <a href="{{ url('/scan/entry?t=' . $qrCode->token_qr) }}"
+                                                                                                style="color: #f59e0b; word-break: break-all;">
+                                                                                                    {{ url('/scan/entry?t=' . $qrCode->token_qr) }}
+                                                                                                </a>
+                                                                                            </p>
+                                                                                        </td>
+                                                                                    </tr>
+                                                                                </tbody>
+                                                                            </table>
+                                                                        </td>
+                                                                    </tr>
+                                                                </tbody>
+                                                            </table>
+                                                        </td>
+                                                    </tr>
+                                                </tbody>
+                                            </table>
                                             <!-- Tujuan -->
                                             <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                                                 <tbody class="mcnTextBlockOuter">
