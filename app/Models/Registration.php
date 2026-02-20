@@ -37,6 +37,7 @@ class Registration extends Model
         'rejected_by',
         'rejected_at',
         'rejection_reason',
+        'is_bypass',
     ];
 
     /**
@@ -49,6 +50,7 @@ class Registration extends Model
         'representative_birth_date' => 'date',
         'has_child_under_4' => 'boolean',
         'family_count' => 'integer',
+        'is_bypass' => 'boolean',
         'approved_at' => 'datetime',
         'rejected_at' => 'datetime',
     ];
@@ -139,6 +141,26 @@ class Registration extends Model
     public function isRejected(): bool
     {
         return $this->getStatus() === 'rejected';
+    }
+
+    /**
+     * Check if registration is from bypass import.
+     */
+    public function isBypass(): bool
+    {
+        return $this->is_bypass === true;
+    }
+
+    /**
+     * Get display status with bypass indicator.
+     */
+    public function getDisplayStatus(): string
+    {
+        $status = $this->getStatus();
+        if ($this->isBypass()) {
+            return $status . ' [BYPASS]';
+        }
+        return $status;
     }
 
     /**
