@@ -43,7 +43,7 @@ class SeatAllocationMail extends Mailable implements ShouldQueue
 
         // Generate/get QR code PNG file
         if ($this->registration->qrCode) {
-            $filename = "qr-codes/{$this->registration->qrCode->id}.png";
+            $filename = "qr-codes/{$this->registration->qrCode->token_qr}.png";
 
             // Generate if not exists
             if (!Storage::exists($filename)) {
