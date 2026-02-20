@@ -2,30 +2,29 @@
 @section('title', 'Formulir Pendaftaran - ' . config('mudik.website.name'))
 @push('styles')
     <style>
-     html {
-        scroll-behavior: smooth;
-      }
+        html {
+            scroll-behavior: smooth;
+        }
     </style>
 @endpush
 @section('header')
     @include('components.header', [
-        'menuItems' => [
-            ['label' => 'Formulir Pendaftaran', 'href' => '#form-pendaftaran', 'active' => true],
-        ]
+        'menuItems' => [['label' => 'Formulir Pendaftaran', 'href' => '#form-pendaftaran', 'active' => true]],
     ])
 @endsection
 @section('content')
     <!-- Hero Section untuk Form -->
     @include('components.hero', [
         'sectionId' => 'form-pendaftaran',
-            'slides' => [
+        'slides' => [
             [
                 'title' => 'Formulir Pendaftaran',
-                    'subtitle' => 'Isi formulir pendaftaran mudik gratis dengan data yang <b>lengkap</b> dan <b>sesuai Kartu Keluarga (KK)</b>, serta gunakan <b>email aktif</b> untuk menerima <b>informasi</b> dan <b>notifikasi</b>.',
-                    'buttonText' => '',
-                    'buttonLink' => '',
+                'subtitle' =>
+                    'Isi formulir pendaftaran mudik gratis dengan data yang <b>lengkap</b> dan <b>sesuai Kartu Keluarga (KK)</b>, serta gunakan <b>email aktif</b> untuk menerima <b>informasi</b> dan <b>notifikasi</b>.',
+                'buttonText' => '',
+                'buttonLink' => '',
             ],
-        ]
+        ],
     ])
     <!-- Formulir Pendaftaran -->
     <section class="section" id="form--pendaftaran">
@@ -71,7 +70,8 @@
                                     <p class="mb-0">
                                         Kuota untuk hari ini belum tersedia.
                                         <br />
-                                        <strong>Silakan kembali lagi dalam 1 jam ke depan</strong> atau kunjungi secara berkala.
+                                        <strong>Silakan kembali lagi dalam 1 jam ke depan</strong> atau kunjungi secara
+                                        berkala.
                                     </p>
                                 </div>
 
@@ -86,62 +86,38 @@
                                 <h5 class="card-title mb-3">DATA PERWAKILAN KELUARGA</h5>
                                 <div class="mb-3">
                                     <label for="representative_name" class="form-label">
-                                    Nama Lengkap Perwakilan
-                                    <span class="text-danger">*</span>
+                                        Nama Lengkap Perwakilan
+                                        <span class="text-danger">*</span>
                                     </label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="representative_name"
-                                        name="representative_name"
-                                        placeholder="Nama Lengkap Perwakilan"
-                                        pattern="[A-Za-z ]+"
-                                        oninput="this.value = this.value.replace(/[^A-Za-z ]/g, '')"
-                                        minlength="3"
-                                        required
-                                        />
+                                    <input type="text" class="form-control" id="representative_name"
+                                        name="representative_name" placeholder="Nama Lengkap Perwakilan"
+                                        pattern="[A-Za-z ]+" oninput="this.value = this.value.replace(/[^A-Za-z ]/g, '')"
+                                        minlength="3" required />
                                 </div>
                                 <div class="mb-3">
                                     <label for="representative_nik" class="form-label">
-                                    Nomor KTP Perwakilan
-                                    <span class="text-danger">*</span>
+                                        Nomor KTP Perwakilan
+                                        <span class="text-danger">*</span>
                                     </label>
-                                    <input
-                                        type="text"
-                                        class="form-control mb-0"
-                                        id="representative_nik"
-                                        name="representative_nik"
-                                        placeholder="Nomor KTP Perwakilan (16 digit)"
-                                        minlength="16"
-                                        maxlength="16"
-                                        pattern="[0-9]{16}"
-                                        required
-                                        />
+                                    <input type="text" class="form-control mb-0" id="representative_nik"
+                                        name="representative_nik" placeholder="Nomor KTP Perwakilan (16 digit)"
+                                        minlength="16" maxlength="16" pattern="[0-9]{16}" required />
                                     <div class="form-text pb-2">Nomor KTP harus tepat 16 digit</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="representative_birth_date" class="form-label">
-                                    Tanggal Lahir Perwakilan
-                                    <span class="text-danger">*</span>
+                                        Tanggal Lahir Perwakilan
+                                        <span class="text-danger">*</span>
                                     </label>
-                                    <input
-                                        type="text"
-                                        class="form-control"
-                                        id="representative_birth_date"
-                                        name="representative_birth_date"
-                                        placeholder="Tanggal Lahir Perwakilan (dd/mm/yyyy)"
-                                        required
-                                        />
+                                    <input type="text" class="form-control" id="representative_birth_date"
+                                        name="representative_birth_date" placeholder="Tanggal Lahir Perwakilan (dd/mm/yyyy)"
+                                        required />
                                 </div>
                                 <div class="form-check">
-                                    <input
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        id="addToParticipants"
-                                        name="addToParticipants"
-                                        />
+                                    <input class="form-check-input" type="checkbox" id="addToParticipants"
+                                        name="addToParticipants" />
                                     <label class="form-check-label" for="addToParticipants">
-                                    Tambahkan ke daftar peserta mudik
+                                        Tambahkan ke daftar peserta mudik
                                     </label>
                                 </div>
                             </div>
@@ -153,66 +129,43 @@
                                 <h5 class="card-title mb-3">DATA KELUARGA</h5>
                                 <div class="mb-3">
                                     <label for="family_count" class="form-label">
-                                    Jumlah Anggota Keluarga
-                                    <span class="text-danger">*</span>
+                                        Jumlah Anggota Keluarga
+                                        <span class="text-danger">*</span>
                                     </label>
-                                    <input
-                                        type="number"
-                                        class="form-control"
-                                        id="family_count"
-                                        name="family_count"
-                                        min="1"
-                                        max="10"
-                                        value="1"
-                                        required
-                                        />
+                                    <input type="number" class="form-control" id="family_count" name="family_count"
+                                        min="1" max="10" value="1" required />
                                 </div>
                                 <div class="mb-3">
                                     <label for="kk_number" class="form-label">
-                                    Nomor Kartu Keluarga
-                                    <span class="text-danger">*</span>
+                                        Nomor Kartu Keluarga
+                                        <span class="text-danger">*</span>
                                     </label>
-                                    <input
-                                        type="text"
-                                        class="form-control mb-0"
-                                        id="kk_number"
-                                        name="kk_number"
-                                        placeholder="Nomor Kartu Keluarga (16 digit)"
-                                        minlength="16"
-                                        maxlength="16"
-                                        pattern="[0-9]{16}"
-                                        required
-                                        />
+                                    <input type="text" class="form-control mb-0" id="kk_number" name="kk_number"
+                                        placeholder="Nomor Kartu Keluarga (16 digit)" minlength="16" maxlength="16"
+                                        pattern="[0-9]{16}" required />
                                     <div class="form-text pb-2">Nomor Kartu Keluarga harus tepat 16 digit</div>
                                 </div>
                                 <div class="mb-3">
                                     <label for="kk_document" class="form-label">
-                                    Upload Dokumen Kartu Keluarga
-                                    <span class="text-danger">*</span>
+                                        Upload Dokumen Kartu Keluarga
+                                        <span class="text-danger">*</span>
                                     </label>
-                                    <div class="upload-area border rounded p-4 text-center" id="fileUploadArea" style="transition: all 0.3s ease;">
+                                    <div class="upload-area border rounded p-4 text-center" id="fileUploadArea"
+                                        style="transition: all 0.3s ease;">
                                         <i class="mdi mdi-cloud-upload" style="font-size: 48px; color: #6c757d"></i>
                                         <p class="mb-2">Klik atau seret file ke sini</p>
-                                        <input
-                                            type="file"
-                                            class="form-control d-none"
-                                            id="kk_document"
-                                            name="kk_document"
-                                            accept=".jpg,.jpeg,.png"
-                                            required
-                                            />
-                                        <button
-                                            type="button"
-                                            class="btn btn-outline-secondary btn-sm px-3 py-1"
-                                            onclick="document.getElementById('kk_document').click()"
-                                            >
-                                        Pilih File
+                                        <input type="file" class="form-control d-none" id="kk_document"
+                                            name="kk_document" accept=".jpg,.jpeg,.png" required />
+                                        <button type="button" class="btn btn-outline-secondary btn-sm px-3 py-1"
+                                            onclick="document.getElementById('kk_document').click()">
+                                            Pilih File
                                         </button>
                                         <div class="form-text mt-2">
-                                            <strong>Format:</strong> JPG, JPEG, PNG<br/>
+                                            <strong>Format:</strong> JPG, JPEG, PNG<br />
                                             <strong>Ukuran Max:</strong> 5 MB
                                         </div>
-                                        <div id="fileInfo" class="mt-3" style="display: none; font-weight: 600;"></div>
+                                        <div id="fileInfo" class="mt-3" style="display: none; font-weight: 600;">
+                                        </div>
                                     </div>
                                 </div>
                             </div>
@@ -224,16 +177,13 @@
                                 <h5 class="card-title mb-3">DATA PESERTA MUDIK</h5>
 
                                 <div id="pesertaContainer">
-                                <!-- Peserta forms will be added here dynamically -->
+                                    <!-- Peserta forms will be added here dynamically -->
                                 </div>
 
-                                <button
-                                type="button"
-                                class="btn btn-primary btn-custom w-100 mt-3"
-                                id="addParticipantBtn"
-                                >
-                                <i class="mdi mdi-plus-circle"></i>
-                                Tambah Peserta
+                                <button type="button" class="btn btn-primary btn-custom w-100 mt-3"
+                                    id="addParticipantBtn">
+                                    <i class="mdi mdi-plus-circle"></i>
+                                    Tambah Peserta
                                 </button>
                             </div>
                         </div>
@@ -243,27 +193,19 @@
                             <div class="card-body">
                                 <h5 class="card-title mb-3">KETERANGAN</h5>
                                 <div class="form-check mb-3">
-                                    <input
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        id="has_child_under_4"
-                                        name="has_child_under_4"
-                                        />
+                                    <input class="form-check-input" type="checkbox" id="has_child_under_4"
+                                        name="has_child_under_4" />
                                     <label class="form-check-label" for="has_child_under_4">
-                                        <strong>Memiliki anak dibawah 4 tahun sebagai peserta mudik ?</strong> Saya menyatakan bahwa anak dibawah 4 tahun akan dipangku selama perjalanan.
+                                        <strong>Memiliki anak dibawah 4 tahun sebagai peserta mudik ?</strong> Saya
+                                        menyatakan bahwa anak dibawah 4 tahun akan dipangku selama perjalanan.
                                     </label>
                                 </div>
                                 <div class="form-check mb-3">
-                                    <input
-                                        class="form-check-input"
-                                        type="checkbox"
-                                        id="data_valid"
-                                        name="data_valid"
-                                        required
-                                        />
+                                    <input class="form-check-input" type="checkbox" id="data_valid" name="data_valid"
+                                        required />
                                     <label class="form-check-label" for="data_valid">
-                                    Saya menyatakan data yang diisi adalah benar dan dapat dipertanggungjawabkan.
-                                    <span class="text-danger">*</span>
+                                        Saya menyatakan data yang diisi adalah benar dan dapat dipertanggungjawabkan.
+                                        <span class="text-danger">*</span>
                                     </label>
                                 </div>
                             </div>
@@ -272,13 +214,13 @@
                         <!-- Submit Button -->
                         <div class="text-center mb-4">
                             <button type="submit" class="btn btn-primary btn-custom btn-lg px-5" id="submitFormBtn">
-                            <span class="btn-text">
-                                <i class="mdi mdi-email"></i> Submit Pendaftaran
-                            </span>
-                            <span class="btn-loading d-none">
-                                <span class="spinner-border spinner-border-sm me-2"></span>
-                                Proses mengirim data...
-                            </span>
+                                <span class="btn-text">
+                                    <i class="mdi mdi-email"></i> Submit Pendaftaran
+                                </span>
+                                <span class="btn-loading d-none">
+                                    <span class="spinner-border spinner-border-sm me-2"></span>
+                                    Proses mengirim data...
+                                </span>
                             </button>
                         </div>
                     </form>
@@ -300,7 +242,7 @@
         const submitUrl = @json($submitUrl ?? '');
 
         // Initialize form
-        document.addEventListener("DOMContentLoaded", function () {
+        document.addEventListener("DOMContentLoaded", function() {
             loadDestinations();
             initializeForm();
             setupEventListeners();
@@ -349,7 +291,8 @@
 
                 // Render destinations
                 const html = data.data.map(dest => {
-                    const badgeClass = dest.remaining > 5 ? 'bg-success' : dest.remaining > 2 ? 'bg-warning' : 'bg-danger';
+                    const badgeClass = dest.remaining > 5 ? 'bg-success' : dest.remaining > 2 ? 'bg-warning' :
+                        'bg-danger';
 
                     if (!dest.is_available) {
                         return `
@@ -446,7 +389,7 @@
                     format: "dd/mm/yyyy",
                     showOnFocus: true,
                     showRightIcon: false,
-                    maxDate: function () {
+                    maxDate: function() {
                         return new Date();
                     },
                     size: "default",
@@ -629,8 +572,8 @@
                     ${
                     pesertaCount > 1
                         ? `<button type="button" class="btn btn-danger btn-sm remove-peserta px-2 py-0" data-id="${pesertaCount}">
-                            <i class="mdi mdi-close-circle-outline fs-5"></i>
-                        </button>`
+                                <i class="mdi mdi-close-circle-outline fs-5"></i>
+                            </button>`
                         : ""
                     }
                 </div>
@@ -657,7 +600,7 @@
             // Add event listener for remove button
             const removeBtn = pesertaDiv.querySelector(".remove-peserta");
             if (removeBtn) {
-                removeBtn.addEventListener("click", function () {
+                removeBtn.addEventListener("click", function() {
                     removePesertaForm(this.dataset.id);
                 });
             }
@@ -701,8 +644,20 @@
 
                         pesertaForm.remove();
                         pesertaCount--;
-                        updatePesertaNumbers();
-                        updateTambahPesertaButton();
+
+                        // CRITICAL: Update family_count to match actual peserta count IMMEDIATELY
+                        // Use setTimeout to ensure DOM is updated before querying
+                        setTimeout(() => {
+                            const actualPesertaCount = document.querySelectorAll(".peserta-form").length;
+                            const familyCountInput = document.getElementById("family_count");
+                            if (familyCountInput) {
+                                familyCountInput.value = actualPesertaCount;
+                                // Trigger change event for any listeners
+                                familyCountInput.dispatchEvent(new Event('change', { bubbles: true }));
+                            }
+                            updatePesertaNumbers();
+                            updateTambahPesertaButton();
+                        }, 0);
                     }
                 });
             }
@@ -731,93 +686,93 @@
 
         function handleTambahkanPerwakilan(e) {
             if (e.target.checked) {
-            // Validasi data perwakilan sudah terisi
-            const nama = document.getElementById("representative_name").value.trim();
-            const ktp = document.getElementById("representative_nik").value.trim();
-            const tanggalLahir = $("#representative_birth_date").val();
+                // Validasi data perwakilan sudah terisi
+                const nama = document.getElementById("representative_name").value.trim();
+                const ktp = document.getElementById("representative_nik").value.trim();
+                const tanggalLahir = $("#representative_birth_date").val();
 
-            // Check if representative data is empty
-            if (!nama || !ktp || !tanggalLahir) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    html: `Pengisian data perwakilan masih ada yang kosong:<br/><br/><div class="text-start">
+                // Check if representative data is empty
+                if (!nama || !ktp || !tanggalLahir) {
+                    Swal.fire({
+                        title: "Peringatan!",
+                        html: `Pengisian data perwakilan masih ada yang kosong:<br/><br/><div class="text-start">
                         ${!nama ? '<p class="fw-bold mb-0">- Nama Lengkap Perwakilan</p>' : ''}
                         ${!ktp ? '<p class="fw-bold mb-0">- Nomor KTP Perwakilan</p>' : ''}
                         ${!tanggalLahir ? '<p class="fw-bold mb-0">- Tanggal Lahir Perwakilan</p>' : ''}
                         </div><br/>Silakan isi semua data perwakilan terlebih dahulu.`,
-                    icon: "warning",
-                    confirmButtonText: "OK",
-                });
-                // Uncheck checkbox
-                e.target.checked = false;
-                return;
-            }
+                        icon: "warning",
+                        confirmButtonText: "OK",
+                    });
+                    // Uncheck checkbox
+                    e.target.checked = false;
+                    return;
+                }
 
-            // Validate name length (min 3 characters)
-            if (nama.length < 3) {
+                // Validate name length (min 3 characters)
+                if (nama.length < 3) {
+                    Swal.fire({
+                        title: "Peringatan!",
+                        text: "Nama perwakilan harus minimal 3 karakter.",
+                        icon: "warning",
+                        confirmButtonText: "OK",
+                    });
+                    e.target.checked = false;
+                    return;
+                }
+
+                // Validate NIK (must be 16 digits)
+                const nikDigits = ktp.replace(/\D/g, '');
+                if (nikDigits.length !== 16) {
+                    Swal.fire({
+                        title: "Peringatan!",
+                        text: "Nomor KTP harus tepat 16 angka.",
+                        icon: "warning",
+                        confirmButtonText: "OK",
+                    });
+                    e.target.checked = false;
+                    return;
+                }
+
+                // All validation passed, proceed with adding to participant
+                if (pesertaCount > 0) {
+                    document.getElementById("namaPeserta1").value = nama;
+                    document.getElementById("ktpPeserta1").value = ktp;
+                    $("#tanggalLahirPeserta1").val(tanggalLahir);
+
+                    // Make first participant fields readonly
+                    document.getElementById("namaPeserta1").setAttribute("readonly", true);
+                    document.getElementById("ktpPeserta1").setAttribute("readonly", true);
+                    $("#tanggalLahirPeserta1").prop("readonly", true).addClass("readonly-datepicker");
+                }
+
+                // Make representative fields readonly to prevent data mismatch
+                document.getElementById("representative_name").setAttribute("readonly", true);
+                document.getElementById("representative_nik").setAttribute("readonly", true);
+                $("#representative_birth_date").prop("readonly", true).addClass("readonly-datepicker");
+
+                // Show info message
                 Swal.fire({
-                    title: "Peringatan!",
-                    text: "Nama perwakilan harus minimal 3 karakter.",
+                    title: "Info",
+                    html: "Data perwakilan sekarang tidak bisa diubah. <br/><strong>Uncheck</strong> untuk mengubah data perwakilan.",
                     icon: "warning",
-                    confirmButtonText: "OK",
+                    confirmButtonText: "Baik, saya mengerti.",
                 });
-                e.target.checked = false;
-                return;
+            } else {
+                // Remove readonly and clear values from participant
+                if (pesertaCount > 0) {
+                    document.getElementById("namaPeserta1").removeAttribute("readonly");
+                    document.getElementById("ktpPeserta1").removeAttribute("readonly");
+                    $("#tanggalLahirPeserta1").prop("readonly", false).removeClass("readonly-datepicker");
+                    document.getElementById("namaPeserta1").value = "";
+                    document.getElementById("ktpPeserta1").value = "";
+                    $("#tanggalLahirPeserta1").val("");
+                }
+
+                // Remove readonly from representative fields
+                document.getElementById("representative_name").removeAttribute("readonly");
+                document.getElementById("representative_nik").removeAttribute("readonly");
+                $("#representative_birth_date").prop("readonly", false).removeClass("readonly-datepicker");
             }
-
-            // Validate NIK (must be 16 digits)
-            const nikDigits = ktp.replace(/\D/g, '');
-            if (nikDigits.length !== 16) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    text: "Nomor KTP harus tepat 16 angka.",
-                    icon: "warning",
-                    confirmButtonText: "OK",
-                });
-                e.target.checked = false;
-                return;
-            }
-
-            // All validation passed, proceed with adding to participant
-            if (pesertaCount > 0) {
-                document.getElementById("namaPeserta1").value = nama;
-                document.getElementById("ktpPeserta1").value = ktp;
-                $("#tanggalLahirPeserta1").val(tanggalLahir);
-
-                // Make first participant fields readonly
-                document.getElementById("namaPeserta1").setAttribute("readonly", true);
-                document.getElementById("ktpPeserta1").setAttribute("readonly", true);
-                $("#tanggalLahirPeserta1").prop("readonly", true).addClass("readonly-datepicker");
-            }
-
-            // Make representative fields readonly to prevent data mismatch
-            document.getElementById("representative_name").setAttribute("readonly", true);
-            document.getElementById("representative_nik").setAttribute("readonly", true);
-            $("#representative_birth_date").prop("readonly", true).addClass("readonly-datepicker");
-
-            // Show info message
-            Swal.fire({
-                title: "Info",
-                html: "Data perwakilan sekarang tidak bisa diubah. <br/><strong>Uncheck</strong> untuk mengubah data perwakilan.",
-                icon: "warning",
-                confirmButtonText: "Baik, saya mengerti.",
-            });
-        } else {
-            // Remove readonly and clear values from participant
-            if (pesertaCount > 0) {
-                document.getElementById("namaPeserta1").removeAttribute("readonly");
-                document.getElementById("ktpPeserta1").removeAttribute("readonly");
-                $("#tanggalLahirPeserta1").prop("readonly", false).removeClass("readonly-datepicker");
-                document.getElementById("namaPeserta1").value = "";
-                document.getElementById("ktpPeserta1").value = "";
-                $("#tanggalLahirPeserta1").val("");
-            }
-
-            // Remove readonly from representative fields
-            document.getElementById("representative_name").removeAttribute("readonly");
-            document.getElementById("representative_nik").removeAttribute("readonly");
-            $("#representative_birth_date").prop("readonly", false).removeClass("readonly-datepicker");
-        }
         }
 
         function validateJumlahAnggota(e) {
@@ -928,8 +883,8 @@
             e.preventDefault();
 
             // Validate jumlah anggota vs peserta
-            const jumlahAnggota = parseInt(document.getElementById("family_count").value);
             const jumlahPeserta = document.querySelectorAll(".peserta-form").length;
+            const jumlahAnggota = parseInt(document.getElementById("family_count").value);
 
             if (jumlahPeserta === 0) {
                 Swal.fire({
@@ -941,14 +896,9 @@
                 return;
             }
 
-            if (jumlahPeserta > jumlahAnggota) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    text: `Jumlah peserta mudik (${jumlahPeserta}) melebihi jumlah anggota keluarga (${jumlahAnggota}). Silakan sesuaikan.`,
-                    icon: "warning",
-                    confirmButtonText: "Baik, saya akan sesuaikan.",
-                });
-                return;
+            // CRITICAL: Auto-sync family_count with actual peserta count if mismatch
+            if (jumlahPeserta !== jumlahAnggota) {
+                document.getElementById("family_count").value = jumlahPeserta;
             }
 
             // Validate representative name (min 3 characters)
@@ -964,7 +914,7 @@
             }
 
             // Validate representative NIK (16 digits)
-             const repNik = document.getElementById("representative_nik").value.replace(/\D/g, '');
+            const repNik = document.getElementById("representative_nik").value.replace(/\D/g, '');
             if (repNik.length !== 16) {
                 Swal.fire({
                     title: "Peringatan!",
@@ -1000,7 +950,7 @@
 
             // Validate all peserta birth dates
             let missingBirthDate = false;
-            $(".datepicker-input").each(function () {
+            $(".datepicker-input").each(function() {
                 if ($(this).prop("required") && !$(this).val()) {
                     missingBirthDate = true;
                     return false;
@@ -1030,10 +980,12 @@
 
             // Validate participants
             let pesertaValid = true;
+            let hasAnyChildUnder4 = false;
             let allPesertaForms = document.querySelectorAll(".peserta-form");
             allPesertaForms.forEach((form, index) => {
                 const name = form.querySelector('input[name="namaPeserta[]"]').value.trim();
                 const nikKia = form.querySelector('input[name="ktpPeserta[]"]').value.replace(/\D/g, '');
+                const birthDateInput = form.querySelector('input[name="tanggalLahirPeserta[]"]');
 
                 if (name.length < 3) {
                     Swal.fire({
@@ -1056,9 +1008,32 @@
                     pesertaValid = false;
                     return false;
                 }
+
+                if (birthDateInput && birthDateInput.value) {
+                    const age = calculateAge(birthDateInput.value);
+                    if (age !== null && age < 4) {
+                        hasAnyChildUnder4 = true;
+                    }
+                }
             });
 
             if (!pesertaValid) return;
+
+            // If any child under 4 but checkbox not checked, reject submission
+            const hasChildCheckbox = document.getElementById("has_child_under_4");
+            if (hasAnyChildUnder4 && !hasChildCheckbox.checked) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    html: `<div class="text-start">
+                        <p class="mb-3"><strong>Data tidak valid:</strong></p>
+                        <p>Data peserta memiliki anak berusia dibawah 4 tahun, tetapi checkbox <strong>"Memiliki anak dibawah 4 tahun"</strong> belum dicentang.</p>
+                        <p class="mt-2">Silakan centang checkbox <strong>"Memiliki anak dibawah 4 tahun"</strong> terlebih dahulu.</p>
+                    </div>`,
+                    icon: "error",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
+                });
+                return;
+            }
 
             // Validate file upload
             const kkDocument = document.getElementById("kk_document");
@@ -1147,78 +1122,79 @@
 
             // Submit to backend
             fetch(submitUrl, {
-                method: 'POST',
-                body: formData,
-                headers: {
-                    'X-Requested-With': 'XMLHttpRequest',
-                    'Accept': 'application/json'
-                }
-            })
-            .then(response => response.json())
-            .then(data => {
-                Swal.close();
+                    method: 'POST',
+                    body: formData,
+                    headers: {
+                        'X-Requested-With': 'XMLHttpRequest',
+                        'Accept': 'application/json'
+                    }
+                })
+                .then(response => response.json())
+                .then(data => {
+                    Swal.close();
 
-                if (data.success) {
-                    //reset submit button
-                    resetSubmitButton();
+                    if (data.success) {
+                        //reset submit button
+                        resetSubmitButton();
 
-                    Swal.fire({
-                        title: "Pendaftaran Berhasil!",
-                        html: `
+                        Swal.fire({
+                            title: "Pendaftaran Berhasil!",
+                            html: `
                         <div class="text-start">
                             <p class="mb-3">${data.message}</p>
                             ${data.data && data.data.email ? `<p><strong>Email:</strong> ${data.data.email}</p>` : ''}
                             <p class="text-muted mt-3">Silakan cek email secara berkala.</p>
                         </div>
                         `,
-                        allowOutsideClick: false,
-                        allowEscapeKey: false,
-                        icon: "success",
-                        confirmButtonText: "Baik, saya mengerti.",
-                    }).then(() => {
-                        // Reset form
-                        clearAllFormData();
-                        // Show redirect timer
-                        showRedirectTimer();
-                    });
-                } else {
+                            allowOutsideClick: false,
+                            allowEscapeKey: false,
+                            icon: "success",
+                            confirmButtonText: "Baik, saya mengerti.",
+                        }).then(() => {
+                            // Reset form
+                            clearAllFormData();
+                            // Show redirect timer
+                            showRedirectTimer();
+                        });
+                    } else {
+                        //reset submit button
+                        resetSubmitButton();
+
+                        // Handle error from backend
+                        let errorMessage = 'Terjadi kesalahan saat memproses pendaftaran :<br/><br/>';
+                        errorMessage += '<div class="text-start mt-2">';
+
+                        if (data.errors) {
+                            for (let field in data.errors) {
+                                data.errors[field].forEach(err => {
+                                    errorMessage += `<p class="mb-0 fw-bolder">- ${err}</p>`;
+                                });
+                            }
+                        } else {
+                            errorMessage += `<p class="mb-0 fw-bolder">- ${data.message}</p>`;
+                        }
+                        errorMessage +=
+                            '</div><br/>Mohon periksa kembali data dan pastikan file yang diunggah sesuai ketentuan.';
+
+                        Swal.fire({
+                            title: "Pendaftaran Gagal!",
+                            html: errorMessage,
+                            icon: "error",
+                            confirmButtonText: "Baik, saya mengerti.",
+                        });
+                    }
+                })
+                .catch(error => {
+                    Swal.close();
                     //reset submit button
                     resetSubmitButton();
-
-                    // Handle error from backend
-                    let errorMessage = 'Terjadi kesalahan saat memproses pendaftaran :<br/><br/>';
-                    errorMessage += '<div class="text-start mt-2">';
-
-                    if (data.errors) {
-                        for (let field in data.errors) {
-                            data.errors[field].forEach(err => {
-                                errorMessage += `<p class="mb-0 fw-bolder">- ${err}</p>`;
-                            });
-                        }
-                    }else{
-                        errorMessage += `<p class="mb-0 fw-bolder">- ${data.message}</p>`;
-                    }
-                    errorMessage += '</div><br/>Mohon periksa kembali data dan pastikan file yang diunggah sesuai ketentuan.';
-
                     Swal.fire({
-                        title: "Pendaftaran Gagal!",
-                        html: errorMessage,
+                        title: "Error!",
+                        text: "Terjadi kesalahan pada koneksi. Silakan coba lagi.",
                         icon: "error",
                         confirmButtonText: "Baik, saya mengerti.",
                     });
-                }
-            })
-            .catch(error => {
-                Swal.close();
-                //reset submit button
-                resetSubmitButton();
-                Swal.fire({
-                    title: "Error!",
-                    text: "Terjadi kesalahan pada koneksi. Silakan coba lagi.",
-                    icon: "error",
-                    confirmButtonText: "Baik, saya mengerti.",
                 });
-            });
         }
 
         // Clear all from inputs and reset form -- success
