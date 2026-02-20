@@ -33,7 +33,8 @@ class RejectRegistrationAction
             // Reject registration and fallback null admin notes
             $notes = $data->admin_notes ?? null;
             $registration->reject($admin->id, $data->rejection_reason, $notes);
-
+            $registration->formLink->markAsRejected();
+            
             // Soft delete participants first (cascading)
             $registration->participants()->delete();
 
