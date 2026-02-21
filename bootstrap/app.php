@@ -11,6 +11,7 @@ use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\CheckFormLinkValid;
 use App\Http\Middleware\CheckQuotaAvailable;
 use App\Http\Middleware\CheckScannerPermission;
+use App\Http\Middleware\ValidateFormLinkSignature;
 use App\Exceptions\MudikException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -29,6 +30,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'throttle' => ThrottleRequests::class,
 
             // Custom Middleware
+            'signed.form' => ValidateFormLinkSignature::class, // Custom signed URL validator with HTTPS support
             'form.link.valid' => CheckFormLinkValid::class,
             'quota.available' => CheckQuotaAvailable::class,
             'scanner.permission' => CheckScannerPermission::class,
