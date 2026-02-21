@@ -53,16 +53,47 @@ class QrCodeService
     {
         $size = config('mudik.qr_code.size', 300);
         $filename = "qr-codes/{$qrCode->token_qr}.png";
+        $qrCodesDir = 'qr-codes';
 
         try {
-            if (!Storage::exists('qr-codes')) {
-                Storage::makeDirectory('qr-codes');
+            Log::info('saveQrCodeAsPng: Starting', [
+                'qr_code_id' => $qrCode->id,
+                'filename' => $filename,
+                'disk_root' => config('filesystems.disks.local.root'),
+            ]);
+
+            // create directory if not exists
+            if (!Storage::exists($qrCodesDir)) {
+                Log::info('saveQrCodeAsPng: Creating directory');
+                $created = Storage::makeDirectory($qrCodesDir);
+                if (!$created) {
+                    throw new \Exception('Failed to create qr-codes directory');
+                }
+                Log::info('saveQrCodeAsPng: Directory created');
             }
+
+            // Verify directory exists and is writable
+            $fullDirPath = storage_path('app/private/qr-codes');
+            if (!is_dir($fullDirPath)) {
+                throw new \Exception("Directory does not exist: {$fullDirPath}");
+            }
+
+            if (!is_writable($fullDirPath)) {
+                throw new \Exception("Directory not writable: {$fullDirPath} - Run: sudo chown -R www-data:www-data {$fullDirPath} && sudo chmod -R 755 {$fullDirPath}");
+            }
+
+            Log::info('saveQrCodeAsPng: Directory verified', [
+                'path' => $fullDirPath,
+                'permissions' => substr(sprintf('%o', fileperms($fullDirPath)), -4),
+            ]);
+
 
             $qr = EndroidQrCode::create($qrCode->qr_data)
                 ->setSize($size)
                 ->setMargin(10)
                 ->setErrorCorrectionLevel(ErrorCorrectionLevel::High);
+
+            Log::info('saveQrCodeAsPng: QR object created');
 
             // Generate PNG
             $writer = new PngWriter();
