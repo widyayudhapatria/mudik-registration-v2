@@ -126,7 +126,7 @@
                                 <h5 class="card-title mb-3">DATA KELUARGA</h5>
                                 <div class="mb-3">
                                     <label for="family_count" class="form-label">
-                                        Jumlah Peserta Keluarga
+                                        Jumlah Peserta Mudik (termasuk perwakilan keluarga)
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input type="number" class="form-control" id="family_count" name="family_count"
