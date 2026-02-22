@@ -113,12 +113,9 @@
                                         name="representative_birth_date" placeholder="Tanggal Lahir Perwakilan (dd/mm/yyyy)"
                                         required />
                                 </div>
-                                <div class="form-check">
-                                    <input class="form-check-input" type="checkbox" id="addToParticipants"
-                                        name="addToParticipants" />
-                                    <label class="form-check-label" for="addToParticipants">
-                                        Tambahkan ke daftar peserta mudik
-                                    </label>
+                                <div class="alert alert-info mb-0 mt-3 d-flex align-items-center gap-2">
+                                    <i class="mdi mdi-information-outline fs-5"></i>
+                                    <span>Data perwakilan keluarga akan otomatis tercantum sebagai <strong>Peserta 1</strong> dalam daftar peserta mudik.</span>
                                 </div>
                             </div>
                         </div>
@@ -129,7 +126,7 @@
                                 <h5 class="card-title mb-3">DATA KELUARGA</h5>
                                 <div class="mb-3">
                                     <label for="family_count" class="form-label">
-                                        Jumlah Anggota Keluarga
+                                        Jumlah Peserta Keluarga
                                         <span class="text-danger">*</span>
                                     </label>
                                     <input type="number" class="form-control" id="family_count" name="family_count"
@@ -361,6 +358,27 @@
 
             // Add first participant form by default
             addPesertaForm();
+            syncRepresentativeToFirstParticipant();
+        }
+
+        function syncRepresentativeToFirstParticipant() {
+            const firstForm = document.querySelector('.peserta-form[data-peserta-id="1"]');
+            if (!firstForm) return;
+
+            firstForm.querySelector('input[name="namaPeserta[]"]').value =
+                document.getElementById('representative_name').value.trim();
+
+            firstForm.querySelector('input[name="ktpPeserta[]"]').value =
+                document.getElementById('representative_nik').value.trim();
+
+            const repBirthDate = $('#representative_birth_date').val();
+            $(`#tanggalLahirPeserta1`).val(repBirthDate);
+        }
+
+        function setupRepresentativeSyncListeners() {
+            document.getElementById('representative_name').addEventListener('input', syncRepresentativeToFirstParticipant);
+            document.getElementById('representative_nik').addEventListener('input', syncRepresentativeToFirstParticipant);
+            $('#representative_birth_date').on('change', syncRepresentativeToFirstParticipant);
         }
 
         function initializeDatepicker(selector) {
@@ -439,7 +457,6 @@
             document.getElementById("addParticipantBtn").addEventListener("click", addPesertaForm);
 
             // Checkbox untuk tambahkan perwakilan ke peserta
-            document.getElementById("addToParticipants").addEventListener("change", handleTambahkanPerwakilan);
 
             // Jumlah anggota keluarga
             document.getElementById("family_count").addEventListener("change", validateJumlahAnggota);
@@ -470,6 +487,8 @@
                     }
                 }
             });
+
+            setupRepresentativeSyncListeners(); 
         }
 
         function formatNumber(e) {
@@ -597,6 +616,11 @@
 
             pesertaContainer.appendChild(pesertaDiv);
 
+            if (pesertaCount === 1) {
+                pesertaDiv.querySelector('input[name="namaPeserta[]"]').setAttribute('readonly', true);
+                pesertaDiv.querySelector('input[name="ktpPeserta[]"]').setAttribute('readonly', true);
+            }
+
             // Add event listener for remove button
             const removeBtn = pesertaDiv.querySelector(".remove-peserta");
             if (removeBtn) {
@@ -612,6 +636,10 @@
             // Initialize datepicker for this peserta's birth date
             const datepickerSelector = `#tanggalLahirPeserta${pesertaCount}`;
             initializeDatepicker(datepickerSelector);
+
+            if (pesertaCount === 1) {
+                setTimeout(() => $(`#tanggalLahirPeserta1`).prop('readonly', true), 600);
+            }
 
             // Add focus event to ensure datepicker works on focus
             const datepickerInput = pesertaDiv.querySelector(".datepicker-input");
@@ -681,97 +709,6 @@
             } else {
                 btn.disabled = false;
                 btn.innerHTML = `<i class="mdi mdi-plus-circle"></i> Tambah Peserta`;
-            }
-        }
-
-        function handleTambahkanPerwakilan(e) {
-            if (e.target.checked) {
-                // Validasi data perwakilan sudah terisi
-                const nama = document.getElementById("representative_name").value.trim();
-                const ktp = document.getElementById("representative_nik").value.trim();
-                const tanggalLahir = $("#representative_birth_date").val();
-
-                // Check if representative data is empty
-                if (!nama || !ktp || !tanggalLahir) {
-                    Swal.fire({
-                        title: "Peringatan!",
-                        html: `Pengisian data perwakilan masih ada yang kosong:<br/><br/><div class="text-start">
-                        ${!nama ? '<p class="fw-bold mb-0">- Nama Lengkap Perwakilan</p>' : ''}
-                        ${!ktp ? '<p class="fw-bold mb-0">- Nomor KTP Perwakilan</p>' : ''}
-                        ${!tanggalLahir ? '<p class="fw-bold mb-0">- Tanggal Lahir Perwakilan</p>' : ''}
-                        </div><br/>Silakan isi semua data perwakilan terlebih dahulu.`,
-                        icon: "warning",
-                        confirmButtonText: "OK",
-                    });
-                    // Uncheck checkbox
-                    e.target.checked = false;
-                    return;
-                }
-
-                // Validate name length (min 3 characters)
-                if (nama.length < 3) {
-                    Swal.fire({
-                        title: "Peringatan!",
-                        text: "Nama perwakilan harus minimal 3 karakter.",
-                        icon: "warning",
-                        confirmButtonText: "OK",
-                    });
-                    e.target.checked = false;
-                    return;
-                }
-
-                // Validate NIK (must be 16 digits)
-                const nikDigits = ktp.replace(/\D/g, '');
-                if (nikDigits.length !== 16) {
-                    Swal.fire({
-                        title: "Peringatan!",
-                        text: "Nomor KTP harus tepat 16 angka.",
-                        icon: "warning",
-                        confirmButtonText: "OK",
-                    });
-                    e.target.checked = false;
-                    return;
-                }
-
-                // All validation passed, proceed with adding to participant
-                if (pesertaCount > 0) {
-                    document.getElementById("namaPeserta1").value = nama;
-                    document.getElementById("ktpPeserta1").value = ktp;
-                    $("#tanggalLahirPeserta1").val(tanggalLahir);
-
-                    // Make first participant fields readonly
-                    document.getElementById("namaPeserta1").setAttribute("readonly", true);
-                    document.getElementById("ktpPeserta1").setAttribute("readonly", true);
-                    $("#tanggalLahirPeserta1").prop("readonly", true).addClass("readonly-datepicker");
-                }
-
-                // Make representative fields readonly to prevent data mismatch
-                document.getElementById("representative_name").setAttribute("readonly", true);
-                document.getElementById("representative_nik").setAttribute("readonly", true);
-                $("#representative_birth_date").prop("readonly", true).addClass("readonly-datepicker");
-
-                // Show info message
-                Swal.fire({
-                    title: "Info",
-                    html: "Data perwakilan sekarang tidak bisa diubah. <br/><strong>Uncheck</strong> untuk mengubah data perwakilan.",
-                    icon: "warning",
-                    confirmButtonText: "Baik, saya mengerti.",
-                });
-            } else {
-                // Remove readonly and clear values from participant
-                if (pesertaCount > 0) {
-                    document.getElementById("namaPeserta1").removeAttribute("readonly");
-                    document.getElementById("ktpPeserta1").removeAttribute("readonly");
-                    $("#tanggalLahirPeserta1").prop("readonly", false).removeClass("readonly-datepicker");
-                    document.getElementById("namaPeserta1").value = "";
-                    document.getElementById("ktpPeserta1").value = "";
-                    $("#tanggalLahirPeserta1").val("");
-                }
-
-                // Remove readonly from representative fields
-                document.getElementById("representative_name").removeAttribute("readonly");
-                document.getElementById("representative_nik").removeAttribute("readonly");
-                $("#representative_birth_date").prop("readonly", false).removeClass("readonly-datepicker");
             }
         }
 
