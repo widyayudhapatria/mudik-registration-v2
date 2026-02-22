@@ -241,7 +241,8 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: left;">
-                                                                            <img align="left" alt="Mudik Gratis 2026" src="https://i.postimg.cc/JhrmSNq3/285x114.png"  height="65" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 65px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;">
+                                                                            <img src="{{ asset('assets/public/images/logo-kabupaten-tangerang.png') }}" height="100" alt="Logo Kabupaten Tangerang" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 100px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;" />
+                                                                                <img src="{{ asset('assets/public/images/logo-mudik.png') }}" height="100" alt="Logo Mudik Gratis Pemerintah Kabupaten Tangerang 2026" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 100px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;" />
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -310,7 +311,7 @@
                                                                     <tr>
                                                                         <td valign="top" class="mcnTextContent" style="padding: 0px 18px 9px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
                                                                             <p>
-                                                                                Terima kasih atas partisipasi Anda dalam <strong>Program Mudik Gratis Lebaran 2026</strong>.
+                                                                                Terima kasih atas partisipasi Anda dalam <strong>Program Mudik Gratis Pemerintah Kabupaten Tangerang 2026</strong>.
                                                                                 Setelah melalui proses verifikasi, kami mohon maaf bahwa <strong>pendaftaran Anda belum dapat kami setujui</strong> pada tahap ini.
                                                                             </p>
                                                                         </td>

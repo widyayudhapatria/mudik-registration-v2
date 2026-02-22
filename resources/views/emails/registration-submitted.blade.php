@@ -75,7 +75,7 @@
         font-weight: inherit !important;
         line-height: inherit !important;
       }
-      
+
       /* Template Styles */
       body {
         background-color: #f4f4f4;
@@ -137,7 +137,7 @@
         font-weight: normal;
         text-decoration: underline;
       }
-      
+
       /* Component Styles */
       .status-title {
         font-size: 24px;
@@ -189,7 +189,7 @@
         font-weight: bold;
         margin-bottom: 10px;
       }
-      
+
       /* Responsive Styles */
       @media only screen and (min-width: 768px) {
         .templateContainer {
@@ -249,7 +249,7 @@
           <td align="center" valign="top" id="bodyCell">
             <!-- BEGIN TEMPLATE -->
             <table border="0" cellpadding="0" cellspacing="0" width="100%">
-              
+
               <!-- HEADER SECTION -->
               <tr>
                 <td align="center" valign="top" id="templateHeader">
@@ -264,7 +264,8 @@
                                   <tbody>
                                     <tr>
                                       <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: left;">
-                                        <img align="left" alt="Mudik Gratis Lebaran 2026 Logo" src="images/285x114.png" height="65" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 65px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;">
+                                        <img src="{{ asset('assets/public/images/logo-kabupaten-tangerang.png') }}" height="100" alt="Logo Kabupaten Tangerang" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 100px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;" />
+                                                                                <img src="{{ asset('assets/public/images/logo-mudik.png') }}" height="100" alt="Logo Mudik Gratis Pemerintah Kabupaten Tangerang 2026" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 100px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;" />
                                       </td>
                                     </tr>
                                   </tbody>
@@ -278,14 +279,14 @@
                   </table>
                 </td>
               </tr>
-              
+
               <!-- BODY SECTION -->
               <tr>
                 <td align="center" valign="top" id="templateBody">
                   <table align="center" border="0" cellpadding="0" cellspacing="0" width="100%" class="templateContainer">
                     <tr>
                       <td valign="top" class="bodyContainer">
-                        
+
                         <!-- Status Title -->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                           <tbody class="mcnTextBlockOuter">
@@ -304,7 +305,7 @@
                             </tr>
                           </tbody>
                         </table>
-                        
+
                         <!-- Greeting -->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                           <tbody class="mcnTextBlockOuter">
@@ -326,7 +327,7 @@
                             </tr>
                           </tbody>
                         </table>
-                        
+
                         <!-- Main Message -->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                           <tbody class="mcnTextBlockOuter">
@@ -337,7 +338,7 @@
                                     <tr>
                                       <td valign="top" class="mcnTextContent" style="padding: 0px 18px 9px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
                                         <p>
-                                          Terima kasih telah mendaftarkan diri dalam <strong>Program Mudik Gratis Lebaran 2026</strong>. 
+                                          Terima kasih telah mendaftarkan diri dalam <strong>Program Mudik Gratis Pemerintah Kabupaten Tangerang 2026</strong>.
                                           Kami dengan senang hati mengkonfirmasi bahwa <strong>pendaftaran Anda telah berhasil kami terima</strong> dan sedang dalam proses verifikasi.
                                         </p>
                                       </td>
@@ -348,7 +349,7 @@
                             </tr>
                           </tbody>
                         </table>
-                        
+
                         <!-- Info Box -->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                           <tbody class="mcnTextBlockOuter">
@@ -363,7 +364,7 @@
                                             <td style="color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
                                               <h4 style="margin: 0 0 10px 0; color: #047857; font-size: 18px; font-weight: bold;">Tahap Verifikasi Data</h4>
                                               <p style="margin: 0;">
-                                                Tim kami akan melakukan verifikasi data pendaftaran Anda. Proses ini membutuhkan waktu maksimal <strong>2 × 24 jam (2 hari kerja)</strong>. 
+                                                Tim kami akan melakukan verifikasi data pendaftaran Anda. Proses ini membutuhkan waktu maksimal <strong>2 × 24 jam (2 hari kerja)</strong>.
                                                 Anda akan menerima notifikasi ketika proses verifikasi selesai.
                                               </p>
                                             </td>
@@ -377,7 +378,7 @@
                             </tr>
                           </tbody>
                         </table>
-                        
+
                         <!-- Timeline -->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                           <tbody class="mcnTextBlockOuter">
@@ -413,7 +414,7 @@
                             </tr>
                           </tbody>
                         </table>
-                        
+
                         <!-- Closing Message -->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                           <tbody class="mcnTextBlockOuter">
@@ -434,7 +435,7 @@
                             </tr>
                           </tbody>
                         </table>
-                        
+
                         <!-- Divider -->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnDividerBlock" style="min-width: 100%;">
                           <tbody class="mcnDividerBlockOuter">
@@ -451,7 +452,7 @@
                             </tr>
                           </tbody>
                         </table>
-                        
+
                         <!-- Contact Info -->
                         <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnTextBlock" style="min-width: 100%;">
                           <tbody class="mcnTextBlockOuter">
@@ -462,10 +463,10 @@
                                     <tr>
                                       <td valign="top" class="mcnTextContent" style="padding: 0px 18px 18px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
                                         <p><strong>Kontak Bantuan</strong></p>
-                                        <p>
-                                          📧 Email: <a href="mailto:support@mudikgratis.com" style="color: #10b981; text-decoration: underline;">support@mudikgratis.com</a><br>
-                                          📞 Telepon: 021-1234567<br>
-                                          🕐 Senin – Jumat, 08:00 – 17:00 WIB
+                                        <<p>
+                                            📧 Email: <a href="mailto:{{ $mudikConfig['support']['email'] }}" style="color: #f58514; text-decoration: underline;">{{ $mudikConfig['support']['email'] }}</a><br>
+                                            📞 Telepon: {{ $mudikConfig['support']['phone'] }}<br>
+                                            🕐 {{ $mudikConfig['support']['schedule'] }}
                                         </p>
                                       </td>
                                     </tr>
@@ -475,13 +476,13 @@
                             </tr>
                           </tbody>
                         </table>
-                        
+
                       </td>
                     </tr>
                   </table>
                 </td>
               </tr>
-              
+
               <!-- FOOTER SECTION -->
               <tr>
                 <td align="center" valign="top" id="templateFooter">
@@ -515,7 +516,7 @@
                   </table>
                 </td>
               </tr>
-              
+
             </table>
             <!-- END TEMPLATE -->
           </td>

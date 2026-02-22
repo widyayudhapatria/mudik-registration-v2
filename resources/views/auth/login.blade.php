@@ -1,6 +1,6 @@
 @extends('layouts.app')
 
-@section('title', 'Login Admin - Mudik Gratis Lebaran 2026')
+@section('title', 'Mudik Gratis Pemerintah Kab. Tangerang 2026')
 
 @push('styles')
 <style>
@@ -13,7 +13,7 @@
         position: relative;
         overflow: hidden;
     }
-    
+
     .login-container::before {
         content: '';
         position: absolute;
@@ -21,11 +21,11 @@
         left: 0;
         right: 0;
         bottom: 0;
-        background-image: 
+        background-image:
             radial-gradient(circle at 20% 50%, rgba(255,255,255,0.1) 0%, transparent 50%),
             radial-gradient(circle at 80% 80%, rgba(255,255,255,0.08) 0%, transparent 50%);
     }
-    
+
     .login-card {
         background: white;
         border-radius: 24px;
@@ -36,12 +36,12 @@
         position: relative;
         z-index: 1;
     }
-    
+
     .login-logo {
         text-align: center;
         margin-bottom: 40px;
     }
-    
+
     .login-title {
         font-size: 2rem;
         font-weight: 800;
@@ -49,21 +49,21 @@
         text-align: center;
         margin-bottom: 10px;
     }
-    
+
     .login-subtitle {
         text-align: center;
         color: var(--gray-text);
         margin-bottom: 40px;
     }
-    
+
     .form-floating > .form-control {
         border-radius: 12px;
     }
-    
+
     .form-floating > label {
         padding-left: 20px;
     }
-    
+
     @media (max-width: 576px) {
         .login-card {
             margin: 20px;
@@ -81,10 +81,10 @@
                 <i class="bi bi-shield-lock-fill text-white" style="font-size: 2.5rem;"></i>
             </div>
         </div>
-        
+
         <h1 class="login-title heading-font">ADMIN LOGIN</h1>
-        <p class="login-subtitle">Mudik Gratis Lebaran 2026</p>
-        
+        <p class="login-subtitle">Mudik Gratis Pemerintah Kab. Tangerang 2026</p>
+
         @if($errors->any())
         <div class="alert alert-danger alert-dismissible fade show" role="alert">
             <i class="bi bi-exclamation-triangle-fill me-2"></i>
@@ -92,15 +92,15 @@
             <button type="button" class="btn-close" data-bs-dismiss="alert"></button>
         </div>
         @endif
-        
+
         <form method="POST" action="{{ route('auth.login.process') }}">
             @csrf
-            
+
             <div class="form-floating mb-3">
-                <input 
-                    type="email" 
-                    class="form-control @error('email') is-invalid @enderror" 
-                    id="email" 
+                <input
+                    type="email"
+                    class="form-control @error('email') is-invalid @enderror"
+                    id="email"
                     name="email"
                     placeholder="name@example.com"
                     value="{{ old('email') }}"
@@ -111,12 +111,12 @@
                     <i class="bi bi-envelope-fill me-2"></i>Email Address
                 </label>
             </div>
-            
+
             <div class="form-floating mb-3">
-                <input 
-                    type="password" 
-                    class="form-control @error('password') is-invalid @enderror" 
-                    id="password" 
+                <input
+                    type="password"
+                    class="form-control @error('password') is-invalid @enderror"
+                    id="password"
                     name="password"
                     placeholder="Password"
                     required
@@ -125,11 +125,11 @@
                     <i class="bi bi-lock-fill me-2"></i>Password
                 </label>
             </div>
-            
+
             <div class="form-check mb-4">
-                <input 
-                    class="form-check-input" 
-                    type="checkbox" 
+                <input
+                    class="form-check-input"
+                    type="checkbox"
                     id="remember"
                     name="remember"
                 >
@@ -137,14 +137,14 @@
                     Remember me
                 </label>
             </div>
-            
+
             <div class="d-grid">
                 <button type="submit" class="btn btn-primary btn-lg" style="border-radius: 12px;">
                     <i class="bi bi-box-arrow-in-right me-2"></i>Login
                 </button>
             </div>
         </form>
-        
+
         <div class="text-center mt-4">
             <a href="{{ route('public.landing') }}" class="text-decoration-none text-muted">
                 <i class="bi bi-arrow-left me-2"></i>Kembali ke Beranda

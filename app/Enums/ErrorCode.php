@@ -20,6 +20,7 @@ enum ErrorCode: string
     case InvalidNIK = 'INVALID_NIK';
     case InvalidFile = 'INVALID_FILE';
     case InvalidQR = 'INVALID_QR';
+    case InvalidFamilyCount = 'INVALID_FAMILY_COUNT';
     case AlreadyScanned = 'ALREADY_SCANNED';
     case NotValidDate = 'NOT_VALID_DATE';
     case ScanFailed = 'SCAN_FAILED';
@@ -53,6 +54,7 @@ enum ErrorCode: string
             self::InvalidFile => "File yang diupload tidak valid.\nGunakan format JPG, PNG, atau PDF dengan ukuran maksimal 2MB.",
             self::InvalidQR => "QR Code tidak valid.\nMohon periksa kembali QR Code Anda.",
             self::AlreadyScanned => "QR Code sudah pernah digunakan\ndan tidak dapat digunakan lagi.",
+            self::InvalidFamilyCount => "Jumlah peserta tidak boleh lebih banyak dari jumlah keluarga.",
             self::NotValidDate => "QR Code belum atau sudah tidak berlaku.\nQR Code hanya berlaku pada tanggal yang ditentukan.",
             self::ScanFailed => "Scan gagal.\nMohon coba lagi atau hubungi petugas.",
             self::QrNotFound => "QR Code tidak ditemukan.\nPastikan QR Code benar dan coba lagi.",

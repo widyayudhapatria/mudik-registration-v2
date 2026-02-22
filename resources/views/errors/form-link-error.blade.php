@@ -1,5 +1,5 @@
 @extends('layouts.app-v2')
-@section('title', 'Link Tidak Valid - Mudik Gratis Banten')
+@section('title', 'Link Tidak Valid - Mudik Bersama Kabupaten Tangerang 2026')
 
 @push('styles')
 <style>

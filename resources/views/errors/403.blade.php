@@ -4,9 +4,9 @@
         <meta charset="utf-8" />
         <meta name="viewport" content="width=device-width, initial-scale=1.0" />
         <meta name="description" content="Error 403 - Invalid Signature" />
-        <meta name="author" content="Mudik Gratis Banten" />
+        <meta name="author" content="{{ config('mudik.website.name') }}" />
         <link rel="shortcut icon" href="{{ asset('assets/public/images/favicon.ico') }}" />
-        <title>Error 403 - Link Tidak Valid | Mudik Gratis 2026</title>
+        <title>Error 403 - Link Tidak Valid | {{ config('mudik.website.name') }}</title>
         <!-- Google Fonts -->
         <link href="https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,700|Roboto:400,500,700" rel="stylesheet" />
         <!-- Bootstrap core CSS -->

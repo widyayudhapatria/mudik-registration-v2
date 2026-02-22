@@ -7,8 +7,9 @@
     <title>Status Pendaftaran | Mudik Gratis 2026</title>
 
     <link href="https://fonts.googleapis.com/css?family=Quattrocento+Sans:400,700|Roboto:400,500,700" rel="stylesheet" />
-    <link href="{{ asset('css/bootstrap.min.css') }}" rel="stylesheet" />
-    <link href="{{ asset('css/materialdesignicons.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/public/css/bootstrap.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/public/css/materialdesignicons.min.css') }}" rel="stylesheet" />
+    <link href="{{ asset('assets/public/css/mobiriseicons.css') }}" rel="stylesheet" />
 
     <style>
         * { margin: 0; padding: 0; box-sizing: border-box; }
@@ -191,8 +192,8 @@
     $formLink    = $reg->formLink;
     $statusClass = $isScanned ? 'status-scanned' : 'status-approved';
 
-    $departureDate = \Carbon\Carbon::parse(config('mudik.departure_date'));
-    $departureTime = \Carbon\Carbon::parse(config('mudik.departure_time'));
+    $departureDate = \Carbon\Carbon::parse(config('mudik.schedule.departure_date'));
+    $departureTime = \Carbon\Carbon::parse(config('mudik.schedule.departure_time'));
 @endphp
 
 <div class="page-wrapper {{ $statusClass }}">
@@ -298,7 +299,7 @@
                             </div>
                         </div>
                         <div class="seat-badge {{ $badgeClass }}">
-                            <i class="mdi mdi-{{ $isScanned && !$isLap ? 'seat' : 'ticket-confirmation' }} me-1"></i>
+                            <i class="mdi mdi-{{ $isScanned && !$isLap ? 'ticket-account' : 'ticket-confirmation' }} me-1"></i>
                             {{ $badgeLabel }}
                         </div>
                     </div>
@@ -312,10 +313,9 @@
                 <h5><i class="mdi mdi-check-circle me-1"></i> Status: SIAP BERANGKAT!</h5>
                 <p>QR Code Anda telah di-scan dengan sukses ✓</p>
                 <ul>
-                    <li>Berkumpul: <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong> ({{ $departureDate->translatedFormat('d F Y') }})</li>
-                    <li>Lokasi: <strong>{{ config('mudik.departure_location', 'Lapangan Parkir Kantor Pemerintah') }}</strong></li>
-                    <li>Berangkat: <strong>{{ $departureTime->format('H:i') }} WIB</strong></li>
-                    <li>Bawa KTP dan KK asli (semua peserta)</li>
+                    <li>Lokasi: <strong>{{ config('mudik.departure_location') }}</strong></li>
+                    <li>Berangkat: <strong>Setelah proses penukaran selesai</strong></li>
+                    <li>Bawa KTP (semua peserta)</li>
                 </ul>
                 @if ($qrCode->scanned_at)
                     <p class="scan-timestamp">
@@ -330,16 +330,15 @@
                     <li>
                         Tukar QR Code ini dengan tiket pada
                         <strong>
-                            {{ $departureDate->copy()->subDay()->translatedFormat('d F Y') }}
-                            – {{ $departureDate->translatedFormat('d F Y') }}
+                            {{ $departureDate->translatedFormat('d F Y') }}
                         </strong>
                     </li>
-                    <li>Berkumpul pukul <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong></li>
-                    <li>Berangkat pukul <strong>{{ $departureTime->format('H:i') }} WIB</strong></li>
+                    <li>Berkumpul pukul <strong>{{ $departureTime->format('H:i') }} WIB</strong></li>
+                    <li>Berangkat pukul : <strong>Setelah proses penukaran selesai</strong></li>
                 </ul>
                 <p class="note">
                     <i class="mdi mdi-alert-circle me-1"></i>
-                    Wajib membawa <strong>KTP</strong> dan <strong>Kartu Keluarga</strong> saat penukaran tiket.
+                    Wajib membawa <strong>KTP</strong> saat penukaran tiket.
                 </p>
             @endif
         </div>
@@ -389,8 +388,8 @@
     </div>
 </div>
 
-<script src="{{ asset('js/jquery.min.js') }}"></script>
-<script src="{{ asset('js/bootstrap.bundle.min.js') }}"></script>
+<script src="{{ asset('assets/public/js/jquery.min.js') }}"></script>
+<script src="{{ asset('assets/public/js/bootstrap.bundle.min.js') }}"></script>
 
 </body>
 </html>

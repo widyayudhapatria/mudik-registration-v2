@@ -24,8 +24,8 @@ class SubmitEmailAction
         try {
             DB::beginTransaction();
 
-            // Check if email already exists
-            $existingLink = FormLink::where('email', $data->email)->first();
+            // Check if email already exists - last email submission for this email (regardless of status)
+            $existingLink = FormLink::where('email', $data->email)->orderByDesc('id')->lockForUpdate()->first();
 
             // Check if email already has form_link with submitted/approved (sedang direview atau sudah disetujui)
             if ($existingLink && in_array($existingLink->status, [FormLinkStatus::Submitted->value, FormLinkStatus::Approved->value])) {

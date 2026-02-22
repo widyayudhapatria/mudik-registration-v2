@@ -28,15 +28,15 @@ class SubmitRegistrationAction
         try {
             DB::beginTransaction();
 
-            // 1. Lock form link FOR UPDATE
+            // 1. Validate form link (with lock early to prevent race condition)
             $formLink = FormLink::where('id', $formLink->id)
                 ->lockForUpdate()
                 ->first();
 
-            // 2. Validate form link status using action
             ValidateFormLinkAction::run($formLink);
 
-            // 3. Validate destination exists and is active
+
+            // 2. Validate destination exists and is active
             $destination = Destination::where('id', $data->destination_id)
                 ->where('is_active', true)
                 ->first();
@@ -48,10 +48,10 @@ class SubmitRegistrationAction
                 );
             }
 
-            // 4. Check daily quota (with lock) - CRITICAL: Check by destination_id
+            // 3. Atomic - lock quota EARLY and keep lock to prevent race condition
             $quota = DailyQuota::where('destination_id', $data->destination_id)
                 ->where('date', Carbon::today()->toDateString())
-                ->lockForUpdate()
+                ->lockForUpdate()  // 🔒 LOCK ACQUIRED
                 ->first();
 
             if (!$quota) {
@@ -61,41 +61,48 @@ class SubmitRegistrationAction
                 );
             }
 
-            // CRITICAL: Use actual participant count for quota check (not family_count)
-            // family_count should match participant count, but we verify against actual participants
+            // Participant count
             $participantCount = count($data->participants);
 
-            // Double-check: family_count should equal actual participants
-            if ($data->family_count !== $participantCount) {
-                // Auto-correct to actual participant count
-                $data->family_count = $participantCount;
-            }
-
-            if ($quota->remaining_daily < $data->family_count) {
+            // if participant is more than family count
+            if ($participantCount > $data->family_count) {
+                //throw error
                 throw new MudikException(
-                    ErrorCode::DailyQuotaFull,
+                    ErrorCode::InvalidFamilyCount,
                     sprintf(
-                        'Kuota harian tidak mencukupi. Tersisa: %d orang, Yang Diinputkan: %d orang',
-                        $quota->remaining_daily,
+                        'Jumlah peserta (%d) tidak boleh lebih banyak dari jumlah keluarga (%d)',
+                        $participantCount,
                         $data->family_count
                     )
                 );
             }
 
-            // 5. Check duplicates
+            // CRITICAL: CHECK QUOTA - DENGAN LOCK AKTIF
+            if ($quota->remaining_daily < $participantCount) {
+                throw new MudikException(
+                    ErrorCode::DailyQuotaFull,
+                    sprintf(
+                        'Kuota harian tidak mencukupi. Tersisa: %d orang, Yang Diinputkan: %d orang',
+                        $quota->remaining_daily,
+                        $participantCount
+                    )
+                );
+            }
+
+            // 4. Check duplicates
             $this->checkDuplicates($data);
 
-            // 6. Upload KK document
+            // 5. Upload KK document
             $kkPath = $this->uploadKKDocument($data->kk_document);
 
-            // 7. Create registration
+            // 6. Create registration
             $registration = Registration::create([
                 ...$data->toModelArray(),
                 'form_link_id' => $formLink->id,
                 'kk_document_path' => $kkPath,
             ]);
 
-            // 8. Create participants
+            // 7. Create participants
             foreach ($data->getParticipantsArray() as $participantData) {
                 Participant::create([
                     'registration_id' => $registration->id,
@@ -103,17 +110,21 @@ class SubmitRegistrationAction
                 ]);
             }
 
-            // 9. Update form link & quota
+            // 8. Update form link & quota (lock still active on quota)
             $formLink->markAsUsed();
 
-            // CRITICAL: Deduct by family_count (not -1)
-            $quota->incrementUsed($data->family_count);
+            // CRITICAL: DECREMENT QUOTA - MASIH DALAM LOCK
+            // ATOMIC: Check + Decrement dalam satu lock scope
+            $quota->used_daily += $participantCount;
+            $quota->save();
 
-            // 10. Clear quota cache
+            // 9. Clear quota cache
             Cache::forget('destinations:available:' . Carbon::today()->toDateString());
 
+            // 10. All done, commit transaction
             DB::commit();
 
+            // 11. Dispatch email job (after commit)
             SendRegistrationSubmittedEmail::dispatch($registration);
 
             Log::info('Registration submitted successfully', [
@@ -122,6 +133,7 @@ class SubmitRegistrationAction
                 'destination_id' => $data->destination_id,
                 'destination_name' => $destination->name,
                 'family_count' => $data->family_count,
+                'participant_count' => $participantCount,
                 'email' => $formLink->email,
             ]);
 
@@ -150,7 +162,13 @@ class SubmitRegistrationAction
             })
             ->exists()
         ) {
-            throw new MudikException(ErrorCode::DuplicateKK);
+            throw new MudikException(
+                ErrorCode::DuplicateKK,
+                sprintf(
+                    'Nomor Kartu Keluarga (KK) %s sudah terdaftar di sistem.',
+                    $data->kk_number
+                )
+            );
         }
 
         // Check representative NIK (only active registrations with submitted/approved form_link)
@@ -161,11 +179,19 @@ class SubmitRegistrationAction
             })
             ->exists()
         ) {
-            throw new MudikException(ErrorCode::DuplicateNIK);
+            throw new MudikException(
+                ErrorCode::DuplicateNIK,
+                sprintf(
+                    'Nomor KTP perwakilan %s sudah terdaftar di sistem.',
+                    $data->representative_nik
+                )
+            );
         }
 
         // Check all participants NIK/KIA (only active participants with active registration and submitted/approved form_link)
-        foreach ($data->participants as $participant) {
+        $duplicateParticipants = [];
+
+        foreach ($data->participants as $index => $participant) {
             if (Participant::withoutTrashed()
                 ->where('nik_kia', $participant->nik_kia)
                 ->whereHas('registration', function ($query) {
@@ -176,8 +202,31 @@ class SubmitRegistrationAction
                 })
                 ->exists()
             ) {
-                throw new MudikException(ErrorCode::DuplicateKTPKIAParticipant);
+                $duplicateParticipants[] = [
+                    'peserta_number' => $index + 1,
+                    'nik_kia' => $participant->nik_kia,
+                    'full_name' => $participant->full_name,
+                ];
             }
+        }
+
+        if (!empty($duplicateParticipants)) {
+            $errorMessage = 'Nomor KTP/KIA peserta berikut sudah terdaftar di sistem:<br/><br/>';
+            foreach ($duplicateParticipants as $duplicate) {
+                $errorMessage .= sprintf(
+                    '- Peserta %d: %s (NIK/KIA: %s)<br/>',
+                    $duplicate['peserta_number'],
+                    $duplicate['full_name'],
+                    $duplicate['nik_kia']
+                );
+            }
+            $errorMessage .= '<br/>Silakan periksa dan gunakan nomor KTP/KIA yang berbeda.';
+
+            throw new MudikException(
+                ErrorCode::DuplicateKTPKIAParticipant,
+                $errorMessage,
+                ['duplicates' => $duplicateParticipants]
+            );
         }
     }
 

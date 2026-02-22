@@ -13,8 +13,8 @@
     <!-- Logo container-->
     <div>
       <a href="{{ route('public.landing') }}" class="logo text-uppercase">
-        <img src="{{ asset('assets/public/images/285x114.png') }}" alt="" class="logo-light" height="55" />
-        <img src="{{ asset('assets/public/images/285x114.png') }}" alt="" class="logo-dark" height="55" />
+        <img src="{{ asset('assets/public/images/285x114.png') }}" alt="" class="logo-light" height="135" style="height: 135px; margin-top: 10px" />
+        <img src="{{ asset('assets/public/images/285x114x2.png') }}" alt="" class="logo-dark" height="65" style="height: 65px" />
       </a>
     </div>
     <!-- End Logo container-->

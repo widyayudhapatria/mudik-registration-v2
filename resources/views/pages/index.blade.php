@@ -3,6 +3,91 @@
 @section('title', 'Homepage - ' . config('mudik.website.name'))
 @push('styles')
     <style>
+        /* Registration Period Alert */
+        .alert-period {
+            position: fixed;
+            top: 0;
+            left: 0;
+            right: 0;
+            z-index: 9999;
+            padding: 12px 20px;
+            transform: translateY(-100%);
+            animation: slideDown 0.5s ease 0.8s forwards;
+        }
+
+        .alert-period--success {
+            background: linear-gradient(135deg, rgba(26,122,74,0.55), rgba(40,167,69,0.55));
+            backdrop-filter: blur(4px);
+        }
+        .alert-period--warning {
+            background: linear-gradient(135deg, rgba(197,124,0,0.55), rgba(255,193,7,0.55));
+            backdrop-filter: blur(4px);
+        }
+        .alert-period--danger  {
+            background: linear-gradient(135deg, rgba(167,29,42,0.55), rgba(220,53,69,0.55));
+            backdrop-filter: blur(4px);
+        }
+
+        .alert-period__inner {
+            max-width: 900px;
+            margin: 0 auto;
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            color: white;
+        }
+
+        .alert-period--warning .alert-period__inner { color: #1a1a1a; }
+
+        .alert-period__icon { font-size: 1.3rem; flex-shrink: 0; }
+
+        .alert-period__text {
+            flex: 1;
+            display: flex;
+            flex-direction: column;
+            gap: 2px;
+            font-size: 0.9rem;
+        }
+
+        .alert-period__text strong:first-child { font-size: 1rem; }
+
+        .alert-period__close {
+            background: rgba(255,255,255,0.25);
+            border: none;
+            color: inherit;
+            width: 28px;
+            height: 28px;
+            border-radius: 50%;
+            font-size: 1.1rem;
+            cursor: pointer;
+            flex-shrink: 0;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            transition: background 0.2s;
+        }
+
+        .alert-period__close:hover { background: rgba(255,255,255,0.4); }
+
+        .alert-period.hide {
+            animation: slideUp 0.4s ease forwards;
+        }
+
+        @keyframes slideDown {
+            from { transform: translateY(-100%); }
+            to   { transform: translateY(0); }
+        }
+
+        @keyframes slideUp {
+            from { transform: translateY(0); }
+            to   { transform: translateY(-100%); }
+        }
+
+        @media (max-width: 576px) {
+            .alert-period__text { font-size: 0.8rem; }
+            .alert-period__text strong:first-child { font-size: 0.9rem; }
+        }
+
         .back-to-top {
             position: fixed;
             bottom: 30px;
@@ -54,22 +139,53 @@
     ])
 @endsection
 @section('content')
+    {{-- Registration Period Alert --}}
+    @php
+        $regStart = \Carbon\Carbon::parse(config('mudik.registration.start_date'));
+        $regEnd   = \Carbon\Carbon::parse(config('mudik.registration.end_date'));
+        $now      = \Carbon\Carbon::now();
+    @endphp
+
+    @if($now->lt($regStart))
+        <div class="alert-period alert-period--warning" id="registrationAlert">
+            <div class="alert-period__inner">
+                <span class="alert-period__icon">🕐</span>
+                <div class="alert-period__text">
+                    <strong>Pendaftaran Belum Dibuka</strong>
+                    <span>Pendaftaran akan dibuka pada <strong>{{ $regStart->translatedFormat('d F Y, H:i') }} WIB</strong></span>
+                </div>
+                <button class="alert-period__close" onclick="closeAlert()">&times;</button>
+            </div>
+        </div>
+    @elseif($now->gt($regEnd))
+        <div class="alert-period alert-period--danger" id="registrationAlert">
+            <div class="alert-period__inner">
+                <span class="alert-period__icon">🔴</span>
+                <div class="alert-period__text">
+                    <strong>Pendaftaran Telah Ditutup</strong>
+                    <span>Periode pendaftaran telah berakhir pada <strong>{{ $regEnd->translatedFormat('d F Y, H:i') }} WIB</strong></span>
+                </div>
+                <button class="alert-period__close" onclick="closeAlert()">&times;</button>
+            </div>
+        </div>
+    @endif
+
     <!-- Hero Section -->
     @include('components.hero', [
         'sectionId' => 'home',
         'slides' => [
-        [
-            'title' => 'Daftar Sekarang, Tempat Terbatas!',
-            'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga<br>Program Pemerintah untuk Meringankan Beban Masyarakat',
-            'buttonText' => 'Daftar Sekarang !',
-            'buttonLink' => '#registration',
-        ],
-        [
-            'title' => 'Program Mudik Gratis Lebaran 2026',
-            'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi yang Layak<br>Aman, Nyaman, dan Terpercaya',
-            'buttonText' => 'Daftar Sekarang !',
-            'buttonLink' => '#registration',
-        ],
+            [
+                'title' => 'Daftar Sekarang, Tempat Terbatas!',
+                'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga <br/>Program Pemerintah Kabupaten Tangerang untuk Meringankan Beban Masyarakat',
+                'buttonText' => 'Daftar Sekarang !',
+                'buttonLink' => '#registration',
+            ],
+            [
+                'title' => 'Program Mudik Kabupaten Tangerang 2026',
+                'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi mudik yang <br> Layak, Aman, Nyaman, dan Terpercaya',
+                'buttonText' => 'Daftar Sekarang !',
+                'buttonLink' => '#registration',
+            ],
         ]
     ])
 
@@ -302,21 +418,21 @@
                                 Tanggal Keberangkatan:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>30 Mei 2026 08:00 WIB</b>
+                                <b>{{ config('mudik.schedule.departure_date') }} {{ config('mudik.schedule.departure_time') }} WIB</b>
                             </h5>
                             <h5 class="mb-0">
                                 <span class="mdi mdi-map-marker"></span>
                                 Lokasi Keberangkatan:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>Kantor Pemerintah Provinsi Banten</b>
+                                <b>{{ config('mudik.locations.departure_location') }}</b>
                             </h5>
                             <h5 class="mb-0">
                                 <span class="mdi mdi-ticket"></span>
                                 Lokasi Penukaran Tiket:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>Lapangan Parkir Kantor Pemerintah Provinsi Banten</b>
+                                <b>{{ config('mudik.locations.ticket_exchange_location') }}</b>
                             </h5>
                             <h5 class="mb-0">
                                 <span class="mdi mdi-phone"></span>
@@ -342,6 +458,18 @@
 
     @push('scripts')
     <script>
+
+    function closeAlert() {
+        const alert = document.getElementById('registrationAlert');
+        if (!alert) return;
+        alert.classList.add('hide');
+        alert.addEventListener('animationend', () => alert.remove(), { once: true });
+    }
+
+    @if($now->between($regStart, $regEnd))
+        setTimeout(closeAlert, 8000);
+    @endif
+
     (function () {
         const backToTop = document.getElementById('backToTop');
 

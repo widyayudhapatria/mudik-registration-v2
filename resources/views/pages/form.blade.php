@@ -882,9 +882,84 @@
         function handleFormSubmit(e) {
             e.preventDefault();
 
-            // Validate jumlah anggota vs peserta
+            // VALIDATION #1: DESTINATION (PALING AWAL)
+            const destinationId = document.getElementById("destination_id").value;
+            if (!destinationId) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Anda harus memilih kota tujuan terlebih dahulu.",
+                    icon: "warning",
+                    confirmButtonText: "Baik, saya akan memilih.",
+                });
+                return;
+            }
+
+            // VALIDATION #2: FILE UPLOAD
+            const kkDocument = document.getElementById("kk_document");
+            if (!kkDocument) {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Input file dokumen KK tidak ditemukan.",
+                    icon: "error",
+                    confirmButtonText: "Baik, saya mengerti.",
+                });
+                return;
+            }
+
+            // Check file selected first
+            if (!kkDocument.files || kkDocument.files.length === 0) {
+                Swal.fire({
+                    title: "Dokumen KK Belum Dipilih!",
+                    html: `<div class="text-start">
+                        <p class="mb-2">Anda belum mengupload dokumen Kartu Keluarga (KK).</p>
+                        <p class="mb-0"><strong>Silakan upload dokumen KK terlebih dahulu.</strong></p>
+                    </div>`,
+                    icon: "warning",
+                    confirmButtonText: "Baik, saya akan upload.",
+                }).then(() => {
+                    // Scroll to upload area and focus
+                    const uploadArea = document.getElementById("fileUploadArea");
+                    if (uploadArea) {
+                        uploadArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        uploadArea.style.border = '2px solid #dc3545';
+                        setTimeout(() => {
+                            uploadArea.style.border = '';
+                        }, 3000);
+                    }
+                });
+                return;
+            }
+
+            // Then check if file is valid (after upload)
+            if (!isFileValid) {
+                Swal.fire({
+                    title: "File Tidak Valid!",
+                    html: `<div class="text-start">
+                        <p class="mb-2">File yang dipilih tidak melewati validasi:</p>
+                        <ul class="mt-2 mb-2">
+                            <li>Pastikan format file: <strong>JPG, JPEG, atau PNG</strong></li>
+                            <li>Pastikan ukuran file tidak melebihi <strong>5 MB</strong></li>
+                        </ul>
+                        <p class="mb-0"><strong>Silakan pilih file yang sesuai.</strong></p>
+                    </div>`,
+                    icon: "warning",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
+                }).then(() => {
+                    // Clear invalid file
+                    kkDocument.value = '';
+                    document.getElementById("fileInfo").style.display = "none";
+                    const uploadArea = document.getElementById("fileUploadArea");
+                    if (uploadArea) {
+                        uploadArea.classList.remove("border-success");
+                    }
+                });
+                return;
+            }
+
+            // VALIDATION #3: JUMLAH PESERTA
             const jumlahPeserta = document.querySelectorAll(".peserta-form").length;
             const jumlahAnggota = parseInt(document.getElementById("family_count").value);
+            console.log(`Validating form submission: jumlahPeserta=${jumlahPeserta}, jumlahAnggota=${jumlahAnggota}`);
 
             if (jumlahPeserta === 0) {
                 Swal.fire({
@@ -896,9 +971,20 @@
                 return;
             }
 
-            // CRITICAL: Auto-sync family_count with actual peserta count if mismatch
             if (jumlahPeserta !== jumlahAnggota) {
-                document.getElementById("family_count").value = jumlahPeserta;
+                console.log(`Mismatch detected: jumlahPeserta (${jumlahPeserta}) != jumlahAnggota (${jumlahAnggota}). Auto-syncing...`);
+                if (jumlahPeserta > jumlahAnggota) {
+                    Swal.fire({
+                        title: "Peringatan!",
+                        text: `Jumlah peserta tidak boleh melebihi jumlah anggota keluarga. Silakan kurangi jumlah peserta atau sesuaikan jumlah anggota keluarga.`,
+                        icon: "warning",
+                        confirmButtonText: "Baik, saya akan periksa kembali.",
+                    });
+                    return;
+                }
+
+                // CRITICAL: Auto-sync family_count with actual peserta count if mismatch
+                //document.getElementById("family_count").value = jumlahPeserta;
             }
 
             // Validate representative name (min 3 characters)
@@ -982,6 +1068,8 @@
             let pesertaValid = true;
             let hasAnyChildUnder4 = false;
             let allPesertaForms = document.querySelectorAll(".peserta-form");
+            let ktpCollection = [];
+
             allPesertaForms.forEach((form, index) => {
                 const name = form.querySelector('input[name="namaPeserta[]"]').value.trim();
                 const nikKia = form.querySelector('input[name="ktpPeserta[]"]').value.replace(/\D/g, '');
@@ -1009,6 +1097,12 @@
                     return false;
                 }
 
+                // Collect KTP for duplicate check
+                ktpCollection.push({
+                    ktp: nikKia,
+                    index: index + 1
+                });
+
                 if (birthDateInput && birthDateInput.value) {
                     const age = calculateAge(birthDateInput.value);
                     if (age !== null && age < 4) {
@@ -1018,6 +1112,40 @@
             });
 
             if (!pesertaValid) return;
+
+            // VALIDATION: CHECK DUPLICATE KTP AMONG PARTICIPANTS
+            const ktpSet = new Set();
+            let duplicateFound = false;
+            let duplicateKtp = '';
+            let duplicateIndexes = [];
+
+            for (let item of ktpCollection) {
+                if (ktpSet.has(item.ktp)) {
+                    duplicateFound = true;
+                    duplicateKtp = item.ktp;
+                    // Find all indexes with this KTP
+                    duplicateIndexes = ktpCollection
+                        .filter(k => k.ktp === item.ktp)
+                        .map(k => k.index);
+                    break;
+                }
+                ktpSet.add(item.ktp);
+            }
+
+            if (duplicateFound) {
+                Swal.fire({
+                    title: "Data Tidak Valid!",
+                    html: `<div class="text-start">
+                        <p class="mb-2"><strong>Nomor KTP Peserta tidak boleh sama diantara yang lain.</strong></p>
+                        <p class="mb-0">Nomor KTP: <strong>${duplicateKtp}</strong></p>
+                        <p class="mb-0">Ditemukan pada Peserta: <strong>${duplicateIndexes.join(', ')}</strong></p>
+                        <p class="mt-3">Silakan periksa dan perbaiki nomor KTP yang duplikat.</p>
+                    </div>`,
+                    icon: "error",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
+                });
+                return;
+            }
 
             // If any child under 4 but checkbox not checked, reject submission
             const hasChildCheckbox = document.getElementById("has_child_under_4");
@@ -1035,34 +1163,7 @@
                 return;
             }
 
-            // Validate file upload
-            const kkDocument = document.getElementById("kk_document");
-            if (!kkDocument.files || kkDocument.files.length === 0) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    text: "Anda harus upload dokumen Kartu Keluarga (KK).",
-                    icon: "warning",
-                    confirmButtonText: "Baik, saya akan periksa kembali.",
-                });
-                return;
-            }
-
-            if (!isFileValid) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    html: `<div class="text-start">
-                        <p>File yang dipilih tidak melewati validasi:</p>
-                        <ul class="mt-2">
-                            <li>Pastikan format file: <strong>JPG, JPEG, atau PNG</strong></li>
-                            <li>Pastikan ukuran file tidak melebihi <strong>5 MB</strong></li>
-                        </ul>
-                    </div>`,
-                    icon: "warning",
-                    confirmButtonText: "Baik, saya akan periksa kembali.",
-                });
-                return;
-            }
-
+            // ALL VALIDATIONS PASSED - PROCEED WITH SUBMISSION
             // Show loading on button submit
             const submitBtn = document.getElementById("submitFormBtn");
             const btnText = submitBtn.querySelector(".btn-text");
@@ -1077,19 +1178,6 @@
             // Add CSRF token
             const csrfToken = document.querySelector('input[name="_token"]').value;
             formData.append('_token', csrfToken);
-
-            // Add destination_id (CRITICAL - required for new flow)
-            const destinationId = document.getElementById("destination_id").value;
-            if (!destinationId) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    text: "Anda harus memilih kota tujuan terlebih dahulu.",
-                    icon: "warning",
-                    confirmButtonText: "Baik, saya akan memilih.",
-                });
-                resetSubmitButton();
-                return;
-            }
             formData.append("destination_id", destinationId);
 
             // Add representative data with converted date
@@ -1165,13 +1253,22 @@
                         errorMessage += '<div class="text-start mt-2">';
 
                         if (data.errors) {
+                            // Handle validation errors
                             for (let field in data.errors) {
                                 data.errors[field].forEach(err => {
                                     errorMessage += `<p class="mb-0 fw-bolder">- ${err}</p>`;
                                 });
                             }
-                        } else {
-                            errorMessage += `<p class="mb-0 fw-bolder">- ${data.message}</p>`;
+                        } else if (data.message) {
+                            // Handle custom error messages (may contain HTML)
+                            // Check if message contains HTML tags
+                            if (/<[^>]*>/.test(data.message)) {
+                                // Message contains HTML, display as is
+                                errorMessage += `<p class="mb-2 fw-bolder">${data.message}</p>`;
+                            } else {
+                                // Plain text message
+                                errorMessage += `<p class="mb-0 fw-bolder">- ${data.message}</p>`;
+                            }
                         }
                         errorMessage +=
                             '</div><br/>Mohon periksa kembali data dan pastikan file yang diunggah sesuai ketentuan.';
