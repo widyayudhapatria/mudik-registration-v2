@@ -882,7 +882,19 @@
         function handleFormSubmit(e) {
             e.preventDefault();
 
-            // Check Validation for file upload first
+            // VALIDATION #1: DESTINATION (PALING AWAL)
+            const destinationId = document.getElementById("destination_id").value;
+            if (!destinationId) {
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: "Anda harus memilih kota tujuan terlebih dahulu.",
+                    icon: "warning",
+                    confirmButtonText: "Baik, saya akan memilih.",
+                });
+                return;
+            }
+
+            // VALIDATION #2: FILE UPLOAD
             const kkDocument = document.getElementById("kk_document");
             if (!kkDocument) {
                 Swal.fire({
@@ -944,7 +956,7 @@
                 return;
             }
 
-            // Validate jumlah anggota vs peserta
+            // VALIDATION #3: JUMLAH PESERTA
             const jumlahPeserta = document.querySelectorAll(".peserta-form").length;
             const jumlahAnggota = parseInt(document.getElementById("family_count").value);
             console.log(`Validating form submission: jumlahPeserta=${jumlahPeserta}, jumlahAnggota=${jumlahAnggota}`);
@@ -1056,6 +1068,8 @@
             let pesertaValid = true;
             let hasAnyChildUnder4 = false;
             let allPesertaForms = document.querySelectorAll(".peserta-form");
+            let ktpCollection = [];
+
             allPesertaForms.forEach((form, index) => {
                 const name = form.querySelector('input[name="namaPeserta[]"]').value.trim();
                 const nikKia = form.querySelector('input[name="ktpPeserta[]"]').value.replace(/\D/g, '');
@@ -1083,6 +1097,12 @@
                     return false;
                 }
 
+                // Collect KTP for duplicate check
+                ktpCollection.push({
+                    ktp: nikKia,
+                    index: index + 1
+                });
+
                 if (birthDateInput && birthDateInput.value) {
                     const age = calculateAge(birthDateInput.value);
                     if (age !== null && age < 4) {
@@ -1092,6 +1112,40 @@
             });
 
             if (!pesertaValid) return;
+
+            // VALIDATION: CHECK DUPLICATE KTP AMONG PARTICIPANTS
+            const ktpSet = new Set();
+            let duplicateFound = false;
+            let duplicateKtp = '';
+            let duplicateIndexes = [];
+
+            for (let item of ktpCollection) {
+                if (ktpSet.has(item.ktp)) {
+                    duplicateFound = true;
+                    duplicateKtp = item.ktp;
+                    // Find all indexes with this KTP
+                    duplicateIndexes = ktpCollection
+                        .filter(k => k.ktp === item.ktp)
+                        .map(k => k.index);
+                    break;
+                }
+                ktpSet.add(item.ktp);
+            }
+
+            if (duplicateFound) {
+                Swal.fire({
+                    title: "Data Tidak Valid!",
+                    html: `<div class="text-start">
+                        <p class="mb-2"><strong>Nomor KTP Peserta tidak boleh sama diantara yang lain.</strong></p>
+                        <p class="mb-0">Nomor KTP: <strong>${duplicateKtp}</strong></p>
+                        <p class="mb-0">Ditemukan pada Peserta: <strong>${duplicateIndexes.join(', ')}</strong></p>
+                        <p class="mt-3">Silakan periksa dan perbaiki nomor KTP yang duplikat.</p>
+                    </div>`,
+                    icon: "error",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
+                });
+                return;
+            }
 
             // If any child under 4 but checkbox not checked, reject submission
             const hasChildCheckbox = document.getElementById("has_child_under_4");
@@ -1109,6 +1163,7 @@
                 return;
             }
 
+            // ALL VALIDATIONS PASSED - PROCEED WITH SUBMISSION
             // Show loading on button submit
             const submitBtn = document.getElementById("submitFormBtn");
             const btnText = submitBtn.querySelector(".btn-text");
@@ -1123,19 +1178,6 @@
             // Add CSRF token
             const csrfToken = document.querySelector('input[name="_token"]').value;
             formData.append('_token', csrfToken);
-
-            // Add destination_id (CRITICAL - required for new flow)
-            const destinationId = document.getElementById("destination_id").value;
-            if (!destinationId) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    text: "Anda harus memilih kota tujuan terlebih dahulu.",
-                    icon: "warning",
-                    confirmButtonText: "Baik, saya akan memilih.",
-                });
-                resetSubmitButton();
-                return;
-            }
             formData.append("destination_id", destinationId);
 
             // Add representative data with converted date
@@ -1211,13 +1253,22 @@
                         errorMessage += '<div class="text-start mt-2">';
 
                         if (data.errors) {
+                            // Handle validation errors
                             for (let field in data.errors) {
                                 data.errors[field].forEach(err => {
                                     errorMessage += `<p class="mb-0 fw-bolder">- ${err}</p>`;
                                 });
                             }
-                        } else {
-                            errorMessage += `<p class="mb-0 fw-bolder">- ${data.message}</p>`;
+                        } else if (data.message) {
+                            // Handle custom error messages (may contain HTML)
+                            // Check if message contains HTML tags
+                            if (/<[^>]*>/.test(data.message)) {
+                                // Message contains HTML, display as is
+                                errorMessage += `<p class="mb-2 fw-bolder">${data.message}</p>`;
+                            } else {
+                                // Plain text message
+                                errorMessage += `<p class="mb-0 fw-bolder">- ${data.message}</p>`;
+                            }
                         }
                         errorMessage +=
                             '</div><br/>Mohon periksa kembali data dan pastikan file yang diunggah sesuai ketentuan.';
