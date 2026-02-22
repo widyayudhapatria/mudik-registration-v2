@@ -51,6 +51,7 @@ class SendSeatAllocationEmailJob implements ShouldQueue
      */
     public function handle(QrCodeService $qrCodeService): void
     {
+        $this->seatAllocations->load('destination');
         $email = $this->registration->formLink->email;
         $subject = '🎫 E-Ticket Mudik Gratis 2026 - ' . $this->registration->destination->name;
 

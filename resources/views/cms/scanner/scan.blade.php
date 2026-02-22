@@ -145,8 +145,8 @@
                                     <span class="badge bg-success">{{ $seat->seat_code }}</span>
                                 @endif
                             </td>
-                            <td>{{ $seat->bus_number ?? '-' }}</td>
-                            <td>{{ $seat->seat_number ?? '-' }}</td>
+                            <td>{{ $seat->bus_name }}</td>
+                            <td>{{ $seat->seat_label }}</td>
                         </tr>
                         @endforeach
                     </tbody>

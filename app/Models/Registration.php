@@ -92,7 +92,7 @@ class Registration extends Model
      */
     public function seatAllocations(): HasMany
     {
-        return $this->hasMany(SeatAllocation::class);
+        return $this->hasMany(SeatAllocation::class)->with('destination');
     }
 
     /**

@@ -281,7 +281,7 @@
                             $badgeClass = $isLap ? 'lap' : 'scanned';
                             $badgeLabel = $isLap
                                 ? 'Dipangku'
-                                : ($seat ? $seat->seat_code : '-');
+                                : ($seat ? $seat->bus_name . ' / ' . $seat->seat_label : '-');
                         } else {
                             $badgeClass = $isLap ? 'lap' : 'reserved';
                             $badgeLabel = $isLap ? 'Dipangku' : 'Reserved';

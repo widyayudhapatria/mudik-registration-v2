@@ -75,4 +75,16 @@ class SeatAllocation extends Model
     {
         return $this->seat_code === 'NO-SEAT';
     }
+
+    public function getBusNameAttribute(): string
+    {
+        if ($this->isNoSeat()) return '-';
+        return $this->destination->code . '-' . $this->bus_number;
+    }
+
+    public function getSeatLabelAttribute(): string
+    {
+        if ($this->isNoSeat()) return '-';
+        return 'Kursi ' . $this->seat_number;
+    }
 }
