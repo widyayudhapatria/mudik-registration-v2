@@ -487,8 +487,7 @@
                                                                             <ul style="margin: 0; padding-left: 20px;">
                                                                                 <li style="margin-bottom: 10px;">QR Code ini (cetak atau tunjukkan di smartphone)</li>
                                                                                 <li style="margin-bottom: 10px;">KTP Asli perwakilan <strong>{{ strtoupper($registration->representative_name) }}</strong></li>
-                                                                                <li style="margin-bottom: 10px;">Kartu Keluarga (KK) Asli</li>
-                                                                                <li style="margin-bottom: 10px;">Dokumen pendukung lainnya jika diminta</li>
+                                                                                <li style="margin-bottom: 10px;">Dokumen pendukung lainnya jika diminta (KTP Peserta Mudik)</li>
                                                                             </ul>
                                                                         </td>
                                                                     </tr>
