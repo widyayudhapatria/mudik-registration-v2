@@ -2,16 +2,16 @@
     'sectionId' => 'home',
     'slides' => [
         [
-            'title' => 'Daftar Sekarang, Tempat Terbatas!',
-            'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga<br>Program Pemerintah Kabupaten Tangerang<br/> untuk Meringankan Beban Masyarakat',
-            'buttonText' => 'Daftar Sekarang !',
-            'buttonLink' => '#registration',
-        ],
-        [
-            'title' => 'Program Mudik Kabupaten Tangerang 2026',
-            'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi mudik yang Layak<br>Aman, Nyaman, dan Terpercaya',
-            'buttonText' => 'Daftar Sekarang !',
-            'buttonLink' => '#registration',
+                'title' => 'Daftar Sekarang, Tempat Terbatas!',
+                'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga <br/>Program Pemerintah Kabupaten Tangerang untuk Meringankan Beban Masyarakat',
+                'buttonText' => 'Daftar Sekarang !',
+                'buttonLink' => '#registration',
+            ],
+            [
+                'title' => 'Program Mudik Kabupaten Tangerang 2026',
+                'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi mudik yang <br> Layak, Aman, Nyaman, dan Terpercaya',
+                'buttonText' => 'Daftar Sekarang !',
+                'buttonLink' => '#registration',
         ],
     ]
 ])

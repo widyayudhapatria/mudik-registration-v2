@@ -168,17 +168,6 @@
                 <button class="alert-period__close" onclick="closeAlert()">&times;</button>
             </div>
         </div>
-    @else
-        <div class="alert-period alert-period--success" id="registrationAlert">
-            <div class="alert-period__inner">
-                <span class="alert-period__icon">🟢</span>
-                <div class="alert-period__text">
-                    <strong>Pendaftaran Sedang Dibuka</strong>
-                    <span>Daftarkan diri Anda sebelum <strong>{{ $regEnd->translatedFormat('d F Y, H:i') }} WIB</strong></span>
-                </div>
-                <button class="alert-period__close" onclick="closeAlert()">&times;</button>
-            </div>
-        </div>
     @endif
 
     <!-- Hero Section -->
@@ -187,13 +176,13 @@
         'slides' => [
             [
                 'title' => 'Daftar Sekarang, Tempat Terbatas!',
-                'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga<br>Program Pemerintah Kabupaten Tangerang<br/> untuk Meringankan Beban Masyarakat',
+                'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga <br/>Program Pemerintah Kabupaten Tangerang untuk Meringankan Beban Masyarakat',
                 'buttonText' => 'Daftar Sekarang !',
                 'buttonLink' => '#registration',
             ],
             [
                 'title' => 'Program Mudik Kabupaten Tangerang 2026',
-                'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi mudik yang Layak<br>Aman, Nyaman, dan Terpercaya',
+                'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi mudik yang <br> Layak, Aman, Nyaman, dan Terpercaya',
                 'buttonText' => 'Daftar Sekarang !',
                 'buttonLink' => '#registration',
             ],
