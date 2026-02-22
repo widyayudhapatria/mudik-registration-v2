@@ -25,11 +25,11 @@ Route::prefix('public')->name('public.')->group(function () {
         ->name('submit-email');
 
     Route::get('/register/{token}', [RegistrationController::class, 'show'])
-        ->middleware(['signed', 'form.link.valid', 'quota.available'])
+        ->middleware(['signed.form', 'form.link.valid', 'quota.available'])
         ->name('registration.form');
 
     Route::post('/register/{token}', [RegistrationController::class, 'submit'])
-        ->middleware(['form.link.valid', 'quota.available'])
+        ->middleware(['signed.form', 'form.link.valid', 'quota.available'])
         ->name('registration.submit');
 });
 
