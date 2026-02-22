@@ -67,7 +67,7 @@
                 <div class="col-md-6 mb-3">
                     <strong>Status:</strong><br>
                     <span class="badge bg-{{ $qrCode->registration->status === 'approved' ? 'success' : 'warning' }}">
-                        {{ ucfirst($qrCode->registration->status) }}
+                        {{ ucfirst($qrCode->registration->getStatus()) }}
                     </span>
                 </div>
             </div>
@@ -113,6 +113,48 @@
             </div>
         </div>
     </div>
+
+    <!-- Seat Allocations (hanya tampil jika sudah di-scan) -->
+    @if($qrCode->isScanned() && $qrCode->registration->seatAllocations->isNotEmpty())
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-grid-3x3-gap me-2"></i>
+                Alokasi Kursi
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nama Peserta</th>
+                            <th>Kode Kursi</th>
+                            <th>Bus</th>
+                            <th>Nomor Kursi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($qrCode->registration->seatAllocations as $seat)
+                        <tr>
+                            <td>{{ $seat->participant->full_name }}</td>
+                            <td>
+                                @if($seat->isNoSeat())
+                                    <span class="badge bg-info">Dipangku</span>
+                                @else
+                                    <span class="badge bg-success">{{ $seat->seat_code }}</span>
+                                @endif
+                            </td>
+                            <td>{{ $seat->bus_number ?? '-' }}</td>
+                            <td>{{ $seat->seat_number ?? '-' }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- QR Info -->
     <div class="card mb-4 shadow-sm">
