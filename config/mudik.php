@@ -48,7 +48,7 @@ return [
     */
     'email' => [
         'from_address' => env('MAIL_FROM_ADDRESS', 'noreply@mudiklebaran.id'),
-        'from_name' => env('MAIL_FROM_NAME', 'Mudik Bersama Kabupaten Banten 2026'),
+        'from_name' => env('MAIL_FROM_NAME', 'Mudik Bersama Kabupaten Tangerang 2026'),
         'max_retry' => 3,
     ],
 
@@ -76,8 +76,8 @@ return [
     |--------------------------------------------------------------------------
     */
     'website' => [
-        'name' => env('APP_NAME', 'Mudik Bersama Kabupaten Banten 2026'),
-        'tagline' => env('APP_TAGLINE', 'Platform Registrasi Mudik Bersama Kabupaten Banten 2026'),
+        'name' => env('APP_NAME', 'Mudik Gratis Bersama Pemerintah Kabupaten Tangerang 2026'),
+        'tagline' => env('APP_TAGLINE', 'Platform Registrasi Mudik Bersama Pemerintah Kabupaten Tangerang 2026 | MUDIK AMAN BERBAGI HARAPAN'),
     ],
 
     /*
@@ -93,22 +93,29 @@ return [
 
     /*
     |--------------------------------------------------------------------------
-    | Business Rules & Schedule
+    | Departure Days Configuration & Ticketing & Schedule
     |--------------------------------------------------------------------------
     */
     'schedule' => [
-        'qr_code_valid_from' => env('QR_CODE_VALID_FROM', '2026-03-01 10:00:00'),
-        'qr_code_valid_until' => env('QR_CODE_VALID_UNTIL', '2026-03-01 23:00:00'),
-        'ticket_exchange' => env('TICKET_EXCHANGE_SCHEDULE', 'Tanggal 1-5 April 2026'),
+        'departure_date' => env('DEPARTURE_DATE', '2026-03-18'),
+        'departure_time' => env('DEPARTURE_TIME', '08:00'),
+        'qr_code_valid_from' => env('QR_CODE_VALID_FROM', '2026-03-18 00:00:00'),
+        'qr_code_valid_until' => env('QR_CODE_VALID_UNTIL', '2026-03-18 23:59:59'),
+        'ticket_exchange_date' => env('TICKET_EXCHANGE_DATE', '18 Maret 2026'),
+        'ticket_exchange_time' => env('TICKET_EXCHANGE_TIME', '08:00 - 12:00 WIB'),
     ],
 
     /*
     |--------------------------------------------------------------------------
-    | Departure Days Configuration
+    | Location Configuration
     |--------------------------------------------------------------------------
     */
-    'departure_date' => '2026-05-30',
-    'departure_time' => '08:00',
+    'locations' => [
+        'departure_location' => env('DEPARTURE_LOCATION', 'Kantor Pusat Pemerintahan Kabupaten Tangerang'),
+        'ticket_exchange_location' => env('TICKET_EXCHANGE_LOCATION', 'Lapangan Pusat Pemerintahan Kabupaten Tangerang - (GSG Tigaraksa)'),
+        'address_location' => env('ADDRESS_LOCATION', 'Jl. H. Somawinata No.1, Kadu Agung, Kec. Tigaraksa, Kabupaten Tangerang, Banten'),
+    ],
+
 
     /*
     |--------------------------------------------------------------------------
@@ -116,7 +123,7 @@ return [
     |--------------------------------------------------------------------------
     */
     'registration' => [
-        'start_date' => env('REGISTRATION_START_DATE', '2025-02-21 00:00:00'),
-        'end_date'   => env('REGISTRATION_END_DATE', '2025-03-21 23:59:59'),
+        'start_date' => env('REGISTRATION_START_DATE', '2025-02-22 00:00:00'),
+        'end_date'   => env('REGISTRATION_END_DATE', '2025-03-17 23:59:59'),
     ],
 ];

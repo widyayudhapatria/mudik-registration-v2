@@ -257,7 +257,8 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: left;">
-                                                                            <img align="left" alt="Mudik Gratis 2026" src="https://i.postimg.cc/JhrmSNq3/285x114.png" height="65" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 65px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;">
+                                                                            <img src="{{ asset('assets/public/images/logo-kabupaten-tangerang.png') }}" height="65" alt="Logo Kabupaten Tangerang" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 65px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;"" />
+                                                                            <img src="{{ asset('assets/public/images/logo-mudik.png') }}" height="70" alt="Logo Mudik Gratis Pemerintah Kabupaten Tangerang 2026" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 65px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;"" />
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -508,10 +509,10 @@
                                                                         <td valign="top" class="mcnTextContent" style="padding: 0px 18px 9px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
                                                                             <h4 style="color: #f58514; margin-bottom: 10px; font-size: 18px; font-weight: bold;">INFORMASI PENUKARAN TIKET :</h4>
                                                                             <ul style="margin: 0; padding-left: 20px;">
-                                                                                <li style="margin-bottom: 10px;"><strong>Tanggal:</strong> 29 - 30 Mei 2026</li>
-                                                                                <li style="margin-bottom: 10px;"><strong>Waktu: 11:00 - 17:00 WIB</strong></li>
-                                                                                <li style="margin-bottom: 10px;"><strong>Lokasi:</strong> Lapangan Parkir Kantor Pemerintah Provinsi Banten</li>
-                                                                                <li style="margin-bottom: 10px;"><strong>Alamat:</strong> Sukajaya, Curug, Serang City, Banten 42171</li>
+                                                                                <li style="margin-bottom: 10px;"><strong>Tanggal:</strong> {{ $mudikConfig['schedule']['ticket_exchange_date'] }}</li>
+                                                                                <li style="margin-bottom: 10px;"><strong>Waktu:</strong> {{ $mudikConfig['schedule']['ticket_exchange_time'] }}</li>
+                                                                                <li style="margin-bottom: 10px;"><strong>Lokasi:</strong> {{ $mudikConfig['locations']['ticket_exchange_location'] }}</li>
+                                                                                <li style="margin-bottom: 10px;"><strong>Alamat:</strong> {{ $mudikConfig['locations']['address_location'] }}</li>
                                                                             </ul>
                                                                         </td>
                                                                     </tr>

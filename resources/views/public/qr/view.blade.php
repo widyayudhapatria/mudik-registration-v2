@@ -191,8 +191,8 @@
     $formLink    = $reg->formLink;
     $statusClass = $isScanned ? 'status-scanned' : 'status-approved';
 
-    $departureDate = \Carbon\Carbon::parse(config('mudik.departure_date'));
-    $departureTime = \Carbon\Carbon::parse(config('mudik.departure_time'));
+    $departureDate = \Carbon\Carbon::parse(config('mudik.schedule.departure_date'));
+    $departureTime = \Carbon\Carbon::parse(config('mudik.schedule.departure_time'));
 @endphp
 
 <div class="page-wrapper {{ $statusClass }}">
@@ -313,9 +313,9 @@
                 <p>QR Code Anda telah di-scan dengan sukses ✓</p>
                 <ul>
                     <li>Berkumpul: <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong> ({{ $departureDate->translatedFormat('d F Y') }})</li>
-                    <li>Lokasi: <strong>{{ config('mudik.departure_location', 'Lapangan Parkir Kantor Pemerintah') }}</strong></li>
-                    <li>Berangkat: <strong>{{ $departureTime->format('H:i') }} WIB</strong></li>
-                    <li>Bawa KTP dan KK asli (semua peserta)</li>
+                    <li>Lokasi: <strong>{{ config('mudik.departure_location') }}</strong></li>
+                    <li>Berangkat: <strong>Setelah proses penukaran selesai</strong></li>
+                    <li>Bawa KTP (semua peserta)</li>
                 </ul>
                 @if ($qrCode->scanned_at)
                     <p class="scan-timestamp">
@@ -335,11 +335,11 @@
                         </strong>
                     </li>
                     <li>Berkumpul pukul <strong>{{ $departureTime->copy()->subHour()->format('H:i') }} WIB</strong></li>
-                    <li>Berangkat pukul <strong>{{ $departureTime->format('H:i') }} WIB</strong></li>
+                    <li>Berangkat pukul : <strong>Setelah proses penukaran selesai</strong></li>
                 </ul>
                 <p class="note">
                     <i class="mdi mdi-alert-circle me-1"></i>
-                    Wajib membawa <strong>KTP</strong> dan <strong>Kartu Keluarga</strong> saat penukaran tiket.
+                    Wajib membawa <strong>KTP</strong> saat penukaran tiket.
                 </p>
             @endif
         </div>

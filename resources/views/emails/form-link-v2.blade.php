@@ -307,23 +307,8 @@
                                                                     <tbody>
                                                                         <tr>
                                                                             <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: left">
-                                                                                <img
-                                                                                    align="left"
-                                                                                    alt="Mudik Gratis 2026"
-                                                                                    src="https://i.postimg.cc/JhrmSNq3/285x114.png"
-                                                                                    height="65"
-                                                                                    style="
-                                                                                    max-width: 285px;
-                                                                                    padding-bottom: 0;
-                                                                                    display: inline !important;
-                                                                                    vertical-align: bottom;
-                                                                                    border: 0;
-                                                                                    height: 65px;
-                                                                                    outline: none;
-                                                                                    text-decoration: none;
-                                                                                    -ms-interpolation-mode: bicubic;
-                                                                                    "
-                                                                                    />
+                                                                                <img src="{{ asset('assets/public/images/logo-kabupaten-tangerang.png') }}" height="65" alt="Logo Kabupaten Tangerang" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 65px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;"" />
+                                                                                <img src="{{ asset('assets/public/images/logo-mudik.png') }}" height="70" alt="Logo Mudik Gratis Pemerintah Kabupaten Tangerang 2026" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 65px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;"" />
                                                                             </td>
                                                                         </tr>
                                                                     </tbody>

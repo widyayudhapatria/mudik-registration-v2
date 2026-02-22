@@ -19,11 +19,11 @@
             background: linear-gradient(135deg, rgba(26,122,74,0.55), rgba(40,167,69,0.55));
             backdrop-filter: blur(4px);
         }
-        .alert-period--warning { 
+        .alert-period--warning {
             background: linear-gradient(135deg, rgba(197,124,0,0.55), rgba(255,193,7,0.55));
             backdrop-filter: blur(4px);
         }
-        .alert-period--danger  { 
+        .alert-period--danger  {
             background: linear-gradient(135deg, rgba(167,29,42,0.55), rgba(220,53,69,0.55));
             backdrop-filter: blur(4px);
         }
@@ -185,18 +185,18 @@
     @include('components.hero', [
         'sectionId' => 'home',
         'slides' => [
-        [
-            'title' => 'Daftar Sekarang, Tempat Terbatas!',
-            'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga<br>Program Pemerintah untuk Meringankan Beban Masyarakat',
-            'buttonText' => 'Daftar Sekarang !',
-            'buttonLink' => '#registration',
-        ],
-        [
-            'title' => 'Program Mudik Gratis Lebaran 2026',
-            'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi yang Layak<br>Aman, Nyaman, dan Terpercaya',
-            'buttonText' => 'Daftar Sekarang !',
-            'buttonLink' => '#registration',
-        ],
+            [
+                'title' => 'Daftar Sekarang, Tempat Terbatas!',
+                'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga<br>Program Pemerintah Kabupaten Tangerang<br/> untuk Meringankan Beban Masyarakat',
+                'buttonText' => 'Daftar Sekarang !',
+                'buttonLink' => '#registration',
+            ],
+            [
+                'title' => 'Program Mudik Kabupaten Tangerang 2026',
+                'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi mudik yang Layak<br>Aman, Nyaman, dan Terpercaya',
+                'buttonText' => 'Daftar Sekarang !',
+                'buttonLink' => '#registration',
+            ],
         ]
     ])
 
@@ -429,21 +429,21 @@
                                 Tanggal Keberangkatan:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>30 Mei 2026 08:00 WIB</b>
+                                <b>{{ config('mudik.schedule.departure_date') }} {{ config('mudik.schedule.departure_time') }} WIB</b>
                             </h5>
                             <h5 class="mb-0">
                                 <span class="mdi mdi-map-marker"></span>
                                 Lokasi Keberangkatan:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>Kantor Pemerintah Provinsi Banten</b>
+                                <b>{{ config('mudik.locations.departure_location') }}</b>
                             </h5>
                             <h5 class="mb-0">
                                 <span class="mdi mdi-ticket"></span>
                                 Lokasi Penukaran Tiket:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>Lapangan Parkir Kantor Pemerintah Provinsi Banten</b>
+                                <b>{{ config('mudik.locations.ticket_exchange_location') }}</b>
                             </h5>
                             <h5 class="mb-0">
                                 <span class="mdi mdi-phone"></span>

@@ -17,7 +17,7 @@ class CheckRegistrationPeriod
         if ($now->lt($start) || $now->gt($end)) {
             $message = $now->lt($start)
                 ? "Pendaftaran belum dibuka. Pendaftaran dibuka mulai {$start->translatedFormat('d F Y H:i')} WIB."
-                : "Pendaftaran telah ditutup pada {$end->translatedFormat('d F Y H:i')} WIB.";
+                : "Pendaftaran telah selesai, pendaftaran berakhir pada {$end->translatedFormat('d F Y H:i')} WIB.";
 
             if ($request->expectsJson()) {
                 return response()->json([

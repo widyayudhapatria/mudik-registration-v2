@@ -3,13 +3,13 @@
     'slides' => [
         [
             'title' => 'Daftar Sekarang, Tempat Terbatas!',
-            'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga<br>Program Pemerintah untuk Meringankan Beban Masyarakat',
+            'subtitle' => 'Wujudkan Impian Mudik Bersama Keluarga<br>Program Pemerintah Kabupaten Tangerang<br/> untuk Meringankan Beban Masyarakat',
             'buttonText' => 'Daftar Sekarang !',
             'buttonLink' => '#registration',
         ],
         [
-            'title' => 'Program Mudik Gratis Lebaran 2026',
-            'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi yang Layak<br>Aman, Nyaman, dan Terpercaya',
+            'title' => 'Program Mudik Kabupaten Tangerang 2026',
+            'subtitle' => 'Komitmen Pemerintah dalam Memberikan Layanan Transportasi mudik yang Layak<br>Aman, Nyaman, dan Terpercaya',
             'buttonText' => 'Daftar Sekarang !',
             'buttonLink' => '#registration',
         ],
@@ -24,6 +24,10 @@
       <div class="container">
         <div class="row justify-content-center">
           <div class="col-lg-10 text-center">
+            <div class="image-logo-mudik d-block d-md-none text-center position-absolute start-50 translate-middle" style="top: 35%; z-index: 3">
+                <img src="{{ asset('assets/public/images/285x114.png') }}" alt="" class="logo-light" height="240" style="height: 240px; margin-bottom: 30px" />
+            </div>
+            <div class="d-block d-md-none" style="height: 180px"></div>
             <div class="main-slider">
               <ul class="slides">
                 @foreach($slides as $slide)
