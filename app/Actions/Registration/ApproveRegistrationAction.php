@@ -28,6 +28,18 @@ class ApproveRegistrationAction
         try {
             DB::beginTransaction();
 
+            // CRITICAL: Lock registration FIRST to prevent double-approve -- lock held until commit
+            $registration = Registration::where('id', $registration->id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$registration) {
+                throw new MudikException(
+                    ErrorCode::ServerError,
+                    'Error: Registrasi id ' . $registration->id . ' tidak ditemukan'
+                );
+            }
+
             // Check if already processed
             if ($registration->isApproved() || $registration->isRejected()) {
                 throw new MudikException(
@@ -37,18 +49,33 @@ class ApproveRegistrationAction
             }
 
             // CRITICAL: Lock destination and validate remaining quota
-            $destination = Destination::lockForUpdate()
-                ->findOrFail($registration->destination_id);
+            $destination = Destination::where('id', $registration->destination_id)
+                ->lockForUpdate()
+                ->first();
 
-            // Validate: destination remaining quota must be >= family_count
-            if ($destination->remaining_quota < $registration->family_count) {
+            if (!$destination) {
+                throw new MudikException(
+                    ErrorCode::ServerError,
+                    'Error: Destination id ' . $registration->destination_id . ' tidak ditemukan'
+                );
+            }
+
+            if (!$destination->is_active) {
+                throw new MudikException(
+                    ErrorCode::ServerError,
+                    sprintf('Destination %s tidak aktif', $destination->name)
+                );
+            }
+
+            // Validate: destination remaining quota must be >= participants_count
+            if ($destination->remaining_quota < $registration->participants()->count()) {
                 throw new MudikException(
                     ErrorCode::DestinationQuotaFull,
                     sprintf(
                         'Quota destination %s tidak mencukupi. Tersisa: %d orang, Yang Diinputkan: %d orang',
                         $destination->name,
                         $destination->remaining_quota,
-                        $registration->family_count
+                        $registration->participants()->count()
                     )
                 );
             }
@@ -58,7 +85,7 @@ class ApproveRegistrationAction
             $registration->approve($admin->id, $notes);
 
             // CRITICAL: Update destination used_quota (confirmed booking)
-            $destination->used_quota += $registration->family_count;
+            $destination->used_quota += $registration->participants()->count();
             $destination->save();
 
             // Generate QR Code
@@ -71,7 +98,7 @@ class ApproveRegistrationAction
                 'approved_by' => $admin->id,
                 'destination_id' => $destination->id,
                 'destination_name' => $destination->name,
-                'family_count' => $registration->family_count,
+                'participants_count' => $registration->participants()->count(),
                 'destination_used_quota' => $destination->used_quota,
                 'destination_remaining_quota' => $destination->remaining_quota,
                 'qr_code_id' => $qrCode->id,
