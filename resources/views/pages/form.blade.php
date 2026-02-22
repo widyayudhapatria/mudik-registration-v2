@@ -882,9 +882,72 @@
         function handleFormSubmit(e) {
             e.preventDefault();
 
+            // Check Validation for file upload first
+            const kkDocument = document.getElementById("kk_document");
+            if (!kkDocument) {
+                Swal.fire({
+                    title: "Error!",
+                    text: "Input file dokumen KK tidak ditemukan.",
+                    icon: "error",
+                    confirmButtonText: "Baik, saya mengerti.",
+                });
+                return;
+            }
+
+            // Check file selected first
+            if (!kkDocument.files || kkDocument.files.length === 0) {
+                Swal.fire({
+                    title: "Dokumen KK Belum Dipilih!",
+                    html: `<div class="text-start">
+                        <p class="mb-2">Anda belum mengupload dokumen Kartu Keluarga (KK).</p>
+                        <p class="mb-0"><strong>Silakan upload dokumen KK terlebih dahulu.</strong></p>
+                    </div>`,
+                    icon: "warning",
+                    confirmButtonText: "Baik, saya akan upload.",
+                }).then(() => {
+                    // Scroll to upload area and focus
+                    const uploadArea = document.getElementById("fileUploadArea");
+                    if (uploadArea) {
+                        uploadArea.scrollIntoView({ behavior: 'smooth', block: 'center' });
+                        uploadArea.style.border = '2px solid #dc3545';
+                        setTimeout(() => {
+                            uploadArea.style.border = '';
+                        }, 3000);
+                    }
+                });
+                return;
+            }
+
+            // Then check if file is valid (after upload)
+            if (!isFileValid) {
+                Swal.fire({
+                    title: "File Tidak Valid!",
+                    html: `<div class="text-start">
+                        <p class="mb-2">File yang dipilih tidak melewati validasi:</p>
+                        <ul class="mt-2 mb-2">
+                            <li>Pastikan format file: <strong>JPG, JPEG, atau PNG</strong></li>
+                            <li>Pastikan ukuran file tidak melebihi <strong>5 MB</strong></li>
+                        </ul>
+                        <p class="mb-0"><strong>Silakan pilih file yang sesuai.</strong></p>
+                    </div>`,
+                    icon: "warning",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
+                }).then(() => {
+                    // Clear invalid file
+                    kkDocument.value = '';
+                    document.getElementById("fileInfo").style.display = "none";
+                    const uploadArea = document.getElementById("fileUploadArea");
+                    if (uploadArea) {
+                        uploadArea.classList.remove("border-success");
+                    }
+                });
+                return;
+            }
+
             // Validate jumlah anggota vs peserta
             const jumlahPeserta = document.querySelectorAll(".peserta-form").length;
             const jumlahAnggota = parseInt(document.getElementById("family_count").value);
+            console.log(`Validating form submission: jumlahPeserta=${jumlahPeserta}, jumlahAnggota=${jumlahAnggota}`);
 
             if (jumlahPeserta === 0) {
                 Swal.fire({
@@ -896,9 +959,20 @@
                 return;
             }
 
-            // CRITICAL: Auto-sync family_count with actual peserta count if mismatch
             if (jumlahPeserta !== jumlahAnggota) {
-                document.getElementById("family_count").value = jumlahPeserta;
+                console.log(`Mismatch detected: jumlahPeserta (${jumlahPeserta}) != jumlahAnggota (${jumlahAnggota}). Auto-syncing...`);
+                if (jumlahPeserta > jumlahAnggota) {
+                    Swal.fire({
+                        title: "Peringatan!",
+                        text: `Jumlah peserta tidak boleh melebihi jumlah anggota keluarga. Silakan kurangi jumlah peserta atau sesuaikan jumlah anggota keluarga.`,
+                        icon: "warning",
+                        confirmButtonText: "Baik, saya akan periksa kembali.",
+                    });
+                    return;
+                }
+
+                // CRITICAL: Auto-sync family_count with actual peserta count if mismatch
+                //document.getElementById("family_count").value = jumlahPeserta;
             }
 
             // Validate representative name (min 3 characters)
@@ -1030,34 +1104,6 @@
                         <p class="mt-2">Silakan centang checkbox <strong>"Memiliki anak dibawah 4 tahun"</strong> terlebih dahulu.</p>
                     </div>`,
                     icon: "error",
-                    confirmButtonText: "Baik, saya akan periksa kembali.",
-                });
-                return;
-            }
-
-            // Validate file upload
-            const kkDocument = document.getElementById("kk_document");
-            if (!kkDocument.files || kkDocument.files.length === 0) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    text: "Anda harus upload dokumen Kartu Keluarga (KK).",
-                    icon: "warning",
-                    confirmButtonText: "Baik, saya akan periksa kembali.",
-                });
-                return;
-            }
-
-            if (!isFileValid) {
-                Swal.fire({
-                    title: "Peringatan!",
-                    html: `<div class="text-start">
-                        <p>File yang dipilih tidak melewati validasi:</p>
-                        <ul class="mt-2">
-                            <li>Pastikan format file: <strong>JPG, JPEG, atau PNG</strong></li>
-                            <li>Pastikan ukuran file tidak melebihi <strong>5 MB</strong></li>
-                        </ul>
-                    </div>`,
-                    icon: "warning",
                     confirmButtonText: "Baik, saya akan periksa kembali.",
                 });
                 return;
