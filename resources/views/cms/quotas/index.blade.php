@@ -526,8 +526,9 @@
 
     <!-- Summary -->
     <div class="summary-card">
-        <h5 class="fw-bold mb-3">Ringkasan Kuota Destinasi</h5>
-        <div style="overflow-x: auto;">
+        <h5 class="fw-bold mb-0">Ringkasan Kuota Destinasi</h5>
+        <small class="text-muted">Terpakai : Hanya dari peserta dewasa saja, < 4 tahun tidak termasuk pengurang quota terpakai.</small>
+        <div class="mt-3" style="overflow-x: auto;">
             <table class="destination-grid-table">
                 <thead>
                     <tr>
@@ -601,6 +602,7 @@
                 </div>
 
                 <!-- Date Quota Table -->
+                <small class="text-muted" style="font-size: 11px;">Terpakai : Hanya dari peserta dewasa saja, < 4 tahun tidak termasuk pengurang quota terpakai.</small>
                 <div style="overflow-x: auto;">
                     <table class="quota-table">
                         <thead>
