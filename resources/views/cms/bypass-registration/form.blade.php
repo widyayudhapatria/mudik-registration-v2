@@ -167,21 +167,33 @@
                     <div class="col-md-6">
                         <div class="card">
                             <div class="card-body bg-warning text-dark">
-                                <h6 class="card-title">Summary</h6>
+                                <h6 class="card-title">Summary Peserta</h6>
                                 <ul class="list-unstyled mb-0">
                                     <li><strong>Registrations:</strong> <span id="previewRegCount">0</span></li>
-                                    <li><strong>Participants:</strong> <span id="previewPartCount">0</span></li>
+                                    <li><strong>Total Peserta:</strong> <span id="previewPartCount">0</span></li>
+                                    <li class="mt-2 border-top pt-2">
+                                        <strong>Breakdown:</strong>
+                                        <ul class="list-unstyled mb-0 pl-3">
+                                            <li><strong>Dewasa (≥4 tahun):</strong> <span id="previewAdultCount">0</span></li>
+                                            <li><strong>Anak (<4 tahun):</strong> <span id="previewUnder4Count">0</span></li>
+                                        </ul>
+                                    </li>
                                 </ul>
                             </div>
                         </div>
                     </div>
                     <div class="col-md-6">
                         <div class="card">
-                            <div class="card-body bg-warning text-dark">
-                                <h6 class="card-title">Quota Impact</h6>
+                            <div class="card-body bg-info text-white">
+                                <h6 class="card-title">Dampak Quota (Dewasa Saja)</h6>
                                 <ul class="list-unstyled mb-0">
-                                    <li><strong>Total:</strong> <span id="quotaTotal">-</span> | <strong>Used:</strong> <span id="quotaUsed">-</span> | <strong>Remaining:</strong> <span id="quotaRemaining">-</span></li>
-                                    <li><strong>Quota after import:</strong> <span id="quotaAfter">-</span></li>
+                                    <li><strong>Total Quota:</strong> <span id="quotaTotal">-</span></li>
+                                    <li><strong>Terpakai:</strong> <span id="quotaUsed">-</span></li>
+                                    <li><strong>Tersisa:</strong> <span id="quotaRemaining">-</span></li>
+                                    <li class="mt-2 border-top pt-2">
+                                        <strong>Akan Digunakan:</strong> <span id="quotaWouldUse">-</span>
+                                    </li>
+                                    <li><strong>Sisa Setelah Import:</strong> <span id="quotaAfter">-</span></li>
                                 </ul>
                             </div>
                         </div>
@@ -196,7 +208,9 @@
                                 <tr>
                                     <th>Rep Name</th>
                                     <th>Email</th>
-                                    <th>Family Count</th>
+                                    <th>Total Peserta</th>
+                                    <th>Dewasa (≥4th)</th>
+                                    <th>Anak (<4th)</th>
                                 </tr>
                             </thead>
                             <tbody id="previewTableBody"></tbody>
@@ -340,6 +354,8 @@ function showPreviewModal(data) {
     const previewTable = document.getElementById('previewTableBody');
     const previewRegCount = document.getElementById('previewRegCount');
     const previewPartCount = document.getElementById('previewPartCount');
+    const previewAdultCount = document.getElementById('previewAdultCount');
+    const previewUnder4Count = document.getElementById('previewUnder4Count');
     const quotaInfo = data.quota || {};
     const proceedBtn = document.getElementById('proceedBtn');
 
@@ -352,11 +368,29 @@ function showPreviewModal(data) {
 
     previewRegCount.textContent = data.preview.total_registrations;
     previewPartCount.textContent = data.preview.total_participants;
+    previewAdultCount.textContent = data.preview.total_participants_for_quota;
+    previewUnder4Count.textContent = data.preview.total_under_4;
 
-    document.getElementById('quotaTotal').textContent = quotaInfo.total || '-';
-    document.getElementById('quotaUsed').textContent = quotaInfo.used || '-';
-    document.getElementById('quotaAfter').textContent = quotaInfo.after_import || '-';
-    document.getElementById('quotaRemaining').textContent = quotaInfo.remaining || '-';
+    // Calculate quota after import as (remaining - would_use)
+    const total = quotaInfo.total ?? '-';
+    const used = quotaInfo.used ?? '-';
+    const remainingRaw = quotaInfo.remaining;
+    const wouldUseRaw = quotaInfo.would_use;
+    const afterImportRaw = quotaInfo.after_import;
+
+    const remainingVal = (remainingRaw === undefined || remainingRaw === null) ? null : Number(remainingRaw);
+    const wouldUseVal = (wouldUseRaw === undefined || wouldUseRaw === null) ? null : Number(wouldUseRaw);
+    const afterImportVal = (afterImportRaw === undefined || afterImportRaw === null) ? null : Number(afterImportRaw);
+
+    const canCalc = remainingVal !== null && !isNaN(remainingVal) && afterImportVal !== null && !isNaN(afterImportVal);
+    const quotaAfterCalc = canCalc ? (remainingVal - afterImportVal) : null;
+
+    // Display quota info with subtraction expression when possible
+    document.getElementById('quotaTotal').textContent = total || '-';
+    document.getElementById('quotaUsed').textContent = used || '-';
+    document.getElementById('quotaRemaining').textContent = (remainingRaw ?? '-');
+    document.getElementById('quotaWouldUse').textContent = wouldUseRaw !== undefined ? wouldUseRaw : '-';
+    document.getElementById('quotaAfter').textContent = canCalc ? `${quotaAfterCalc} (${remainingVal} - ${afterImportVal})` : '-';
 
     previewTable.innerHTML = '';
     (data.registrations || []).forEach(reg => {
@@ -364,18 +398,28 @@ function showPreviewModal(data) {
         row.innerHTML = `
             <td>${reg.representative_name}</td>
             <td>${reg.representative_email}</td>
-            <td>${reg.family_count}</td>
+            <td>${reg.family_count} orang</td>
+            <td><strong>${reg.adult_count}</strong></td>
+            <td><span class="badge badge-info text-bg-secondary">${reg.under_4_count}</span></td>
         `;
         previewTable.appendChild(row);
     });
 
     // Handle warnings display and button state
-    const hasWarnings = data.preview.warnings && data.preview.warnings.length > 0;
+    const existingWarnings = (data.preview.warnings && data.preview.warnings.length) ? data.preview.warnings.slice() : [];
+    let hasWarnings = existingWarnings.length > 0;
+
+    if (canCalc && quotaAfterCalc < 0) {
+        hasWarnings = true;
+        existingWarnings.push({
+            message: `Quota insufficient: ${quotaAfterCalc} = (${remainingVal}-${afterImportVal})`
+        });
+    }
 
     if (hasWarnings) {
         const warningsList = document.getElementById('warningsList');
         warningsList.innerHTML = '';
-        data.preview.warnings.forEach(warning => {
+        existingWarnings.forEach(warning => {
             const li = document.createElement('li');
             li.textContent = warning.message || JSON.stringify(warning);
             warningsList.appendChild(li);

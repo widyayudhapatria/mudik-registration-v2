@@ -68,27 +68,32 @@ class BypassRegistrationController extends Controller
             'filename' => $result['filename'],
             'registrations' => $result['registrations'],
             'total_registrations' => $result['total_registrations'],
-            'total_participants' => $result['total_participants'],
+            'total_participants' => $result['total_participants'],  // All participants (including under 4)
+            'total_participants_for_quota' => $result['total_participants_for_quota'],  // Only adults
+            'total_under_4' => $result['total_under_4'],
             'warnings' => $result['warnings'] ?? [],
         ]);
 
-        // Calculate quota impact
+        // Calculate quota impact (using only adult count)
         $totalQuota = $destination->total_quota;
         $usedQuota = DB::table('participants')
             ->join('registrations', 'participants.registration_id', '=', 'registrations.id')
             ->where('registrations.destination_id', $destination->id)
             ->where('registrations.approved_at', '!=', null)
+            ->where('participants.is_child_under_4', false)  // Only count adults
             ->count();
 
         $remainingQuota = $totalQuota - $usedQuota;
-        $wouldUse = $result['total_participants'];
+        $wouldUse = $result['total_participants_for_quota'];  // Only adult count for quota
         $afterImport = $usedQuota + $wouldUse;
 
         return response()->json([
             'success' => true,
             'preview' => [
                 'total_registrations' => $result['total_registrations'],
-                'total_participants' => $result['total_participants'],
+                'total_participants' => $result['total_participants'],  // All
+                'total_participants_for_quota' => $result['total_participants_for_quota'],  // Adults only
+                'total_under_4' => $result['total_under_4'],
                 'warnings' => $result['warnings'],
             ],
             'quota' => [

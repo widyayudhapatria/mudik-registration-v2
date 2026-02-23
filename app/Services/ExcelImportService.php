@@ -70,13 +70,43 @@ class ExcelImportService
 
             // Group data by representative
             $groupedData = $this->groupByRepresentativeNik($rows);
+            $maxPerFamily = 10;
+            $earlyErrors = [];
+
+            foreach ($groupedData as $nik => $group) {
+                $participantCount = count($group['participants']);
+                if ($participantCount > $maxPerFamily) {
+                    $earlyErrors[] = [
+                        'row' => '-', // tidak tersedia row tunggal karena sudah digroup
+                        'type' => 'family_count',
+                        'message' => "Perwakilan {$group['representative']['name']} (NIK: {$nik}) mendaftarkan {$participantCount} peserta, melebihi batas maksimum per keluarga ({$maxPerFamily})."
+                    ];
+                }
+            }
+
+            if (!empty($earlyErrors)) {
+                return [
+                    'success' => false,
+                    'validation_errors' => $earlyErrors,
+                    'error_count' => count($earlyErrors),
+                    'warning_count' => 0,
+                ];
+            }
+
             $registrationData = $this->transformToRegistrations($groupedData);
+
+            // Calculate total counts
+            $totalParticipantsAll = array_sum(array_map(fn($r) => count($r['participants']), $registrationData));
+            $totalParticipantsAdult = array_sum(array_map(fn($r) => $r['adult_count'], $registrationData));
+            $totalParticipantsUnder4 = array_sum(array_map(fn($r) => $r['under_4_count'], $registrationData));
 
             return [
                 'success' => true,
                 'registrations' => $registrationData,
                 'total_registrations' => count($registrationData),
-                'total_participants' => array_sum(array_map(fn($r) => count($r['participants']), $registrationData)),
+                'total_participants' => $totalParticipantsAll,  // All participants (including under 4)
+                'total_participants_for_quota' => $totalParticipantsAdult,  // Only adults (age >= 4) for quota
+                'total_under_4' => $totalParticipantsUnder4,
                 'warnings' => $validation['warnings'] ?? [],
                 'filename' => $file->getClientOriginalName(),
             ];
@@ -240,12 +270,25 @@ class ExcelImportService
 
     /**
      * Transform grouped data to registrations format
+     * Also calculates adult count (age >= 4) for quota purposes
      */
     protected function transformToRegistrations(array $grouped): array
     {
         $registrations = [];
 
         foreach ($grouped as $nik => $group) {
+            // Calculate adult count (participants aged >= 4 years old)
+            $adultCount = 0;
+            $under4Count = 0;
+
+            foreach ($group['participants'] as $participant) {
+                if ($this->isAdult($participant['birth_date'])) {
+                    $adultCount++;
+                } else {
+                    $under4Count++;
+                }
+            }
+
             $registrations[] = [
                 'representative_name' => $group['representative']['name'],
                 'representative_email' => $group['representative']['email'],
@@ -254,10 +297,32 @@ class ExcelImportService
                 'family_count' => $group['representative']['family_count'],
                 'kk_number' => $group['representative']['kk_number'],
                 'participants' => $group['participants'],
+                'adult_count' => $adultCount,
+                'under_4_count' => $under4Count,
+                'total_for_quota' => $adultCount, // Only adults count for quota
             ];
         }
 
         return $registrations;
+    }
+
+    /**
+     * Check if participant is adult (age >= 4 years old)
+     */
+    protected function isAdult(string $birthDate): bool
+    {
+        if (empty($birthDate)) {
+            return true; // Default to adult if no birth date
+        }
+
+        try {
+            $dob = new \DateTime($birthDate);
+            $today = new \DateTime();
+            $age = $today->diff($dob)->y;
+            return $age >= 4;
+        } catch (\Exception $e) {
+            return true; // Default to adult if date parsing fails
+        }
     }
 
     /**
