@@ -8,6 +8,7 @@ use App\Exceptions\MudikException;
 use App\Http\Controllers\Controller;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Facades\Log;
 use Illuminate\View\View;
@@ -73,6 +74,27 @@ class RegistrationController extends Controller
             'has_expires' => $request->has('expires'),
             'app_url' => config('app.url'),
         ]);
+
+        // Rate limiting: max 5 submissions per hour per token+IP
+        $key = 'registration-submit:' . $token . ':' . $request->ip();
+
+        if (RateLimiter::tooManyAttempts($key, 5)) {
+            $seconds = RateLimiter::availableIn($key);
+            $minutes = ceil($seconds / 60);
+
+            Log::warning('RegistrationController::submit - Rate limit exceeded', [
+                'token' => $token,
+                'ip' => $request->ip(),
+                'available_in_seconds' => $seconds,
+            ]);
+
+            return response()->json([
+                'success' => false,
+                'message' => "Terlalu banyak percobaan submit. Silakan coba lagi dalam {$minutes} menit."
+            ], 429);
+        }
+
+        RateLimiter::hit($key, 3600); // 1 hour
 
         try {
             $formLink = $request->formLink;
