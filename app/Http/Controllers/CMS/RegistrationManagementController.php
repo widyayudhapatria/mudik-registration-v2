@@ -12,9 +12,12 @@ use App\Filters\RegistrationFilters;
 use App\Http\Controllers\Controller;
 use App\Models\Registration;
 use App\Models\Destination;
+use App\Exports\RegistrationAbsenExport;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
+use Illuminate\Http\Response;
+use Symfony\Component\HttpFoundation\BinaryFileResponse;
 
 class RegistrationManagementController extends Controller
 {
@@ -133,5 +136,23 @@ class RegistrationManagementController extends Controller
         } catch (MudikException $e) {
             return response()->json($e->toArray(), 400);
         }
+    }
+
+    public function export(Request $request): BinaryFileResponse
+    {
+        $this->authorize('viewAny', Registration::class);
+
+        $registrations = Registration::with([
+            'participants',
+            'destination',
+            'seatAllocations.destination',
+            'qrCode',
+        ])
+        ->useFilters(RegistrationFilters::class)
+        ->whereHas('formLink', fn($q) => $q->where('status', 'approved'))
+        ->latest('created_at')
+        ->get();
+
+        return (new RegistrationAbsenExport($registrations))->download();
     }
 }

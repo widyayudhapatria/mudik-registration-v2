@@ -45,6 +45,7 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
 
     Route::prefix('registrations')->name('registrations.')->group(function () {
         Route::get('/', [RegistrationManagementController::class, 'index'])->name('index');
+        Route::get('/export', [RegistrationManagementController::class, 'export'])->name('export');
         Route::get('/{registration}', [RegistrationManagementController::class, 'show'])->withTrashed()->name('show');
         Route::post('/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('approve');
         Route::post('/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('reject');

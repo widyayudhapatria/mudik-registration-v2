@@ -269,6 +269,11 @@
         <h5 class="mb-0 fw-bold">
             Daftar Pendaftaran ({{ $registrations->total() }})
         </h5>
+        {{-- Export Button --}}
+        <a href="{{ route('cms.registrations.export', request()->query()) }}"
+            class="btn btn-success btn-sm">
+                <i class="bi bi-file-earmark-excel me-1"></i> Export Absen
+        </a>
     </div>
 
     <!-- Desktop Table View -->
