@@ -192,7 +192,24 @@ class BypassRegistrationController extends Controller
             ->where('destination_id', $import->destination_id)
             ->orderBy('created_at', 'desc')
             ->take($import->total_registrations)
-            ->get();
+            ->get()
+            ->map(function ($registration) {
+                // Calculate adult count (age >= 4)
+                $adultCount = $registration->participants()
+                    ->where('is_child_under_4', false)
+                    ->count();
+
+                // Calculate under 4 count
+                $under4Count = $registration->participants()
+                    ->where('is_child_under_4', true)
+                    ->count();
+
+                // Add to registration object
+                $registration->adult_count = $adultCount;
+                $registration->under_4_count = $under4Count;
+
+                return $registration;
+            });
 
         return view('cms.bypass-registration.results', [
             'import' => $import,

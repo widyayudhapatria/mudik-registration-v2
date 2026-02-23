@@ -66,7 +66,7 @@
                     </div>
 
                     <div class="row mt-3">
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="card bg-success text-white">
                                 <div class="card-body">
                                     <h6 class="card-title text-white">Successful</h6>
@@ -76,18 +76,33 @@
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
+                        <div class="col-md-3">
                             <div class="card bg-warning">
                                 <div class="card-body">
-                                    <h6 class="card-title">Total Participants</h6>
-                                    <p class="card-text font-weight-bold" style="font-size: 1.5rem;">
+                                    <h6 class="card-title">Total Peserta</h6>
+                                    <p class="card-text font-weight-bold mb-0" style="font-size: 1.5rem;">
                                         {{ $import->total_participants }}
+                                        <small class="text-muted" style="font-size: 0.75rem;">
+                                            Dewasa: <strong>{{ $registrations->sum('adult_count') }}</strong> |
+                                            Anak: <strong>{{ $registrations->sum('under_4_count') }}</strong>
+                                    </small>
                                     </p>
                                 </div>
                             </div>
                         </div>
-                        <div class="col-md-4">
-                            <div class="card @if($import->failed > 0) bg-danger text-white @else bg-info text-white @endif">
+                        <div class="col-md-3">
+                            <div class="card bg-info text-white">
+                                <div class="card-body">
+                                    <h6 class="card-title text-white">Quota Usage</h6>
+                                    <p class="card-text font-weight-bold mb-0" style="font-size: 1.5rem;">
+                                        {{ $registrations->sum('adult_count') }}
+                                        <small class="text-white" style="font-size: 0.75rem;">(Only adults counted)</small>
+                                    </p>
+                                </div>
+                            </div>
+                        </div>
+                        <div class="col-md-3">
+                            <div class="card @if($import->failed > 0) bg-danger text-white @else bg-secondary @endif">
                                 <div class="card-body">
                                     <h6 class="card-title">Failed</h6>
                                     <p class="card-text font-weight-bold" style="font-size: 1.5rem;">
@@ -132,7 +147,9 @@
                                     <tr>
                                         <th>Rep Name</th>
                                         <th>Email</th>
-                                        <th>Participants</th>
+                                        <th>Total Peserta</th>
+                                        <th>Dewasa (≥4th)</th>
+                                        <th>Anak (<4th)</th>
                                         <th>Status</th>
                                         <th>Action</th>
                                     </tr>
@@ -143,7 +160,13 @@
                                             <td>{{ $reg->representative_name }}</td>
                                             <td><small>{{ $reg->formLink->email }}</small></td>
                                             <td>
-                                                <span class="badge badge-primary text-bg-dark">{{ $reg->participants->count() }}</span>
+                                                 <strong>{{ $reg->participants->count() }}</strong>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-info text-bg-secondary">{{ $reg->adult_count ?? 0 }}</span>
+                                            </td>
+                                            <td>
+                                                <span class="badge badge-info text-bg-secondary">{{ $reg->under_4_count ?? 0 }}</span>
                                             </td>
                                             <td>
                                                 @if($reg->isApproved())
@@ -162,7 +185,7 @@
                                         </tr>
                                     @empty
                                         <tr>
-                                            <td colspan="5" class="text-center text-muted">No registrations</td>
+                                            <td colspan="7" class="text-center text-muted">No registrations</td>
                                         </tr>
                                     @endforelse
                                 </tbody>
