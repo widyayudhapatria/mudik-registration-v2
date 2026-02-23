@@ -364,6 +364,109 @@
             @endif
         </div>
 
+        <!-- Email Log Section -->
+        @if($registration->isApproved())
+            <div class="detail-card">
+                <h6 class="fw-bold mb-3">
+                    <i class="bi bi-envelope-fill me-2"></i>
+                    Status Pengiriman Email QR Code
+                </h6>
+
+                @php
+                    $qrCodeEmails = $registration->qrCodeEmails()->latest('created_at')->get();
+                    $latestEmail = $qrCodeEmails->first();
+                @endphp
+
+                @if($latestEmail)
+                    <div class="small">
+                        <div class="mb-2">
+                            <strong>Email Tujuan:</strong><br>
+                            {{ $latestEmail->email_to }}
+                        </div>
+
+                        <div class="mb-2">
+                            <strong>Status:</strong><br>
+                            @if($latestEmail->isSent())
+                                <span class="badge bg-success">
+                                    <i class="bi bi-check-circle-fill me-1"></i>Terkirim
+                                </span>
+                                <div class="text-muted small mt-1">Tanggal: {{ $latestEmail->sent_at->format('d/m/Y H:i') }}</div>
+                            @elseif($latestEmail->isFailed())
+                                <span class="badge bg-danger">
+                                    <i class="bi bi-exclamation-circle-fill me-1"></i>Gagal
+                                </span>
+                                <div class="text-muted small mt-1">Tanggal: {{ $latestEmail->failed_at->format('d/m/Y H:i') }}</div>
+                            @else
+                                <span class="badge bg-warning text-dark">
+                                    <i class="bi bi-clock-fill me-1"></i>Pending
+                                </span>
+                                <div class="text-muted small mt-1">Dibuat: {{ $latestEmail->created_at->format('d/m/Y H:i') }}</div>
+                            @endif
+                        </div>
+
+                        @if($latestEmail->isFailed())
+                            <div class="mb-3">
+                                <strong>Pesan Error:</strong><br>
+                                <div class="text-danger small"><code>{{ $latestEmail->error_message }}</code></div>
+                            </div>
+
+                            <div class="mb-3">
+                                <strong>Percobaan:</strong> {{ $latestEmail->retry_count }}/3
+                            </div>
+
+                            @if($latestEmail->canRetry(3))
+                                <button type="button" class="btn btn-warning w-100 btn-sm" onclick="resendQrCode({{ $registration->id }})">
+                                    <i class="bi bi-arrow-repeat me-1"></i>Kirim Ulang Email
+                                </button>
+                            @else
+                                <div class="alert alert-danger p-2 mb-0">
+                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
+                                    <small>Sudah mencapai batas maksimal percobaan (3x). Hubungi administrator.</small>
+                                </div>
+                            @endif
+                        @endif
+                    </div>
+
+                    @if($qrCodeEmails->count() > 1)
+                        <hr>
+                        <div class="small">
+                            <strong class="d-block mb-2">Riwayat Pengiriman:</strong>
+                            <div style="max-height: 200px; overflow-y: auto;">
+                                @foreach($qrCodeEmails as $email)
+                                <div class="mb-2 pb-2" style="border-bottom: 1px solid #e9ecef;">
+                                    <div class="d-flex justify-content-between align-items-start">
+                                        <div>
+                                            @if($email->isSent())
+                                                <span class="badge bg-success badge-sm">Terkirim</span>
+                                            @elseif($email->isFailed())
+                                                <span class="badge bg-danger badge-sm">Gagal</span>
+                                            @else
+                                                <span class="badge bg-warning text-dark badge-sm">Pending</span>
+                                            @endif
+                                        </div>
+                                        <div class="text-muted" style="font-size: 0.75rem;">
+                                            {{ $email->created_at->format('d/m/Y H:i') }}
+                                        </div>
+                                    </div>
+                                    @if($email->isFailed() && $email->error_message)
+                                    <div class="text-danger mt-1" style="font-size: 0.75rem;">
+                                        <code>{{ Str::limit($email->error_message, 50) }}</code>
+                                    </div>
+                                    @endif
+                                </div>
+                                @endforeach
+                            </div>
+                        </div>
+                    @endif
+                @else
+                    <div class="alert alert-info p-2 mb-0">
+                        <i class="bi bi-info-circle me-1"></i>
+                        <small>Email QR code belum ada di sistem</small>
+                    </div>
+                @endif
+            </div>
+        @endif
+
         <!-- Timeline -->
         <div class="detail-card">
             <h6 class="fw-bold mb-3">Timeline</h6>
@@ -452,5 +555,22 @@ document.getElementById('rejectForm')?.addEventListener('submit', async function
         alert('Gagal menolak: ' + (error.response?.data?.message || error.message));
     }
 });
+
+async function resendQrCode(registrationId) {
+    if (!confirm('Yakin ingin mengirim ulang email QR code?')) return;
+
+    try {
+        const response = await axios.post(
+            `/cms/registrations/${registrationId}/resend-qr-code`
+        );
+
+        if (response.data.success) {
+            alert(response.data.message);
+            location.reload();
+        }
+    } catch (error) {
+        alert('Gagal mengirim ulang email: ' + (error.response?.data?.message || error.message));
+    }
+}
 </script>
 @endpush

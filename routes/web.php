@@ -49,8 +49,9 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
         Route::get('/{registration}', [RegistrationManagementController::class, 'show'])->withTrashed()->name('show');
         Route::post('/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('approve');
         Route::post('/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('reject');
+        Route::post('/{registration}/resend-qr-code', [RegistrationManagementController::class, 'resendQrCode'])->name('resend-qr-code');
     });
- 
+
     Route::prefix('seat-manifest')->name('seat-manifest.')->group(function () {
         Route::get('/', [SeatManifestController::class, 'index'])->name('index');
     });
