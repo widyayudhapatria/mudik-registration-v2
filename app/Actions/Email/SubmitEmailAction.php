@@ -11,6 +11,7 @@ use App\Jobs\SendFormLinkEmail;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
+use Illuminate\Support\Facades\URL;
 use Illuminate\Support\Str;
 use Lorisleiva\Actions\Concerns\AsAction;
 use Throwable;
@@ -22,6 +23,14 @@ class SubmitEmailAction
     public function handle(SubmitEmailData $data): FormLink
     {
         try {
+            // CRITICAL: Force HTTPS scheme if APP_URL uses HTTPS
+            // This ensures signed URL signature matches during validation
+            $appUrl = config('app.url');
+            if (str_starts_with($appUrl, 'https://')) {
+                URL::forceScheme('https');
+                Log::info('Forced HTTPS scheme for URL generation');
+            }
+
             DB::beginTransaction();
 
             // Check if email already exists - last email submission for this email (regardless of status)
@@ -67,16 +76,32 @@ class SubmitEmailAction
         }
     }
 
+    private function generateSignedUrl(string $token, Carbon $expiredAt): string
+    {
+        $signedUrl = URL::temporarySignedRoute(
+            'public.registration.form',
+            $expiredAt,
+            ['token' => $token]
+        );
+
+        // Unescape HTML entities
+        return html_entity_decode($signedUrl);
+    }
+
     protected function createNewLink(string $email): FormLink
     {
         $expiryDays = config('mudik.form_link_expiry_days', 3);
         $token = Str::random(64);
+        $expiredAt = Carbon::now()->addDays($expiryDays);
+
+        // Generate signed URL dan simpan langsung
+        $signedUrl = $this->generateSignedUrl($token, $expiredAt);
 
         return FormLink::create([
             'email' => $email,
             'token' => $token,
-            'generated_link' => route('public.registration.form', ['token' => $token]),
-            'expired_at' => Carbon::now()->addDays($expiryDays),
+            'generated_link' => $signedUrl,
+            'expired_at' => $expiredAt,
             'status' => FormLinkStatus::Pending->value,
         ]);
     }
@@ -85,11 +110,15 @@ class SubmitEmailAction
     {
         $expiryDays = config('mudik.form_link_expiry_days', 3);
         $token = Str::random(64);
+        $expiredAt = Carbon::now()->addDays($expiryDays);
+
+        // Generate signed URL baru
+        $signedUrl = $this->generateSignedUrl($token, $expiredAt);
 
         $formLink->update([
             'token' => $token,
-            'generated_link' => route('public.registration.form', ['token' => $token]),
-            'expired_at' => Carbon::now()->addDays($expiryDays),
+            'generated_link' => $signedUrl,
+            'expired_at' => $expiredAt,
             'used_at' => null,
             'status' => FormLinkStatus::Pending->value,
             'resend_count' => $formLink->resend_count + 1,
