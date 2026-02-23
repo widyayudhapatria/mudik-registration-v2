@@ -66,7 +66,7 @@
                                         <option value="">-- Pilih Destination --</option>
                                         @foreach($destinations as $destination)
                                             <option value="{{ $destination->id }}">
-                                                {{ $destination->name }} ({{ $destination->total_quota }} orang)
+                                                {{ $destination->name }} (quota: {{ $destination->total_quota }} orang - remaining: {{ $destination->remaining_quota }} orang)
                                             </option>
                                         @endforeach
                                     </select>
