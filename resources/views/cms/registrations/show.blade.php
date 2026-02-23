@@ -126,7 +126,10 @@
     <!-- Main Info -->
     <div class="col-lg-8">
         <div class="detail-card">
-            <h5 class="fw-bold mb-4">Informasi Perwakilan</h5>
+            <h5 class="fw-bold mb-4">
+                <i class="bi bi-person-badge-fill me-2"></i>
+                Informasi Perwakilan
+            </h5>
 
             <div class="row detail-section mb-0">
                 <div class="col-md-6 mb-3">
@@ -152,18 +155,12 @@
         </div>
 
         <div class="detail-card">
-            <h5 class="fw-bold mb-4">Informasi Data Keluarga</h5>
+            <h5 class="fw-bold mb-4">Informasi Data Mudik</h5>
             <div class="row detail-section mb-0">
                 <div class="col-md-6 mb-3">
-                    <div class="detail-label">Jumlah Anggota Keluarga</div>
+                    <div class="detail-label">Jumlah Peserta Mudik</div>
                     <div class="detail-value">{{ $registration->family_count }} orang</div>
                 </div>
-
-                <div class="col-md-6 mb-3">
-                    <div class="detail-label">Nomor Kartu Keluarga</div>
-                    <div class="detail-value">{{ $registration->kk_number }}</div>
-                </div>
-
                 <div class="col-md-6 mb-3">
                     <div class="detail-label">Tujuan</div>
                     <div class="detail-value">{{ $registration->destination->name }}</div>
@@ -175,8 +172,17 @@
         <div class="detail-card">
             <h5 class="fw-bold mb-4">
                 <i class="bi bi-people-fill me-2"></i>
-                Daftar Peserta ({{ $registration->participants->count() }})
+                Daftar Peserta Mudik
             </h5>
+            @php
+                $totalChild = $registration->participants->where('is_child_under_4', true)->count();
+                $totalAdult = $registration->participants->where('is_child_under_4', false)->count();
+            @endphp
+            <div class="alert alert-success mb-4">
+                <i class="bi bi-info-circle-fill me-2"></i>
+                <strong>Rincian Peserta Mudik :</strong> Dewasa {{ $totalAdult }} orang, Anak < 4 tahun {{ $totalChild }} orang.
+            </div>
+
 
             @foreach($registration->participants as $index => $participant)
             <div class="participant-card">
@@ -203,26 +209,48 @@
 
         <!-- Document KK -->
         <div class="detail-card">
-            <h5 class="fw-bold mb-4">Dokumen Kartu Keluarga</h5>
-
-            @if($registration->kk_document_path)
-            <div class="text-center">
-                @if(Str::endsWith($registration->kk_document_path, '.pdf'))
-                <a href="{{ Storage::url($registration->kk_document_path) }}" target="_blank" class="btn btn-primary">
-                    <i class="bi bi-file-earmark-pdf-fill me-2"></i>Lihat PDF
-                </a>
-                @else
-                <img id="kkDocumentImage" src="{{ Storage::url($registration->kk_document_path) }}" alt="Kartu Keluarga" class="document-preview" style="cursor: zoom-in;">
-                <div class="mt-3">
-                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('kkDocumentImage').click()">
-                        <i class="bi bi-zoom-in me-2"></i>Perbesar
-                    </button>
+            <div class="row">
+                <div class="col-12">
+                    <h5 class="fw-bold mb-4">
+                        <i class="bi bi-file-earmark-person-fill me-2"></i>
+                        Informasi Data Keluarga
+                    </h5>
+                    <div class="row detail-section mb-0">
+                        <div class="col-md-6 mb-3">
+                            <div class="detail-label">Nomor Kartu Keluarga</div>
+                            <div class="detail-value">{{ $registration->kk_number }}</div>
+                        </div>
+                    </div>
+                    <div class="row detail-section mb-0">
+                        <div class="col-md-6 mb-3">
+                            <div class="detail-label">Kartu Keluarga</div>
+                        </div>
+                    </div>
                 </div>
-                @endif
             </div>
-            @else
-            <p class="text-muted text-center">Dokumen tidak tersedia</p>
-            @endif
+            <div class="row">
+                <div class="col-12">
+                    @if($registration->kk_document_path)
+                        <div class="text-center">
+                            @if(Str::endsWith($registration->kk_document_path, '.pdf'))
+                            <a href="{{ Storage::url($registration->kk_document_path) }}" target="_blank" class="btn btn-primary">
+                                <i class="bi bi-file-earmark-pdf-fill me-2"></i>Lihat PDF
+                            </a>
+                            @else
+                            <img id="kkDocumentImage" src="{{ Storage::url($registration->kk_document_path) }}" alt="Kartu Keluarga" class="document-preview" style="cursor: zoom-in;">
+                            <div class="mt-3">
+                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('kkDocumentImage').click()">
+                                    <i class="bi bi-zoom-in me-2"></i>Perbesar
+                                </button>
+                            </div>
+                            @endif
+                        </div>
+                    @else
+                    <p class="text-muted text-center">Dokumen tidak tersedia</p>
+                    @endif
+
+                </div>
+            </div>
         </div>
     </div>
 
