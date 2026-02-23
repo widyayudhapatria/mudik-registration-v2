@@ -193,9 +193,13 @@
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-success text-bg-success fs-6">{{ $stat['participants_total_today'] }}</span>
-                                <small class="d-block text-muted">
-                                    <i class="bi bi-people me-1"></i>
-                                    Dewasa: {{ $stat['participants_adult_today'] }} - Anak (< 4th): {{ $stat['participants_under4_today'] }}
+                                <small class="d-block text-muted" style="font-size: 11px;">
+                                    <i class="bi bi-person-standing"></i>
+                                    Dewasa: <span>{{ $stat['participants_adult_today'] }}</span>
+                                </small>
+                                <small class="d-block text-muted" style="font-size: 11px;">
+                                    <i class="bi bi-stars"></i>
+                                    Anak (< 4th): <span>{{ $stat['participants_under4_today'] }}</span>
                                 </small>
                             </td>
                             <td class="text-center">
@@ -203,9 +207,13 @@
                             </td>
                             <td class="text-center">
                                 <span class="badge bg-success text-bg-success fs-6">{{ $stat['participants_total_approved_today'] }}</span>
-                                <small class="d-block text-muted">
-                                    <i class="bi bi-people me-1"></i>
-                                    Dewasa: {{ $stat['participants_adult_approved_today'] }} - Anak (< 4th): {{ $stat['participants_under4_approved_today'] }}
+                                <small class="d-block text-muted" style="font-size: 11px;">
+                                    <i class="bi bi-person-standing"></i>
+                                    Dewasa: <span>{{ $stat['participants_adult_approved_today'] }}</span>
+                                </small>
+                                <small class="d-block text-muted" style="font-size: 11px;">
+                                    <i class="bi bi-stars"></i>
+                                    Anak (< 4th): <span>{{ $stat['participants_under4_approved_today'] }}</span>
                                 </small>
                             </td>
                         </tr>
@@ -316,8 +324,11 @@
                     </div>
                 </div>
                 <span class="text-muted small mt-2 d-block">
-                    <i class="bi bi-people me-1"></i>
-                    Dewasa: {{ $statistics['summary']['total_participants_registered_adult'] }} - Anak (< 4th): {{ $statistics['summary']['total_participants_registered_under4'] }}
+                    <i class="bi bi-person-standing"></i>
+                    Dewasa: {{ $statistics['summary']['total_participants_registered_adult'] }}
+                    <i class="bi bi-dash-lg"></i>
+                    <i class="bi bi-stars"></i>
+                    Anak (< 4th): {{ $statistics['summary']['total_participants_registered_under4'] }}
                 </span>
                 <p class="text-muted small mb-0">
                     <i class="bi bi-info-circle me-1"></i>
@@ -339,8 +350,11 @@
                     </div>
                 </div>
                 <span class="text-muted small mt-2 d-block">
-                    <i class="bi bi-people me-1"></i>
-                    Dewasa: {{ $statistics['summary']['total_participants_approved_adult'] }} - Anak (< 4th): {{ $statistics['summary']['total_participants_approved_under4'] }}
+                    <i class="bi bi-person-standing"></i>
+                    Dewasa: {{ $statistics['summary']['total_participants_approved_adult'] }}
+                    <i class="bi bi-dash-lg"></i>
+                    <i class="bi bi-stars"></i>
+                    Anak (< 4th): {{ $statistics['summary']['total_participants_approved_under4'] }}
                 </span>
                 <p class="text-muted small mb-0">
                     <i class="bi bi-info-circle me-1"></i>
@@ -374,13 +388,13 @@
                                 <strong>{{ $quota['name'] }}</strong>
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-secondary">{{ number_format($quota['total_quota']) }}</span>
+                                <span class="badge bg-secondary fs-6">{{ number_format($quota['total_quota']) }}</span>
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-primary">{{ number_format($quota['used_quota']) }}</span>
+                                <span class="badge bg-primary fs-6">{{ number_format($quota['used_quota']) }}</span>
                             </td>
                             <td class="text-center">
-                                <span class="badge bg-{{ $quota['remaining_quota'] > 0 ? 'success' : 'danger' }}">
+                                <span class="badge bg-{{ $quota['remaining_quota'] > 0 ? 'success' : 'danger' }} fs-6">
                                     {{ number_format($quota['remaining_quota']) }}
                                 </span>
                             </td>
