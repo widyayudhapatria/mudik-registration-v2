@@ -62,6 +62,13 @@
                 </a>
             </li>
             <li class="sidebar-menu-item">
+                <a href="{{ route('cms.seat-manifest.index') }}"
+                class="sidebar-menu-link {{ request()->routeIs('cms.seat-manifest.*') ? 'active' : '' }}">
+                    <i class="bi bi-grid-3x3-gap"></i>
+                    <span>Manifest Kursi</span>
+                </a>
+            </li>
+            <li class="sidebar-menu-item">
                 <a href="{{ route('cms.destinations.index') }}" class="sidebar-menu-link {{ request()->routeIs('cms.destinations.*') ? 'active' : '' }}">
                     <i class="bi bi-calendar3"></i>
                     <span>Kuota Tujuan</span>

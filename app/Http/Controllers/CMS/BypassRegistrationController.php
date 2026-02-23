@@ -68,27 +68,32 @@ class BypassRegistrationController extends Controller
             'filename' => $result['filename'],
             'registrations' => $result['registrations'],
             'total_registrations' => $result['total_registrations'],
-            'total_participants' => $result['total_participants'],
+            'total_participants' => $result['total_participants'],  // All participants (including under 4)
+            'total_participants_for_quota' => $result['total_participants_for_quota'],  // Only adults
+            'total_under_4' => $result['total_under_4'],
             'warnings' => $result['warnings'] ?? [],
         ]);
 
-        // Calculate quota impact
+        // Calculate quota impact (using only adult count)
         $totalQuota = $destination->total_quota;
         $usedQuota = DB::table('participants')
             ->join('registrations', 'participants.registration_id', '=', 'registrations.id')
             ->where('registrations.destination_id', $destination->id)
             ->where('registrations.approved_at', '!=', null)
+            ->where('participants.is_child_under_4', false)  // Only count adults
             ->count();
 
         $remainingQuota = $totalQuota - $usedQuota;
-        $wouldUse = $result['total_participants'];
+        $wouldUse = $result['total_participants_for_quota'];  // Only adult count for quota
         $afterImport = $usedQuota + $wouldUse;
 
         return response()->json([
             'success' => true,
             'preview' => [
                 'total_registrations' => $result['total_registrations'],
-                'total_participants' => $result['total_participants'],
+                'total_participants' => $result['total_participants'],  // All
+                'total_participants_for_quota' => $result['total_participants_for_quota'],  // Adults only
+                'total_under_4' => $result['total_under_4'],
                 'warnings' => $result['warnings'],
             ],
             'quota' => [
@@ -187,7 +192,24 @@ class BypassRegistrationController extends Controller
             ->where('destination_id', $import->destination_id)
             ->orderBy('created_at', 'desc')
             ->take($import->total_registrations)
-            ->get();
+            ->get()
+            ->map(function ($registration) {
+                // Calculate adult count (age >= 4)
+                $adultCount = $registration->participants()
+                    ->where('is_child_under_4', false)
+                    ->count();
+
+                // Calculate under 4 count
+                $under4Count = $registration->participants()
+                    ->where('is_child_under_4', true)
+                    ->count();
+
+                // Add to registration object
+                $registration->adult_count = $adultCount;
+                $registration->under_4_count = $under4Count;
+
+                return $registration;
+            });
 
         return view('cms.bypass-registration.results', [
             'import' => $import,

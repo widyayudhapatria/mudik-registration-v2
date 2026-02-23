@@ -20,7 +20,15 @@
                                 <li><strong>Destination:</strong> {{ $importData['destination_name'] }}</li>
                                 <li><strong>File:</strong> {{ $importData['filename'] }}</li>
                                 <li><strong>Registrations:</strong> {{ $importData['total_registrations'] }}</li>
-                                <li><strong>Participants:</strong> {{ $importData['total_participants'] }}</li>
+                                <li><strong>Total Peserta:</strong> {{ $importData['total_participants'] }}</li>
+                                <li class="mt-2 border-top pt-2">
+                                    <strong>Breakdown Peserta:</strong>
+                                    <ul class="list-unstyled mb-0 pl-3">
+                                        <li><strong>Dewasa (≥4 tahun):</strong> {{ $importData['total_participants_for_quota'] ?? 0 }}</li>
+                                        <li><strong>Anak (<4 tahun):</strong> {{ $importData['total_under_4'] ?? 0 }}</li>
+                                    </ul>
+                                </li>
+                                <li class="mt-2 border-top pt-2"><strong style="color: #e74c3c;">⚠️ Quota hanya dihitung dari peserta dewasa (≥4 tahun)</strong></li>
                             </ul>
                         </div>
 
@@ -32,7 +40,9 @@
                                         <th>Representative</th>
                                         <th>Email</th>
                                         <th>NIK</th>
-                                        <th>Participants</th>
+                                        <th>Total</th>
+                                        <th>Dewasa (≥4th)</th>
+                                        <th>Anak (<4th)</th>
                                     </tr>
                                 </thead>
                                 <tbody>
@@ -42,6 +52,8 @@
                                             <td>{{ $reg['representative_email'] }}</td>
                                             <td>{{ $reg['representative_nik'] }}</td>
                                             <td>{{ count($reg['participants']) }}</td>
+                                            <td><strong>{{ $reg['adult_count'] ?? 0 }}</strong></td>
+                                            <td><span class="badge badge-info text-bg-secondary">{{ $reg['under_4_count'] ?? 0 }}</span></td>
                                         </tr>
                                     @endforeach
                                 </tbody>

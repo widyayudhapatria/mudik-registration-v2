@@ -443,7 +443,7 @@
                                 <thead>
                                     <tr>
                                         <th>Kota</th>
-                                        <th class="text-center">Registrasi</th>
+                                        <th class="text-center">Kuota</th>
                                         <th class="text-center">Total Peserta</th>
                                         <th class="text-center">Sudah Scan</th>
                                         <th class="text-center">Belum Scan</th>
@@ -456,7 +456,7 @@
                         html += `
                                     <tr>
                                         <td><strong>${dest.kota}</strong></td>
-                                        <td class="text-center">${dest.registrasi}</td>
+                                        <td class="text-center">${dest.total_quota}</td>
                                         <td class="text-center">${dest.total_peserta}</td>
                                         <td class="text-center"><span class="badge bg-success">${dest.sudah_scan}</span></td>
                                         <td class="text-center"><span class="badge bg-warning text-dark">${dest.belum_scan}</span></td>

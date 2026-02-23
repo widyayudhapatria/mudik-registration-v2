@@ -3,17 +3,63 @@
 @section('title', 'Detail QR Code')
 @section('page-title', 'Detail QR Code')
 
+@push('styles')
+<style>
+    .print-only { display: none; }
+
+    @media print {
+        .sidebar,
+        .topbar,
+        .modal,
+        .no-print { display: none !important; }
+
+        .main-content { margin-left: 0 !important; padding: 10px !important; }
+        body { font-size: 12pt; }
+
+        .card {
+            box-shadow: none !important;
+            border: 1px solid #bbb !important;
+            margin-bottom: 12px !important;
+            page-break-inside: avoid;
+        }
+
+        .card-header,
+        .badge,
+        .btn {
+            -webkit-print-color-adjust: exact;
+            print-color-adjust: exact;
+        }
+
+        .table td, .table th {
+            border: 1px solid #999 !important;
+            padding: 4px 8px !important;
+        }
+
+        .print-only { display: block !important; }
+    }
+</style>
+@endpush
+
 @section('content')
 <div style="background:white; border-radius:16px; padding:30px;">
 
-    <!-- Back Button -->
-    <div class="mb-4">
+    {{-- Header khusus print --}}
+    <div class="print-only mb-4 pb-3" style="text-align:center; border-bottom: 2px solid #333;">
+        <h3 style="margin:0; font-weight:bold;">TIKET MUDIK LEBARAN 2026</h3>
+        <p style="margin:4px 0 0; font-size: 11pt; color:#555;">Bukti Pendaftaran Resmi</p>
+    </div>
+
+    {{-- Back Button & Print Button --}}
+    <div class="mb-4 d-flex gap-2 no-print">
         <a href="{{ route('cms.scanner.index') }}" class="btn btn-secondary">
             <i class="bi bi-arrow-left"></i> Kembali ke Scanner
         </a>
+        <button class="btn btn-outline-primary" onclick="window.print()">
+            <i class="bi bi-printer me-1"></i> Print Tiket
+        </button>
     </div>
 
-    <!-- QR Status Badge -->
+    {{-- QR Status Badge --}}
     <div class="text-center mb-4">
         @if($qrCode->isScanned())
             <span class="badge bg-warning text-dark fs-5 px-4 py-3">
@@ -34,7 +80,7 @@
         @endif
     </div>
 
-    <!-- QR Code Display -->
+    {{-- QR Code Display --}}
     <div class="card mb-4 shadow-sm">
         <div class="card-header" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); color: white;">
             <h5 class="mb-0"><i class="bi bi-qr-code me-2"></i>QR Code</h5>
@@ -45,7 +91,7 @@
         </div>
     </div>
 
-    <!-- Registration Info -->
+    {{-- Registration Info --}}
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-light">
             <h5 class="mb-0"><i class="bi bi-person-badge me-2"></i>Informasi Pendaftar</h5>
@@ -67,14 +113,14 @@
                 <div class="col-md-6 mb-3">
                     <strong>Status:</strong><br>
                     <span class="badge bg-{{ $qrCode->registration->status === 'approved' ? 'success' : 'warning' }}">
-                        {{ ucfirst($qrCode->registration->status) }}
+                        {{ ucfirst($qrCode->registration->getStatus()) }}
                     </span>
                 </div>
             </div>
         </div>
     </div>
 
-    <!-- Participants -->
+    {{-- Participants --}}
     <div class="card mb-4 shadow-sm">
         <div class="card-header bg-light">
             <h5 class="mb-0">
@@ -103,7 +149,7 @@
                             <td>{{ $participant->birth_date->format('d/m/Y') }}</td>
                             <td>
                                 @if($participant->is_child_under_4)
-                                    <span class="badge bg-info">Anak < 4 tahun</span>
+                                    <span class="badge bg-info">Anak &lt; 4 tahun</span>
                                 @endif
                             </td>
                         </tr>
@@ -113,6 +159,48 @@
             </div>
         </div>
     </div>
+
+    <!-- Seat Allocations (hanya tampil jika sudah di-scan) -->
+    @if($qrCode->isScanned() && $qrCode->registration->seatAllocations->isNotEmpty())
+    <div class="card mb-4 shadow-sm">
+        <div class="card-header bg-light">
+            <h5 class="mb-0">
+                <i class="bi bi-grid-3x3-gap me-2"></i>
+                Alokasi Kursi
+            </h5>
+        </div>
+        <div class="card-body">
+            <div class="table-responsive">
+                <table class="table table-hover mb-0">
+                    <thead class="table-light">
+                        <tr>
+                            <th>Nama Peserta</th>
+                            <th>Kode Kursi</th>
+                            <th>Bus</th>
+                            <th>Nomor Kursi</th>
+                        </tr>
+                    </thead>
+                    <tbody>
+                        @foreach($qrCode->registration->seatAllocations as $seat)
+                        <tr>
+                            <td>{{ $seat->participant->full_name }}</td>
+                            <td>
+                                @if($seat->isNoSeat())
+                                    <span class="badge bg-info">Dipangku</span>
+                                @else
+                                    <span class="badge bg-success">{{ $seat->seat_code }}</span>
+                                @endif
+                            </td>
+                            <td>{{ $seat->bus_name }}</td>
+                            <td>{{ $seat->seat_label }}</td>
+                        </tr>
+                        @endforeach
+                    </tbody>
+                </table>
+            </div>
+        </div>
+    </div>
+    @endif
 
     <!-- QR Info -->
     <div class="card mb-4 shadow-sm">
@@ -143,37 +231,39 @@
         </div>
     </div>
 
-    <!-- Action Button -->
-    @if($qrCode->canBeScanned())
-    <div class="text-center">
-        <button type="button" class="btn btn-success btn-lg px-5 py-3"
-                style="border-radius: 12px;"
-                onclick="confirmScan()">
-            <i class="bi bi-check-circle me-2"></i>
-            <strong>Konfirmasi Scan QR Code</strong>
-        </button>
-        <p class="text-muted mt-3 small">
-            <i class="bi bi-info-circle me-1"></i>
-            Pastikan semua data sudah benar sebelum konfirmasi
-        </p>
+    {{-- Action Button --}}
+    <div class="no-print">
+        @if($qrCode->canBeScanned())
+        <div class="text-center">
+            <button type="button" class="btn btn-success btn-lg px-5 py-3"
+                    style="border-radius: 12px;"
+                    onclick="confirmScan()">
+                <i class="bi bi-check-circle me-2"></i>
+                <strong>Konfirmasi Scan QR Code</strong>
+            </button>
+            <p class="text-muted mt-3 small">
+                <i class="bi bi-info-circle me-1"></i>
+                Pastikan semua data sudah benar sebelum konfirmasi
+            </p>
+        </div>
+        @elseif($qrCode->isScanned())
+        <div class="alert alert-warning text-center">
+            <i class="bi bi-exclamation-triangle me-2"></i>
+            QR Code ini sudah pernah di-scan pada {{ $qrCode->scanned_at->format('d/m/Y H:i') }} WIB
+            oleh {{ $qrCode->scannedBy->name ?? 'Admin' }}
+        </div>
+        @else
+        <div class="alert alert-danger text-center">
+            <i class="bi bi-x-circle me-2"></i>
+            QR Code ini tidak dapat di-scan. {{ $qrCode->getValidationMessage() }}
+        </div>
+        @endif
     </div>
-    @elseif($qrCode->isScanned())
-    <div class="alert alert-warning text-center">
-        <i class="bi bi-exclamation-triangle me-2"></i>
-        QR Code ini sudah pernah di-scan pada {{ $qrCode->scanned_at->format('d/m/Y H:i') }} WIB
-        oleh {{ $qrCode->scannedBy->name ?? 'Admin' }}
-    </div>
-    @else
-    <div class="alert alert-danger text-center">
-        <i class="bi bi-x-circle me-2"></i>
-        QR Code ini tidak dapat di-scan. {{ $qrCode->getValidationMessage() }}
-    </div>
-    @endif
 
 </div>
 
-<!-- Success Modal -->
-<div class="modal fade" id="successModal" tabindex="-1" data-bs-backdrop="static">
+{{-- Success Modal --}}
+<div class="modal fade no-print" id="successModal" tabindex="-1" data-bs-backdrop="static">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-success text-white">
@@ -202,8 +292,8 @@
     </div>
 </div>
 
-<!-- Error Modal -->
-<div class="modal fade" id="errorModal" tabindex="-1">
+{{-- Error Modal --}}
+<div class="modal fade no-print" id="errorModal" tabindex="-1">
     <div class="modal-dialog modal-dialog-centered">
         <div class="modal-content">
             <div class="modal-header bg-danger text-white">

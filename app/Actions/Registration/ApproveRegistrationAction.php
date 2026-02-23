@@ -67,15 +67,19 @@ class ApproveRegistrationAction
                 );
             }
 
-            // Validate: destination remaining quota must be >= participants_count
-            if ($destination->remaining_quota < $registration->participants()->count()) {
+            // Validate: destination remaining quota must be >= adults_count (only adults count for quota)
+            $adultCount = $registration->participants()->where('is_child_under_4', false)->count();
+
+            if ($destination->remaining_quota < $adultCount) {
                 throw new MudikException(
                     ErrorCode::DestinationQuotaFull,
                     sprintf(
-                        'Quota destination %s tidak mencukupi. Tersisa: %d orang, Yang Diinputkan: %d orang',
+                        'Quota destination %s tidak mencukupi. Tersisa: %d orang, Yang Diperlukan: %d orang (dari %d peserta, hanya %d dewasa yang dihitung)',
                         $destination->name,
                         $destination->remaining_quota,
-                        $registration->participants()->count()
+                        $adultCount,
+                        $registration->participants()->count(),
+                        $adultCount
                     )
                 );
             }
@@ -84,8 +88,8 @@ class ApproveRegistrationAction
             $notes = $data->admin_notes ?? null;
             $registration->approve($admin->id, $notes);
 
-            // CRITICAL: Update destination used_quota (confirmed booking)
-            $destination->used_quota += $registration->participants()->count();
+            // CRITICAL: Update destination used_quota (only count adults aged >= 4 years old)
+            $destination->used_quota += $adultCount;
             $destination->save();
 
             // Generate QR Code
@@ -98,7 +102,9 @@ class ApproveRegistrationAction
                 'approved_by' => $admin->id,
                 'destination_id' => $destination->id,
                 'destination_name' => $destination->name,
-                'participants_count' => $registration->participants()->count(),
+                'total_participants' => $registration->participants()->count(),
+                'adult_count' => $adultCount,
+                'under_4_count' => $registration->participants()->where('is_child_under_4', true)->count(),
                 'destination_used_quota' => $destination->used_quota,
                 'destination_remaining_quota' => $destination->remaining_quota,
                 'qr_code_id' => $qrCode->id,

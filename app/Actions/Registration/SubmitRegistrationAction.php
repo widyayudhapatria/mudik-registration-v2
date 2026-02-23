@@ -4,6 +4,7 @@ namespace App\Actions\Registration;
 
 use App\Actions\FormLink\ValidateFormLinkAction;
 use App\Data\RegistrationData;
+use App\Data\ParticipantData;
 use App\Enums\ErrorCode;
 use App\Exceptions\MudikException;
 use App\Models\DailyQuota;
@@ -62,29 +63,30 @@ class SubmitRegistrationAction
             }
 
             // Participant count
-            $participantCount = count($data->participants);
+            $totalParticipantCount = count($data->participants);
+            $quotaParticipantCount = $data->getQuotaParticipantCount(); // exclude under 4 years old from quota count
 
             // if participant is more than family count
-            if ($participantCount > $data->family_count) {
+            if ($totalParticipantCount > $data->family_count) {
                 //throw error
                 throw new MudikException(
                     ErrorCode::InvalidFamilyCount,
                     sprintf(
                         'Jumlah peserta (%d) tidak boleh lebih banyak dari jumlah keluarga (%d)',
-                        $participantCount,
+                        $totalParticipantCount,
                         $data->family_count
                     )
                 );
             }
 
-            // CRITICAL: CHECK QUOTA - DENGAN LOCK AKTIF
-            if ($quota->remaining_daily < $participantCount) {
+            // CRITICAL: CHECK QUOTA - hanya peserta >= 4 tahun yang dihitung
+            if ($quota->remaining_daily < $quotaParticipantCount) {
                 throw new MudikException(
                     ErrorCode::DailyQuotaFull,
                     sprintf(
                         'Kuota harian tidak mencukupi. Tersisa: %d orang, Yang Diinputkan: %d orang',
                         $quota->remaining_daily,
-                        $participantCount
+                        $quotaParticipantCount
                     )
                 );
             }
@@ -115,7 +117,7 @@ class SubmitRegistrationAction
 
             // CRITICAL: DECREMENT QUOTA - MASIH DALAM LOCK
             // ATOMIC: Check + Decrement dalam satu lock scope
-            $quota->used_daily += $participantCount;
+            $quota->used_daily += $quotaParticipantCount;
             $quota->save();
 
             // 9. Clear quota cache
@@ -133,7 +135,8 @@ class SubmitRegistrationAction
                 'destination_id' => $data->destination_id,
                 'destination_name' => $destination->name,
                 'family_count' => $data->family_count,
-                'participant_count' => $participantCount,
+                'participant_count' => $totalParticipantCount,
+                'quota_participant_count' => $quotaParticipantCount,
                 'email' => $formLink->email,
             ]);
 
@@ -147,6 +150,9 @@ class SubmitRegistrationAction
                 'form_link_id' => $formLink->id,
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
+                'class' => get_class($e),
+                'line' => $e->getLine(),  
+                'file' => $e->getFile(),
             ]);
             throw new MudikException(ErrorCode::ServerError);
         }

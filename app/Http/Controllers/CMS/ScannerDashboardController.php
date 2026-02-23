@@ -175,6 +175,7 @@ class ScannerDashboardController extends Controller
                 return [
                     'id' => $dest->id,
                     'kota' => $dest->name ?? 'N/A',
+                    'total_quota' => $dest->total_quota ?? 0,
                     'total_peserta' => $totalParticipants,
                     'sudah_scan' => $scannedParticipants,
                     'belum_scan' => $totalParticipants - $scannedParticipants,
