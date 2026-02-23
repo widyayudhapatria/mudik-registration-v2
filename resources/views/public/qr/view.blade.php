@@ -315,7 +315,6 @@
                 <ul>
                     <li>Lokasi: <strong>{{ config('mudik.departure_location') }}</strong></li>
                     <li>Berangkat: <strong>Setelah proses penukaran selesai</strong></li>
-                    <li>Bawa KTP (semua peserta)</li>
                 </ul>
                 @if ($qrCode->scanned_at)
                     <p class="scan-timestamp">
@@ -335,10 +334,12 @@
                     </li>
                     <li>Berkumpul pukul <strong>{{ $departureTime->format('H:i') }} WIB</strong></li>
                     <li>Berangkat pukul : <strong>Setelah proses penukaran selesai</strong></li>
+                    <li>Bawa KTP Asli dan Fotocopy KTP (semua peserta mudik)</li>
+                    <li>Bawa Fotocopy KK yang diupload saat pendaftaran</li>
                 </ul>
                 <p class="note">
                     <i class="mdi mdi-alert-circle me-1"></i>
-                    Wajib membawa <strong>KTP</strong> saat penukaran tiket.
+                    Wajib membawa <strong>KTP Asli, Fotocopy KTP, dan Fotocopy KK</strong> saat penukaran tiket.
                 </p>
             @endif
         </div>

@@ -392,9 +392,8 @@
                                                             <table align="left" width="100%" border="0" cellpadding="0" cellspacing="0" style="min-width: 100%;">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: left;">
-                                                                            <img src="{{ asset('assets/public/images/logo-kabupaten-tangerang.png') }}" height="100" alt="Logo Kabupaten Tangerang" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 100px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;" />
-                                                                                <img src="{{ asset('assets/public/images/logo-mudik.png') }}" height="100" alt="Logo Mudik Gratis Pemerintah Kabupaten Tangerang 2026" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 100px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;" />
+                                                                         <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: center;">
+                                                                            <img src="{{ asset('assets/public/images/header_mudik.png') }}" height="120" alt="Logo Header Mudik Gratis Kabupaten Tangerang Lebaran 2026" />
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -474,7 +473,7 @@
                                                                             <p>
                                                                                 Email ini adalah
                                                                                 <strong>bukti final</strong>
-                                                                                dari pendaftaran mudik gratis Anda. Simpan email ini dengan baik sebagai referensi.
+                                                                                dari pendaftaran mudik gratis Anda. Simpan email ini dengan baik sebagai referensi keberangkatan.
                                                                             </p>
                                                                         </td>
                                                                     </tr>
@@ -631,7 +630,7 @@
                                                                                 <tbody>
                                                                                     <tr>
                                                                                         <td valign="top" style="padding: 20px; text-align: center;">
-                                                                                            <h3 style="margin: 0 0 15px 0; color: #047857; font-size: 18px; font-weight: bold;">QR CODE REFERENSI FINAL</h3>
+                                                                                            <h3 style="margin: 0 0 15px 0; color: #047857; font-size: 18px; font-weight: bold;">QR CODE FINAL</h3>
                                                                                             @if($qrCodePath && file_exists($qrCodePath))
                                                                                                 <img src="{{ $message->embed($qrCodePath) }}" alt="QR Code Final" class="qr-code" style="max-width: 250px; height: auto; margin: 15px auto; display: block; border: 0;">
                                                                                             @endif

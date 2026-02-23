@@ -256,9 +256,8 @@
                                                             <table align="left" width="100%" border="0" cellpadding="0" cellspacing="0" style="min-width: 100%;">
                                                                 <tbody>
                                                                     <tr>
-                                                                        <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: left;">
-                                                                            <img src="{{ asset('assets/public/images/logo-kabupaten-tangerang.png') }}" height="100" alt="Logo Kabupaten Tangerang" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 100px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;" />
-                                                                                <img src="{{ asset('assets/public/images/logo-mudik.png') }}" height="100" alt="Logo Mudik Gratis Pemerintah Kabupaten Tangerang 2026" style="max-width: 285px; padding-bottom: 0; display: inline !important; vertical-align: bottom; border: 0; height: 100px; outline: none; text-decoration: none; -ms-interpolation-mode: bicubic;" />
+                                                                        <td valign="top" style="padding-right: 9px; padding-left: 9px; padding-top: 0; padding-bottom: 0; text-align: center;">
+                                                                            <img src="{{ asset('assets/public/images/header_mudik.png') }}" height="120" alt="Logo Header Mudik Gratis Kabupaten Tangerang Lebaran 2026" />
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>
@@ -327,12 +326,12 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td valign="top" style="padding: 20px; text-align: center;">
-                                                                            <h3 style="margin: 0 0 15px 0; color: #065f46; font-size: 20px; font-weight: bold;">QR CODE PENUKARAN TIKET</h3>
+                                                                            <h3 style="margin: 0 0 15px 0; color: #065f46; font-size: 20px; font-weight: bold;">QR CODE KEBERANGKATAN</h3>
                                                                             <img src="{{ $message->embed($qrCodePath) }}" alt="QR Code" class="qr-code" style="max-width: 300px; height: auto; margin: 15px auto; display: block; border: 0;">
                                                                             <table width="100%" cellpadding="10" cellspacing="0" border="0" style="background-color: #d1f4e0; margin-top: 10px;">
                                                                                 <tr>
                                                                                     <td style="color: #065f46; font-weight: bold; text-align: center; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px;">
-                                                                                        ⚠️ Simpan QR Code ini dengan baik!
+                                                                                        ⚠️ Simpan QR Code ini dengan baik! Wajib dibawa saat penukaran tiket dan keberangkatan.
                                                                                     </td>
                                                                                 </tr>
                                                                             </table>
@@ -483,11 +482,11 @@
                                                                 <tbody>
                                                                     <tr>
                                                                         <td valign="top" class="mcnTextContent" style="padding: 0px 18px 9px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
-                                                                            <h4 style="color: #f58514; margin-bottom: 10px; font-size: 18px; font-weight: bold;">WAJIB DIBAWA SAAT PENUKARAN :</h4>
+                                                                            <h4 style="color: #f58514; margin-bottom: 10px; font-size: 18px; font-weight: bold;">WAJIB DIBAWA SAAT KEBERANGKATAN & PENUKARAN :</h4>
                                                                             <ul style="margin: 0; padding-left: 20px;">
                                                                                 <li style="margin-bottom: 10px;">QR Code ini (cetak atau tunjukkan di smartphone)</li>
-                                                                                <li style="margin-bottom: 10px;">KTP Asli perwakilan <strong>{{ strtoupper($registration->representative_name) }}</strong></li>
-                                                                                <li style="margin-bottom: 10px;">Dokumen pendukung lainnya jika diminta (KTP Peserta Mudik)</li>
+                                                                                <li style="margin-bottom: 10px;">KTP Asli dan Fotocopy KTP perwakilan semua peserta mudik</li>
+                                                                                <li style="margin-bottom: 10px;">Fotocopy KK yang diupload saat pendaftaran</li>
                                                                             </ul>
                                                                         </td>
                                                                     </tr>
