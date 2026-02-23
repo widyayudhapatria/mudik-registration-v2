@@ -584,7 +584,7 @@
                                                                                                         @if($seat->participant->is_child_under_4)
                                                                                                             Dipangku ({{ $seat->seat_code }})
                                                                                                         @else
-                                                                                                            {{ $seat->seat_code }}
+                                                                                                            {{ $seat->bus_name }} / {{ $seat->seat_label }}
                                                                                                         @endif
                                                                                                     </span>
                                                                                                 </td>

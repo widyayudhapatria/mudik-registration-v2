@@ -69,4 +69,11 @@ class RegistrationData extends Data
             ->map(fn(ParticipantData $participant) => $participant->toModelArray())
             ->toArray();
     }
+
+    public function getQuotaParticipantCount(): int
+    {
+        return $this->participants->toCollection()
+            ->reject(fn(ParticipantData $participant) => $participant->isUnderFourYears())
+            ->count();
+    }
 }

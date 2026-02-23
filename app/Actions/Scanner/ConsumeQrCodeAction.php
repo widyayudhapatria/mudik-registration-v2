@@ -153,8 +153,8 @@ class ConsumeQrCodeAction
                             'participant_name' => $seat->participant->full_name,
                             'participant_age' => $seat->participant->getAge(),
                             'seat_code' => $seat->seat_code,
-                            'bus_number' => $seat->bus_number,
-                            'seat_number' => $seat->seat_number,
+                            'bus_name' => $seat->bus_name,       
+                            'seat_label' => $seat->seat_label,   
                             'is_no_seat' => $seat->isNoSeat(),
                         ];
                     })->toArray(),

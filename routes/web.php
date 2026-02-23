@@ -5,6 +5,7 @@ use App\Http\Controllers\CMS\DestinationManagementController;
 use App\Http\Controllers\CMS\EmailRequestController;
 use App\Http\Controllers\CMS\QuotaManagementController;
 use App\Http\Controllers\CMS\RegistrationManagementController;
+use App\Http\Controllers\CMS\SeatManifestController;
 use App\Http\Controllers\CMS\BypassRegistrationController;
 use App\Http\Controllers\Public\EmailSubmissionController;
 use App\Http\Controllers\Public\QrViewController;
@@ -44,9 +45,14 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
 
     Route::prefix('registrations')->name('registrations.')->group(function () {
         Route::get('/', [RegistrationManagementController::class, 'index'])->name('index');
+        Route::get('/export', [RegistrationManagementController::class, 'export'])->name('export');
         Route::get('/{registration}', [RegistrationManagementController::class, 'show'])->withTrashed()->name('show');
         Route::post('/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('approve');
         Route::post('/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('reject');
+    });
+ 
+    Route::prefix('seat-manifest')->name('seat-manifest.')->group(function () {
+        Route::get('/', [SeatManifestController::class, 'index'])->name('index');
     });
 
     Route::prefix('bypass-registrations')->name('bypass-registrations.')->group(function () {

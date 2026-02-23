@@ -30,4 +30,9 @@ class ParticipantData extends Data
             'birth_date' => Carbon::parse($this->birth_date)->format('Y-m-d'),
         ];
     }
+
+    public function isUnderFourYears(): bool
+    {
+        return Carbon::parse($this->birth_date)->age < 4;
+    }
 }
