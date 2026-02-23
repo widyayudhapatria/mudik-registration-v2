@@ -96,11 +96,13 @@
                             <div>
                                 <h5 class="mb-1">Daftar Kota Tujuan Mudik</h5>
                                 <p class="text-muted mb-0 small">Kelola destinasi dan alokasi quota per kota</p>
-                                @if (isset($globalInfo))
-                                    <div class="small text-muted mt-1">Global Quota:
-                                        <strong>{{ number_format($globalInfo['total_quota']) }}</strong> — Allocated:
-                                        <strong>{{ number_format($globalInfo['allocated_quota']) }}</strong>, Remaining:
-                                        <strong>{{ number_format($globalInfo['remaining_global_quota']) }}</strong>
+                                @if (isset($global_quota))
+                                    <div class="small text-muted mt-1">Global Quota Tahun {{ $global_quota->year }} :
+                                        <strong>{{ number_format($global_quota->total_quota) }}</strong> —
+                                        Allocated:
+                                        <strong>{{ number_format($global_quota->allocated_quota) }}</strong>,
+                                        Remaining:
+                                        <strong>{{ number_format($global_quota->remaining_global_quota) }}</strong>
                                     </div>
                                 @endif
                             </div>
@@ -165,6 +167,7 @@
                                     <div class="col-4">
                                         <small class="text-muted d-block">Peserta mudik</small>
                                         <strong>{{ $destination['total_participants'] }}</strong> peserta
+                                        <small class="text-muted">(*dewasa)</small>
                                     </div>
                                     <div class="col-4">
                                         <small class="text-muted d-block">Registrant</small>
