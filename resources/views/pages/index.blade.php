@@ -418,7 +418,10 @@
                                 Tanggal Keberangkatan:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>{{ config('mudik.schedule.departure_date') }} {{ config('mudik.schedule.departure_time') }} WIB</b>
+                                <b>
+                                    {{ \Carbon\Carbon::parse(config('mudik.schedule.departure_date'))->locale('id')->translatedFormat('d F Y') }}
+                                    - Pukul
+                                    {{ config('mudik.schedule.departure_time') }} WIB</b>
                             </h5>
                             <h5 class="mb-0">
                                 <span class="mdi mdi-map-marker"></span>
