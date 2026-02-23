@@ -54,7 +54,7 @@ class DashboardController extends Controller
     {
         $today = Carbon::today();
 
-        // Section 1: Aktivitas Hari Ini (Today's Activity)
+        // ---- Section 1: Aktivitas Hari Ini (Today's Activity)
         $todayEmailSubmissions = FormLink::whereDate('created_at', $today)->count();
 
         // Today's status counts (via FormLink)
@@ -67,24 +67,108 @@ class DashboardController extends Controller
             ->count();
 
         $todayApproved = Registration::approvedByTimestamp()->whereDate('approved_at', $today)->count();
-
         $todayRejected = Registration::rejectedByTimestamp()->whereDate('rejected_at', $today)->count();
+        //--- End of Section 1 ---
 
-        // Section 2: Statistik Keseluruhan (All Time Overview)
+
+        // ---- Section 2: Daily Statistics (Today only)
+        $dailyStats = Destination::active()
+            ->orderBy('display_order')
+            ->orderBy('name')
+            ->get()
+            ->map(function ($destination) use ($today) {
+                // Registrations created today for this destination
+                $registrationsToday = Registration::where('destination_id', $destination->id)
+                    ->whereDate('created_at', $today)
+                    ->count();
+
+                // Participants from registrations created today for this destination
+                $adultParticipantsToday = Participant::whereHas('registration', function ($query) use ($destination, $today) {
+                    $query->where('destination_id', $destination->id)
+                        ->whereDate('created_at', $today);
+                })->where('is_child_under_4', false)->count();
+
+                $childUnder4ParticipantsToday = Participant::whereHas('registration', function ($query) use ($destination, $today) {
+                    $query->where('destination_id', $destination->id)
+                        ->whereDate('created_at', $today);
+                })->where('is_child_under_4', true)->count();
+
+                $totalParticipantsToday = $adultParticipantsToday + $childUnder4ParticipantsToday;
+
+
+                // Participants from approved registrations created today
+                $adultParticipantsApprovedToday = Participant::whereHas('registration', function ($query) use ($destination, $today) {
+                    $query->where('destination_id', $destination->id)
+                        ->whereDate('approved_at', $today);
+                })->where('is_child_under_4', false)->count();
+
+                $childUnder4ParticipantsApprovedToday = Participant::whereHas('registration', function ($query) use ($destination, $today) {
+                    $query->where('destination_id', $destination->id)
+                        ->whereDate('approved_at', $today);
+                })->where('is_child_under_4', true)->count();
+
+                $totalParticipantsApprovedToday = Participant::whereHas('registration', function ($query) use ($destination, $today) {
+                    $query->where('destination_id', $destination->id)
+                        ->whereDate('approved_at', $today);
+                })->count();
+
+
+                // Registrations approved today
+                $approvedToday = Registration::where('destination_id', $destination->id)
+                    ->whereDate('approved_at', $today)
+                    ->count();
+
+                return [
+                    'destination_name' => $destination->name,
+                    'registrations_today' => $registrationsToday,
+                    'participants_adult_today' => $adultParticipantsToday,
+                    'participants_under4_today' => $childUnder4ParticipantsToday,
+                    'participants_total_today' => $totalParticipantsToday,
+                    'participants_adult_approved_today' => $adultParticipantsApprovedToday,
+                    'participants_under4_approved_today' => $childUnder4ParticipantsApprovedToday,
+                    'participants_total_approved_today' => $totalParticipantsApprovedToday,
+                    'approved_today' => $approvedToday,
+                ];
+            });
+        //--- End of Section 2 ---
+
+
+        // ---- Section 3: Statistik Keseluruhan (All Time Overview)
         $totalPending = FormLink::status('pending')->count();
         $totalSubmitted = FormLink::status('submitted')->count();
         $totalApproved = Registration::approvedByTimestamp()->count();
         $totalRejected = Registration::rejectedByTimestamp()->count();
+        //--- End of Section 3 ---
 
-        // Section 3: Participants vs Registrations
+
+        // ---- Section 4: Participants vs Registrations
         $totalRegistrations = Registration::count();
 
-        // Total participants from approved registrations only
-        $totalParticipants = Participant::whereHas('registration', function ($query) {
-            $query->approved();
-        })->count();
+        // Total participants: registered (all) split by adult / <4
+        $totalParticipantsRegisteredAdult = Participant::whereHas('registration', function ($q) {
+            $q;
+        })->where('is_child_under_4', false)->count();
 
-        // Section 3: Quota per Destination
+        $totalParticipantsRegisteredUnder4 = Participant::whereHas('registration', function ($q) {
+            $q;
+        })->where('is_child_under_4', true)->count();
+
+        $totalParticipantsRegistered = $totalParticipantsRegisteredAdult + $totalParticipantsRegisteredUnder4;
+
+        // Total participants from approved registrations only (split by adult / <4)
+        $totalParticipantsApprovedAdult = Participant::whereHas('registration', function ($query) {
+            $query->approved();
+        })->where('is_child_under_4', false)->count();
+
+        $totalParticipantsApprovedUnder4 = Participant::whereHas('registration', function ($query) {
+            $query->approved();
+        })->where('is_child_under_4', true)->count();
+
+        $totalParticipantsApproved = $totalParticipantsApprovedAdult + $totalParticipantsApprovedUnder4;
+        //--- End of Section 4 ---
+
+
+        // ---- Section 5: Quota per Destination
         $destinations = Destination::active()
             ->orderBy('display_order')
             ->orderBy('name')
@@ -110,36 +194,6 @@ class DashboardController extends Controller
                 ];
             });
 
-        // Section 4: Daily Statistics (Today only)
-        $dailyStats = Destination::active()
-            ->orderBy('display_order')
-            ->orderBy('name')
-            ->get()
-            ->map(function ($destination) use ($today) {
-                // Registrations created today for this destination
-                $registrationsToday = Registration::where('destination_id', $destination->id)
-                    ->whereDate('created_at', $today)
-                    ->count();
-
-                // Participants from approved registrations created today
-                $participantsToday = Participant::whereHas('registration', function ($query) use ($destination, $today) {
-                    $query->approved()
-                        ->where('destination_id', $destination->id)
-                        ->whereDate('created_at', $today);
-                })->count();
-
-                // Registrations approved today
-                $approvedToday = Registration::where('destination_id', $destination->id)
-                    ->whereDate('approved_at', $today)
-                    ->count();
-
-                return [
-                    'destination_name' => $destination->name,
-                    'registrations_today' => $registrationsToday,
-                    'participants_today' => $participantsToday,
-                    'approved_today' => $approvedToday,
-                ];
-            });
 
         return [
             // Section 1: Aktivitas Hari Ini (Today's Activity)
@@ -162,7 +216,14 @@ class DashboardController extends Controller
             // Section 3: Participants vs Registrations
             'summary' => [
                 'total_registrations' => $totalRegistrations,
-                'total_participants' => $totalParticipants,
+                // registered (mendaftar)
+                'total_participants_registered' => $totalParticipantsRegistered,
+                'total_participants_registered_adult' => $totalParticipantsRegisteredAdult,
+                'total_participants_registered_under4' => $totalParticipantsRegisteredUnder4,
+                // approved
+                'total_participants_approved' => $totalParticipantsApproved,
+                'total_participants_approved_adult' => $totalParticipantsApprovedAdult,
+                'total_participants_approved_under4' => $totalParticipantsApprovedUnder4,
             ],
 
             // Section 4: Quota per Destination

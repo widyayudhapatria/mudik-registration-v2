@@ -166,8 +166,65 @@
         </div>
     </div>
 
-    {{-- Section 2: Ringkasan Keseluruhan --}}
-    <div class="mb-3">
+    {{-- Section 2: Daily Statistics (Hari Ini) --}}
+    <div class="table-card">
+        <h5 class="section-title">
+            <i class="bi bi-calendar-check-fill me-2"></i>Statistik Hari Ini
+            <small class="text-muted fw-normal">({{ \Carbon\Carbon::today()->isoFormat('dddd, D MMMM Y') }})</small>
+        </h5>
+
+        <div class="table-responsive">
+            <table class="table table-hover align-middle">
+                <thead class="table-light">
+                    <tr>
+                        <th>Tujuan</th>
+                        <th class="text-center">Pendaftaran Masuk</th>
+                        <th class="text-center">Peserta Mudik</th>
+                        <th class="text-center">Approval Pendaftaran</th>
+                        <th class="text-center">Peserta Mudik Disetujui</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    @forelse($statistics['daily_stats'] as $stat)
+                        <tr>
+                            <td><strong>{{ $stat['destination_name'] }}</strong></td>
+                            <td class="text-center">
+                                <span class="badge bg-info text-bg-info fs-6">{{ $stat['registrations_today'] }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success text-bg-success fs-6">{{ $stat['participants_total_today'] }}</span>
+                                <small class="d-block text-muted">
+                                    <i class="bi bi-people me-1"></i>
+                                    Dewasa: {{ $stat['participants_adult_today'] }} - Anak (< 4th): {{ $stat['participants_under4_today'] }}
+                                </small>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-primary text-bg-primary fs-6">{{ $stat['approved_today'] }}</span>
+                            </td>
+                            <td class="text-center">
+                                <span class="badge bg-success text-bg-success fs-6">{{ $stat['participants_total_approved_today'] }}</span>
+                                <small class="d-block text-muted">
+                                    <i class="bi bi-people me-1"></i>
+                                    Dewasa: {{ $stat['participants_adult_approved_today'] }} - Anak (< 4th): {{ $stat['participants_under4_approved_today'] }}
+                                </small>
+                            </td>
+                        </tr>
+                    @empty
+                        <tr>
+                            <td colspan="4" class="text-center text-muted py-4">
+                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
+                                Belum ada aktivitas hari ini
+                            </td>
+                        </tr>
+                    @endforelse
+                </tbody>
+            </table>
+        </div>
+    </div>
+
+
+    {{-- Section 3: Ringkasan Keseluruhan --}}
+    <div class="mb-3 mt-4">
         <h5 class="section-title mb-3">
             <i class="bi bi-bar-chart-fill me-2"></i>Ringkasan Keseluruhan
         </h5>
@@ -219,7 +276,7 @@
         </div>
     </div>
 
-    {{-- Section 3: Participants vs Registrations --}}
+    {{-- Section 4: Participants vs Registrations --}}
     <div class="mb-3">
         <h5 class="section-title mb-3">
             <i class="bi bi-people-fill me-2"></i>Pendaftaran vs Peserta
@@ -227,7 +284,7 @@
     </div>
 
     <div class="row g-4 mb-4">
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="stat-card">
                 <div class="d-flex align-items-center mb-3">
                     <div class="stat-icon me-3"
@@ -246,7 +303,7 @@
             </div>
         </div>
 
-        <div class="col-md-6">
+        <div class="col-md-4">
             <div class="stat-card">
                 <div class="d-flex align-items-center mb-3">
                     <div class="stat-icon me-3"
@@ -254,19 +311,46 @@
                         <i class="bi bi-people-fill"></i>
                     </div>
                     <div>
-                        <div class="stat-value">{{ $statistics['summary']['total_participants'] }}</div>
-                        <div class="stat-label">Total Peserta Mudik</div>
+                        <div class="stat-value">{{ $statistics['summary']['total_participants_registered'] }}</div>
+                        <div class="stat-label">Total Peserta Mudik (Terdaftar)</div>
                     </div>
                 </div>
+                <span class="text-muted small mt-2 d-block">
+                    <i class="bi bi-people me-1"></i>
+                    Dewasa: {{ $statistics['summary']['total_participants_registered_adult'] }} - Anak (< 4th): {{ $statistics['summary']['total_participants_registered_under4'] }}
+                </span>
                 <p class="text-muted small mb-0">
                     <i class="bi bi-info-circle me-1"></i>
-                    Jumlah peserta yang disetujui (1 pendaftaran = 1-6 peserta)
+                    Jumlah peserta yang tedaftar
+                </p>
+            </div>
+        </div>
+
+         <div class="col-md-4">
+            <div class="stat-card">
+                <div class="d-flex align-items-center mb-3">
+                    <div class="stat-icon me-3"
+                        style="background: linear-gradient(135deg, #1a871e 0%, #285c2d 100%); color: white;">
+                        <i class="bi bi-person-fill-check"></i>
+                    </div>
+                    <div>
+                        <div class="stat-value">{{ $statistics['summary']['total_participants_approved'] }}</div>
+                        <div class="stat-label">Total Peserta Mudik (Disetujui)</div>
+                    </div>
+                </div>
+                <span class="text-muted small mt-2 d-block">
+                    <i class="bi bi-people me-1"></i>
+                    Dewasa: {{ $statistics['summary']['total_participants_approved_adult'] }} - Anak (< 4th): {{ $statistics['summary']['total_participants_approved_under4'] }}
+                </span>
+                <p class="text-muted small mb-0">
+                    <i class="bi bi-info-circle me-1"></i>
+                    Jumlah peserta yang disetujui
                 </p>
             </div>
         </div>
     </div>
 
-    {{-- Section 4: Quota per Destination --}}
+    {{-- Section 5: Quota per Destination --}}
     <div class="table-card mb-4">
         <h5 class="section-title">
             <i class="bi bi-diagram-3-fill me-2"></i>Kuota Per Tujuan
@@ -319,50 +403,6 @@
                             <td colspan="5" class="text-center text-muted py-4">
                                 <i class="bi bi-inbox fs-3 d-block mb-2"></i>
                                 Belum ada data tujuan
-                            </td>
-                        </tr>
-                    @endforelse
-                </tbody>
-            </table>
-        </div>
-    </div>
-
-    {{-- Section 5: Daily Statistics (Hari Ini) --}}
-    <div class="table-card">
-        <h5 class="section-title">
-            <i class="bi bi-calendar-check-fill me-2"></i>Statistik Hari Ini
-            <small class="text-muted fw-normal">({{ \Carbon\Carbon::today()->isoFormat('dddd, D MMMM Y') }})</small>
-        </h5>
-
-        <div class="table-responsive">
-            <table class="table table-hover align-middle">
-                <thead class="table-light">
-                    <tr>
-                        <th>Tujuan</th>
-                        <th class="text-center">Pendaftaran Masuk</th>
-                        <th class="text-center">Peserta Disetujui</th>
-                        <th class="text-center">Approval Hari Ini</th>
-                    </tr>
-                </thead>
-                <tbody>
-                    @forelse($statistics['daily_stats'] as $stat)
-                        <tr>
-                            <td><strong>{{ $stat['destination_name'] }}</strong></td>
-                            <td class="text-center">
-                                <span class="badge bg-info">{{ $stat['registrations_today'] }}</span>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge bg-success">{{ $stat['participants_today'] }}</span>
-                            </td>
-                            <td class="text-center">
-                                <span class="badge bg-primary">{{ $stat['approved_today'] }}</span>
-                            </td>
-                        </tr>
-                    @empty
-                        <tr>
-                            <td colspan="4" class="text-center text-muted py-4">
-                                <i class="bi bi-inbox fs-3 d-block mb-2"></i>
-                                Belum ada aktivitas hari ini
                             </td>
                         </tr>
                     @endforelse
