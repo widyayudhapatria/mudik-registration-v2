@@ -42,8 +42,8 @@ class SeatCounter extends Model
     {
         $this->current_seat_number++;
 
-        // Check if seat exceeds 50 → Move to next bus
-        if ($this->current_seat_number > 50) {
+        // Check if seat exceeds max seats → Move to next bus
+        if ($this->current_seat_number > config('mudik.counter_seat.bus_max_seats')) {
             $this->current_bus_number++;
             $this->current_seat_number = 1;
         }

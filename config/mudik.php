@@ -126,4 +126,13 @@ return [
         'start_date' => env('REGISTRATION_START_DATE', '2025-02-22 00:00:00'),
         'end_date'   => env('REGISTRATION_END_DATE', '2025-03-17 23:59:59'),
     ],
+
+    /*
+    |--------------------------------------------------------------------------
+    | Counter Seat Configuration
+    |--------------------------------------------------------------------------
+    */
+    'counter_seat' => [
+        'bus_max_seats' => env('BUS_MAX_SEATS', 50),
+    ],
 ];
