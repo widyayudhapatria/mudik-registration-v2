@@ -233,16 +233,21 @@
                     @if($registration->kk_document_path)
                         <div class="text-center">
                             @if(Str::endsWith($registration->kk_document_path, '.pdf'))
-                            <a href="{{ Storage::url($registration->kk_document_path) }}" target="_blank" class="btn btn-primary">
-                                <i class="bi bi-file-earmark-pdf-fill me-2"></i>Lihat PDF
-                            </a>
+                                <a href="{{ Storage::url($registration->kk_document_path) }}" target="_blank" class="btn btn-primary">
+                                    <i class="bi bi-file-earmark-pdf-fill me-2"></i>Lihat PDF
+                                </a>
                             @else
-                            <img id="kkDocumentImage" src="{{ Storage::url($registration->kk_document_path) }}" alt="Kartu Keluarga" class="document-preview" style="cursor: zoom-in;">
-                            <div class="mt-3">
-                                <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('kkDocumentImage').click()">
-                                    <i class="bi bi-zoom-in me-2"></i>Perbesar
-                                </button>
-                            </div>
+                                @if($registration->is_bypass)
+                                    <img id="kkDocumentImage" src="{{ asset('assets/public/images/bypass-kk.png') }}" alt="Kartu Keluarga" class="document-preview" style="cursor: zoom-in;">
+                                @else
+                                    <img id="kkDocumentImage" src="{{ Storage::url($registration->kk_document_path) }}" alt="Kartu Keluarga" class="document-preview" style="cursor: zoom-in;">
+                                @endif
+
+                                <div class="mt-3">
+                                    <button type="button" class="btn btn-outline-primary" onclick="document.getElementById('kkDocumentImage').click()">
+                                        <i class="bi bi-zoom-in me-2"></i>Perbesar
+                                    </button>
+                                </div>
                             @endif
                         </div>
                     @else
