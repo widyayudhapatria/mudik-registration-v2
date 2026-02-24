@@ -373,6 +373,7 @@
 
             const repBirthDate = $('#representative_birth_date').val();
             $(`#tanggalLahirPeserta1`).val(repBirthDate);
+            $('#hiddenTanggalLahirPeserta1').val(repBirthDate);
         }
 
         function setupRepresentativeSyncListeners() {
@@ -617,8 +618,21 @@
             pesertaContainer.appendChild(pesertaDiv);
 
             if (pesertaCount === 1) {
-                pesertaDiv.querySelector('input[name="namaPeserta[]"]').setAttribute('readonly', true);
-                pesertaDiv.querySelector('input[name="ktpPeserta[]"]').setAttribute('readonly', true);
+                const nameInput = pesertaDiv.querySelector('input[name="namaPeserta[]"]');
+                const ktpInput = pesertaDiv.querySelector('input[name="ktpPeserta[]"]');
+                const birthInput = pesertaDiv.querySelector('input[name="tanggalLahirPeserta[]"]');
+
+                nameInput.setAttribute('readonly', true);
+                ktpInput.setAttribute('readonly', true);
+
+                birthInput.setAttribute('disabled', true);
+
+                const hiddenBirth = document.createElement('input');
+                hiddenBirth.type = 'hidden';
+                hiddenBirth.name = 'tanggalLahirPeserta[]';
+                hiddenBirth.id = 'hiddenTanggalLahirPeserta1';
+
+                pesertaDiv.appendChild(hiddenBirth);
             }
 
             // Add event listener for remove button
