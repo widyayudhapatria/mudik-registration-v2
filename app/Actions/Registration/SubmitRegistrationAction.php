@@ -67,12 +67,12 @@ class SubmitRegistrationAction
             $quotaParticipantCount = $data->getQuotaParticipantCount(); // exclude under 4 years old from quota count
 
             // if participant is more than family count
-            if ($totalParticipantCount > $data->family_count) {
+            if ($totalParticipantCount !== $data->family_count) {
                 //throw error
                 throw new MudikException(
                     ErrorCode::InvalidFamilyCount,
                     sprintf(
-                        'Jumlah peserta (%d) tidak boleh lebih banyak dari jumlah keluarga (%d)',
+                        'Jumlah peserta (%d) tidak sesuai dengan jumlah peserta mudik (%d)',
                         $totalParticipantCount,
                         $data->family_count
                     )
