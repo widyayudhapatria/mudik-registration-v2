@@ -570,8 +570,8 @@
                                                                                 >
                                                                                 <p><strong>Butuh bantuan?</strong></p>
                                                                                 <p>
-                                                                                     📧 Email: <a href="mailto:{{ $mudikConfig['support']['email'] }}" style="color: #f58514; text-decoration: underline;">{{ $mudikConfig['support']['email'] }}</a><br>
-                                                                                    📞 Telepon: {{ $mudikConfig['support']['phone'] }}<br>
+                                                                                    📷 Instagram: <span style="color: #f58514; text-decoration: underline;">{{ $mudikConfig['support']['email'] }}</span><br>
+                                                                                    💬 WA: {{ $mudikConfig['support']['phone'] }}<br>
                                                                                     🕐 {{ $mudikConfig['support']['schedule'] }}
                                                                                 </p>
                                                                             </td>
