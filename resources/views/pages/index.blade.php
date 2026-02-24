@@ -440,7 +440,23 @@
                                 Kontak:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>{{ config('mudik.support.phone') }} / {{ config('mudik.support.email') }}</b>
+                                @php
+                                    $phones = explode('&', config('mudik.support.phone'));
+                                @endphp
+                                <span class="d-block fw-bolder">
+                                @foreach($phones as $phone)
+                                    @php
+                                        $phone = trim($phone);
+                                        $wa = preg_replace('/[^0-9]/', '', $phone);
+                                    @endphp
+                                    <a class="d-block" href="https://wa.me/{{ $wa }}" target="_blank">
+                                        {{ $phone }}
+                                    </a>
+                                @endforeach
+                                </span>
+                                <span class="d-block fw-bolder">
+                                    {!! str_replace('&', '<br>', config('mudik.support.email')) !!}
+                                </span>
                             </h5>
                         </div>
                     </div>
