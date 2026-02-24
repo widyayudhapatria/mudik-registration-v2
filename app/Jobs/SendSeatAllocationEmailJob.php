@@ -5,6 +5,7 @@ namespace App\Jobs;
 use App\Mail\SeatAllocationMail;
 use App\Models\EmailLog;
 use App\Models\Registration;
+use App\Models\SeatAllocation;
 use App\Services\QrCodeService;
 use Illuminate\Bus\Queueable;
 use Illuminate\Contracts\Queue\ShouldQueue;
@@ -21,7 +22,7 @@ class SendSeatAllocationEmailJob implements ShouldQueue
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
     public Registration $registration;
-    public Collection $seatAllocations;
+    public array $seatAllocationIds;
 
     /**
      * The number of times the job may be attempted.
@@ -43,7 +44,7 @@ class SendSeatAllocationEmailJob implements ShouldQueue
     public function __construct(Registration $registration, Collection $seatAllocations)
     {
         $this->registration = $registration;
-        $this->seatAllocations = $seatAllocations;
+        $this->seatAllocationIds = $seatAllocations->pluck('id')->toArray();
     }
 
     /**
@@ -51,7 +52,11 @@ class SendSeatAllocationEmailJob implements ShouldQueue
      */
     public function handle(QrCodeService $qrCodeService): void
     {
-        $this->seatAllocations->load('destination');
+        // Load fresh seat allocations from database with destination relation
+        $seatAllocations = SeatAllocation::with('destination')
+            ->whereIn('id', $this->seatAllocationIds)
+            ->get();
+
         $email = $this->registration->formLink->email;
         $subject = '🎫 E-Ticket Mudik Gratis 2026 - ' . $this->registration->destination->name;
 
@@ -66,7 +71,7 @@ class SendSeatAllocationEmailJob implements ShouldQueue
             // Send email with QR code service
             Mail::to($email)->send(new SeatAllocationMail(
                 $this->registration,
-                $this->seatAllocations,
+                $seatAllocations,
                 $qrCodeService
             ));
 
@@ -76,7 +81,7 @@ class SendSeatAllocationEmailJob implements ShouldQueue
             Log::info('Seat allocation email sent successfully', [
                 'registration_id' => $this->registration->id,
                 'email' => $email,
-                'seats_count' => $this->seatAllocations->filter(fn($s) => !$s->isNoSeat())->count(),
+                'seats_count' => $seatAllocations->filter(fn($s) => !$s->isNoSeat())->count(),
             ]);
         } catch (Throwable $e) {
             $emailLog->markAsFailed($e->getMessage());
