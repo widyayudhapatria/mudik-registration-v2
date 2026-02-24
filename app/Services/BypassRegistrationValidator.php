@@ -96,8 +96,8 @@ class BypassRegistrationValidator
 
             // Family count validation
             $familyCount = (int)($row['family_count'] ?? 0);
-            if ($familyCount < 1 || $familyCount > 6) {
-                $this->errors[] = ['row' => $rn, 'column' => 'family_count', 'message' => 'Family count harus angka antara 1-6'];
+            if ($familyCount < 1 || $familyCount > 10) {
+                $this->errors[] = ['row' => $rn, 'column' => 'family_count', 'message' => 'Family count harus angka antara 1-10'];
             }
 
             // is_child_under_4 validation

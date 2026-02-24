@@ -418,7 +418,7 @@
                                 Waktu Keberangkatan:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>{{ \Carbon\Carbon::parse(config('mudik.schedule.departure_date'))->translatedFormat('d F Y') }},
+                                <b>{{ \Carbon\Carbon::parse(config('mudik.schedule.departure_date'))->translatedFormat('d F Y') }} -
                                 Pukul {{ \Carbon\Carbon::parse(config('mudik.schedule.departure_time'))->format('H.i') }} WIB</b>
                             </h5>
                             <h5 class="mb-0">

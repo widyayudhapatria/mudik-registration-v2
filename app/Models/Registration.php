@@ -112,6 +112,15 @@ class Registration extends Model
     }
 
     /**
+     * Get the QR code email logs for this registration.
+     */
+    public function qrCodeEmails(): HasMany
+    {
+        return $this->hasMany(EmailLog::class, 'form_link_id', 'form_link_id')
+            ->where('email_type', 'qr_code');
+    }
+
+    /**
      * Get the status of the registration.
      */
     public function getStatus(): string

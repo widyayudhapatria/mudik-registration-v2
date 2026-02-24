@@ -5,11 +5,13 @@ namespace App\Actions\Scanner;
 use App\Data\ScanQrData;
 use App\Enums\ErrorCode;
 use App\Enums\ScanResult;
+use App\Enums\RegistrationStatus;
 //use App\Events\ScanPerformed;
 use App\Exceptions\MudikException;
 use App\Jobs\SendSeatAllocationEmailJob;
 use App\Models\Admin;
 use App\Models\QrCode;
+use App\Models\Registration;
 use App\Models\ScanLog;
 use Carbon\Carbon;
 use Illuminate\Support\Facades\DB;
@@ -41,8 +43,32 @@ class ConsumeQrCodeAction
                 throw new MudikException(ErrorCode::QrNotFound, null, [], 404);
             }
 
-            // Validate token
+            // CRITICAL: Lock registration FOR UPDATE
+            // Must lock AFTER QR code to prevent deadlock
+            $registration = Registration::where('id', $qrCode->registration_id)
+                ->lockForUpdate()
+                ->first();
+
+            if (!$registration) {
+                throw new MudikException(
+                    ErrorCode::ServerError,
+                    'Registration tidak ditemukan'
+                );
+            }
+
+            // Validate QR code - WITH BOTH LOCKS ACTIVE
             $this->validateQrCode($qrCode, $admin);
+
+            //Validate registration status - WITH BOTH LOCKS ACTIVE
+            if ($registration->approved_at === null) {
+                throw new MudikException(
+                    ErrorCode::ServerError,
+                    sprintf(
+                        'Pendaftaran status adalah %s, harus APPROVED untuk scanning',
+                        $registration->status
+                    )
+                );
+            }
 
             // Mark as scanned
             $qrCode->markAsScanned($admin->id);
@@ -55,16 +81,17 @@ class ConsumeQrCodeAction
                 request()->userAgent()
             );
 
-            // 🆕 Allocate seats for participants
+            // Allocate seats for participants
             $seatAllocations = AllocateSeatsAction::run(
                 $qrCode->registration,
                 $scanLog,
                 $admin
             );
 
+            // All done, commit transaction - RELEASE BOTH LOCKS
             DB::commit();
 
-            // 🆕 Send email with seat allocations (outside transaction)
+            // Send email with seat allocations (outside transaction)
             dispatch(new SendSeatAllocationEmailJob(
                 $qrCode->registration,
                 $seatAllocations

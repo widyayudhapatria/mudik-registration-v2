@@ -4,6 +4,7 @@ namespace App\Http\Controllers\CMS;
 
 use App\Actions\Registration\ApproveRegistrationAction;
 use App\Actions\Registration\RejectRegistrationAction;
+use App\Actions\Registration\ResendQrCodeEmailAction;
 use App\Data\ApproveRegistrationData;
 use App\Data\RejectRegistrationData;
 use App\Enums\Permissions\MudikPermissions;
@@ -46,7 +47,7 @@ class RegistrationManagementController extends Controller
             ->useFilters(RegistrationFilters::class)
             ->latest('created_at')
             ->paginate(20);
-        
+
         $destinations = Destination::ordered()->get();
 
         if ($request->wantsJson()) {
@@ -138,6 +139,29 @@ class RegistrationManagementController extends Controller
         }
     }
 
+    /**
+     * Resend QR code email.
+     *
+     * POST /cms/registrations/{registration}/resend-qr-code
+     */
+    public function resendQrCode(Registration $registration): JsonResponse
+    {
+        $this->authorize('view', $registration);
+
+        try {
+            $admin = auth('admin')->user();
+
+            $result = ResendQrCodeEmailAction::run($registration, $admin);
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['message'],
+            ]);
+        } catch (MudikException $e) {
+            return response()->json($e->toArray(), 400);
+        }
+    }
+
     public function export(Request $request): BinaryFileResponse
     {
         $this->authorize('viewAny', Registration::class);
@@ -148,10 +172,10 @@ class RegistrationManagementController extends Controller
             'seatAllocations.destination',
             'qrCode',
         ])
-        ->useFilters(RegistrationFilters::class)
-        ->whereHas('formLink', fn($q) => $q->where('status', 'approved'))
-        ->latest('created_at')
-        ->get();
+            ->useFilters(RegistrationFilters::class)
+            ->whereHas('formLink', fn($q) => $q->where('status', 'approved'))
+            ->latest('created_at')
+            ->get();
 
         return (new RegistrationAbsenExport($registrations))->download();
     }

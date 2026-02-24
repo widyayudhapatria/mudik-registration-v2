@@ -7,10 +7,12 @@ use Illuminate\Http\UploadedFile;
 use Spatie\LaravelData\Attributes\Validation\ArrayType;
 use Spatie\LaravelData\Attributes\Validation\BooleanType;
 use Spatie\LaravelData\Attributes\Validation\File;
+use Spatie\LaravelData\Attributes\Validation\Image;
 use Spatie\LaravelData\Attributes\Validation\Integer;
 use Spatie\LaravelData\Attributes\Validation\Max;
 use Spatie\LaravelData\Attributes\Validation\Min;
 use Spatie\LaravelData\Attributes\Validation\Mimes;
+use Spatie\LaravelData\Attributes\Validation\Mimetypes;
 use Spatie\LaravelData\Attributes\Validation\Regex;
 use Spatie\LaravelData\Attributes\Validation\Required;
 use Spatie\LaravelData\Attributes\Validation\Size;
@@ -39,7 +41,7 @@ class RegistrationData extends Data
         #[Required, StringType, Size(16), Regex('/^\d{16}$/')]
         public string $kk_number,
 
-        #[Required, File, Mimes('jpg', 'jpeg', 'png'), Max(5120)]
+        #[Required, File, Image, Mimetypes('image/jpeg', 'image/png'), Max(5120)]
         public UploadedFile $kk_document,
 
         #[Required, ArrayType]

@@ -254,16 +254,38 @@
             <div class="stat-box total">
                 <h4><i class="bi bi-people-fill me-2" aria-hidden="true"></i>Total Peserta Mudik</h4>
                 <p class="value" id="totalParticipants">0</p>
+                <small class="d-block" style="font-size: 11px;">
+                    <i class="bi bi-person-standing"></i>
+                    Dewasa: <span id="totalParticipantsAdult">0</span>
+                </small>
+                <small class="d-block" style="font-size: 11px;">
+                    <i class="bi bi-stars"></i>
+                    Anak (< 4th): <span id="totalParticipantsChild">0</span>
+                </small>
             </div>
             <div class="stat-box scanned">
                 <h4><i class="bi bi-check2-circle me-2" aria-hidden="true"></i>Sudah Scan</h4>
                 <p class="value" id="scannedParticipants">0</p>
-                <div class="unit">peserta</div>
+                <small class="d-block" style="font-size: 11px;">
+                    <i class="bi bi-person-standing"></i>
+                    Dewasa: <span id="scannedParticipantsAdult">0</span>
+                </small>
+                <small class="d-block" style="font-size: 11px;">
+                    <i class="bi bi-stars"></i>
+                    Anak (< 4th): <span id="scannedParticipantsChild">0</span>
+                </small>
             </div>
             <div class="stat-box unscanned">
                 <h4><i class="bi bi-x-circle-fill me-2" aria-hidden="true"></i>Belum Scan</h4>
                 <p class="value" id="unscannedParticipants">0</p>
-                <div class="unit">peserta</div>
+                <small class="d-block" style="font-size: 11px;">
+                    <i class="bi bi-person-standing"></i>
+                    Dewasa: <span id="unscannedParticipantsAdult">0</span>
+                </small>
+                <small class="d-block" style="font-size: 11px;">
+                    <i class="bi bi-stars"></i>
+                    Anak (< 4th): <span id="unscannedParticipantsChild">0</span>
+                </small>
             </div>
             <div class="stat-box percentage">
                 <h4><i class="bi bi-percent me-2" aria-hidden="true"></i>Persentase</h4>
@@ -349,7 +371,13 @@
                     const d = json.data;
 
                     document.getElementById('totalParticipants').textContent = d.total_participants;
+                    document.getElementById('totalParticipantsAdult').textContent = d.total_participants_adult;
+                    document.getElementById('totalParticipantsChild').textContent = d.total_participants_child;
                     document.getElementById('scannedParticipants').textContent = d.scanned_participants;
+                    document.getElementById('scannedParticipantsAdult').textContent = d.scanned_participants_adult;
+                    document.getElementById('scannedParticipantsChild').textContent = d.scanned_participants_child;
+                    document.getElementById('unscannedParticipantsAdult').textContent = d.unscanned_participants_adult;
+                    document.getElementById('unscannedParticipantsChild').textContent = d.unscanned_participants_child;
                     document.getElementById('unscannedParticipants').textContent = d.unscanned_participants;
                     document.getElementById('completionPercentage').textContent = d.completion_percentage + '%';
                     document.getElementById('todayScans').textContent = d.today_scans;
@@ -443,8 +471,8 @@
                                 <thead>
                                     <tr>
                                         <th>Kota</th>
-                                        <th class="text-center">Registrasi</th>
-                                        <th class="text-center">Total Peserta</th>
+                                        <th class="text-center">Kuota</th>
+                                        <th class="text-center">Total Peserta Mudik</th>
                                         <th class="text-center">Sudah Scan</th>
                                         <th class="text-center">Belum Scan</th>
                                         <th class="text-center">Persentase</th>
@@ -455,11 +483,43 @@
                     json.data.forEach(dest => {
                         html += `
                                     <tr>
-                                        <td><strong>${dest.kota}</strong></td>
-                                        <td class="text-center">${dest.registrasi}</td>
-                                        <td class="text-center">${dest.total_peserta}</td>
-                                        <td class="text-center"><span class="badge bg-success">${dest.sudah_scan}</span></td>
-                                        <td class="text-center"><span class="badge bg-warning text-dark">${dest.belum_scan}</span></td>
+                                        <td class="fs-6"><strong>${dest.kota}</strong></td>
+                                        <td class="text-center">
+                                            <span class="badge bg-secondary fs-6">${dest.total_quota}</span>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-primary fs-6">${dest.total_peserta}</span>
+                                            <small class="d-block text-muted" style="font-size: 11px;">
+                                                <i class="bi bi-person-standing"></i>
+                                                Dewasa: <span>${dest.total_peserta_dewasa}</span>
+                                            </small>
+                                            <small class="d-block text-muted" style="font-size: 11px;">
+                                                <i class="bi bi-stars"></i>
+                                                Anak (< 4th): <span>${dest.total_peserta_anak}</span>
+                                            </small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-success fs-6">${dest.sudah_scan}</span>
+                                            <small class="d-block text-muted" style="font-size: 11px;">
+                                                <i class="bi bi-person-standing"></i>
+                                                Dewasa: <span>${dest.sudah_scan_dewasa}</span>
+                                            </small>
+                                            <small class="d-block text-muted" style="font-size: 11px;">
+                                                <i class="bi bi-stars"></i>
+                                                Anak (< 4th): <span>${dest.sudah_scan_anak}</span>
+                                            </small>
+                                        </td>
+                                        <td class="text-center">
+                                            <span class="badge bg-warning text-dark fs-6">${dest.belum_scan}</span>
+                                            <small class="d-block text-muted" style="font-size: 11px;">
+                                                <i class="bi bi-person-standing"></i>
+                                                Dewasa: <span>${dest.belum_scan_dewasa}</span>
+                                            </small>
+                                            <small class="d-block text-muted" style="font-size: 11px;">
+                                                <i class="bi bi-stars"></i>
+                                                Anak (< 4th): <span>${dest.belum_scan_anak}</span>
+                                            </small>
+                                        </td>
                                         <td class="text-center">
                                             <strong>${dest.persentase}%</strong>
                                             <div class="progress-bar-container" style="margin-top: 6px;">

@@ -24,6 +24,7 @@ class AllocateSeatsAction
      * @param Admin $admin
      * @return Collection<SeatAllocation>
      */
+
     public function handle(Registration $registration, ScanLog $scanLog, Admin $admin): Collection
     {
         return DB::transaction(function () use ($registration, $scanLog, $admin) {

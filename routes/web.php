@@ -1,6 +1,7 @@
 <?php
 
 use App\Http\Controllers\CMS\DashboardController;
+use App\Http\Controllers\CMS\AdminManagementController;
 use App\Http\Controllers\CMS\DestinationManagementController;
 use App\Http\Controllers\CMS\EmailRequestController;
 use App\Http\Controllers\CMS\QuotaManagementController;
@@ -43,14 +44,31 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
 
     Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
 
+    Route::prefix('admin-management')->name('admin-management.')->middleware('super.admin')->group(function () {
+        Route::get('/', [AdminManagementController::class, 'index'])->name('index');
+        Route::get('/create', [AdminManagementController::class, 'create'])->name('create');
+        Route::post('/', [AdminManagementController::class, 'store'])->name('store');
+        Route::get('/{admin}/edit', [AdminManagementController::class, 'edit'])->name('edit');
+        Route::put('/{admin}', [AdminManagementController::class, 'update'])->name('update');
+        Route::post('/{admin}/toggle-active', [AdminManagementController::class, 'toggleActive'])->name('toggle-active');
+        Route::delete('/{admin}', [AdminManagementController::class, 'destroy'])->name('destroy');
+    });
+
+    // Change password - accessible by all authenticated admins (bisa ubah diri sendiri)
+    Route::prefix('admin-management')->name('admin-management.')->group(function () {
+        Route::get('/{admin}/change-password', [AdminManagementController::class, 'showChangePassword'])->name('change-password.show');
+        Route::put('/{admin}/change-password', [AdminManagementController::class, 'updatePassword'])->name('change-password.update');
+    });
+
     Route::prefix('registrations')->name('registrations.')->group(function () {
         Route::get('/', [RegistrationManagementController::class, 'index'])->name('index');
         Route::get('/export', [RegistrationManagementController::class, 'export'])->name('export');
         Route::get('/{registration}', [RegistrationManagementController::class, 'show'])->withTrashed()->name('show');
         Route::post('/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('approve');
         Route::post('/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('reject');
+        Route::post('/{registration}/resend-qr-code', [RegistrationManagementController::class, 'resendQrCode'])->name('resend-qr-code');
     });
- 
+
     Route::prefix('seat-manifest')->name('seat-manifest.')->group(function () {
         Route::get('/', [SeatManifestController::class, 'index'])->name('index');
     });
@@ -146,6 +164,11 @@ Route::prefix('auth')->name('auth.')->group(function () {
 
         if (Auth::guard('admin')->attempt($credentials, $request->boolean('remember'))) {
             $request->session()->regenerate();
+
+            // Update last login timestamp
+            $admin = Auth::guard('admin')->user();
+            $admin->update(['last_login_at' => now()]);
+
             return redirect()->intended(route('cms.dashboard'));
         }
 
