@@ -151,7 +151,7 @@ class SubmitRegistrationAction
                 'error' => $e->getMessage(),
                 'trace' => $e->getTraceAsString(),
                 'class' => get_class($e),
-                'line' => $e->getLine(),  
+                'line' => $e->getLine(),
                 'file' => $e->getFile(),
             ]);
             throw new MudikException(ErrorCode::ServerError);
@@ -238,7 +238,53 @@ class SubmitRegistrationAction
 
     protected function uploadKKDocument($file): string
     {
+        // 1. Validasi MIME type real (double check)
+        $allowedMimes = ['image/jpeg', 'image/png'];
+        $fileMime = $file->getMimeType();
+
+        if (!in_array($fileMime, $allowedMimes)) {
+            throw new MudikException(
+                ErrorCode::InvalidFile,
+                'File harus berupa gambar JPG atau PNG yang valid.'
+            );
+        }
+
+        // 2. Validasi file adalah image dengan getimagesize
+        try {
+            $imageInfo = getimagesize($file->getRealPath());
+            if ($imageInfo === false) {
+                throw new MudikException(
+                    ErrorCode::InvalidFile,
+                    'File yang diupload bukan gambar yang valid.'
+                );
+            }
+
+            // Validasi MIME dari getimagesize
+            $detectedMime = $imageInfo['mime'];
+            if (!in_array($detectedMime, $allowedMimes)) {
+                throw new MudikException(
+                    ErrorCode::InvalidFile,
+                    'Tipe gambar tidak didukung.'
+                );
+            }
+        } catch (\Exception $e) {
+            // Jika error dari MudikException, re-throw
+            if ($e instanceof MudikException) {
+                throw $e;
+            }
+            // Untuk exception lain
+            throw new MudikException(
+                ErrorCode::InvalidFile,
+                'File yang diupload tidak dapat diproses sebagai gambar.'
+            );
+        }
+
+        // 3. Generate safe filename (hapus original filename untuk security)
+        $extension = $file->getClientOriginalExtension();
+        $safeFilename = uniqid('kk_', true) . '_' . time() . '.' . $extension;
+
+        // 4. Store dengan nama file yang di-generate
         $path = config('mudik.upload.kk_document_path', 'uploads/kk_documents');
-        return $file->store($path, 'public');
+        return $file->storeAs($path, $safeFilename, 'public');
     }
 }

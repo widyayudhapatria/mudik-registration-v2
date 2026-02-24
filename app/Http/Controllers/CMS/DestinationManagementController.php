@@ -7,6 +7,7 @@ use App\Actions\Quota\UpdateDestinationAction;
 use App\Data\DestinationData;
 use App\Http\Controllers\Controller;
 use App\Models\Destination;
+use App\Models\GlobalQuotaConfig;
 use Illuminate\Http\JsonResponse;
 use Illuminate\Http\Request;
 use Illuminate\View\View;
@@ -48,6 +49,11 @@ class DestinationManagementController extends Controller
         //         ];
         //     });
 
+        // Global quota config
+        $global_quota = GlobalQuotaConfig::getCurrentYear();
+
+        // Optimized query to get total participants per destination
+
 
 
         $destinations = Destination::withCount(['dailyQuotas', 'registrations'])
@@ -59,6 +65,7 @@ class DestinationManagementController extends Controller
                     ->whereNotNull('registrations.approved_at')
                     ->whereNull('registrations.deleted_at')
                     ->whereNull('participants.deleted_at')
+                    ->where('participants.is_child_under_4', false)
                     ->selectRaw('COUNT(participants.id)');
             }, 'total_participants')
             ->orderBy('display_order', 'asc')
@@ -98,6 +105,7 @@ class DestinationManagementController extends Controller
 
         return view('cms.destinations.index', [
             'destinations' => $destinations,
+            'global_quota' => $global_quota,
         ]);
     }
 

@@ -22,6 +22,13 @@ class BypassRegistrationController extends Controller
     ) {
         $this->excelService = $excelService;
         $this->bypassService = $bypassService;
+
+        $this->middleware(function ($request, $next) {
+            if (!auth('admin')->user()->isSuperAdmin()) {
+                abort(403);
+            }
+            return $next($request);
+        });
     }
 
     /**

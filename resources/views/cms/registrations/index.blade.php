@@ -303,7 +303,7 @@
                         <td>{{ $registration->representative_nik }}</td>
                         <td>{{ $registration->destination->name }}</td>
                         <td>
-                            <span class="badge bg-info">{{ $registration->participants()->withTrashed()->count() }} orang</span>
+                            <span class="badge bg-info">{{ $registration->family_count }} orang</span>
                         </td>
                         <td>{{ $registration->created_at->format('d/m/Y H:i') }}</td>
                         <td>

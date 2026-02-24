@@ -415,10 +415,11 @@
                             <h5 class="team-name text-uppercase text-custom mb-4 text-center">Informasi Penting</h5>
                             <h5 class="mb-0">
                                 <span class="mdi mdi-calendar-range"></span>
-                                Tanggal Keberangkatan:
+                                Waktu Keberangkatan:
                             </h5>
                             <h5 class="mb-3 ps-4">
-                                <b>{{ config('mudik.schedule.departure_date') }} {{ config('mudik.schedule.departure_time') }} WIB</b>
+                                <b>{{ \Carbon\Carbon::parse(config('mudik.schedule.departure_date'))->translatedFormat('d F Y') }} -
+                                Pukul {{ \Carbon\Carbon::parse(config('mudik.schedule.departure_time'))->format('H.i') }} WIB</b>
                             </h5>
                             <h5 class="mb-0">
                                 <span class="mdi mdi-map-marker"></span>
