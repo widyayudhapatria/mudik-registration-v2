@@ -485,7 +485,7 @@
                                                                             <h4 style="color: #f58514; margin-bottom: 10px; font-size: 18px; font-weight: bold;">WAJIB DIBAWA SAAT KEBERANGKATAN & PENUKARAN :</h4>
                                                                             <ul style="margin: 0; padding-left: 20px;">
                                                                                 <li style="margin-bottom: 10px;">QR Code ini (cetak atau tunjukkan di smartphone)</li>
-                                                                                <li style="margin-bottom: 10px;">KTP Asli dan Fotocopy KTP perwakilan semua peserta mudik</li>
+                                                                                <li style="margin-bottom: 10px;">KTP Asli dan Fotocopy KTP semua peserta mudik</li>
                                                                                 <li style="margin-bottom: 10px;">Fotocopy KK yang diupload saat pendaftaran</li>
                                                                             </ul>
                                                                         </td>

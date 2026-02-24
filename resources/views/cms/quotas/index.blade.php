@@ -534,7 +534,7 @@
                     <tr>
                         <th style="width: 25%;">Kota</th>
                         <th style="width: 18%; text-align: center;">Total Quota</th>
-                        <th style="width: 18%; text-align: center;">Terpakai</th>
+                        <th style="width: 18%; text-align: center;">Terpakai (Approved)</th>
                         <th style="width: 18%; text-align: center;">Sisa</th>
                         <th style="width: 21%; text-align: center;">Action</th>
                     </tr>
