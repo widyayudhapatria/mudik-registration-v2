@@ -6,6 +6,7 @@ use Illuminate\Foundation\Configuration\Middleware;
 use Illuminate\Routing\Middleware\SubstituteBindings;
 use Illuminate\Routing\Middleware\ThrottleRequests;
 use Illuminate\Routing\Middleware\ValidateSignature;
+use Illuminate\Http\Exceptions\ThrottleRequestsException;
 use App\Http\Middleware\Authenticate;
 use App\Http\Middleware\RedirectIfAuthenticated;
 use App\Http\Middleware\CheckFormLinkValid;
@@ -45,6 +46,21 @@ return Application::configure(basePath: dirname(__DIR__))
         ]);
     })
     ->withExceptions(function (Exceptions $exceptions) {
+        // Handle Throttle Requests Exception
+        $exceptions->render(function (ThrottleRequestsException $e, $request) {
+            if ($request->expectsJson()) {
+                return response()->json([
+                    'success' => false,
+                    'message' => 'Terlalu banyak percobaan. Silahkan tunggu beberapa saat.',
+                    'retry_after' => (int) ($e->getHeaders()['Retry-After'] ?? 60),
+                ], 429);
+            }
+
+            return response()->view('errors.throttle', [
+                'retry_after' => (int) ($e->getHeaders()['Retry-After'] ?? 60),
+            ], 429);
+        });
+
         // Custom exception handling
         $exceptions->render(function (MudikException $e, $request) {
             if ($request->expectsJson()) {

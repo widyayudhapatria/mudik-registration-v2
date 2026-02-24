@@ -123,4 +123,18 @@ return [
         'store' => env('APP_MAINTENANCE_STORE', 'database'),
     ],
 
+    /*
+    |--------------------------------------------------------------------------
+    | Trusted Proxies
+    |--------------------------------------------------------------------------
+    | Set trusted proxies for the application. These are typically load balancers
+    | or reverse proxies that sit in front of your application and forward requests. You can specify
+    | the trusted proxies as an array of IP addresses or CIDR notation.
+    |
+    | Example: TRUSTED_PROXIES=203.0.113.1,203.0.113.2
+    | Or for all: TRUSTED_PROXIES=*
+    |
+    */
+    'trusted_proxies' => explode(',', env('TRUSTED_PROXIES', '*')),
+
 ];

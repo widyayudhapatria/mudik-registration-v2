@@ -10,12 +10,6 @@ use Illuminate\Http\JsonResponse;
 
 class EmailSubmissionController extends Controller
 {
-    public function __construct()
-    {
-        // Rate limiting: 5 requests per 10 minutes
-        $this->middleware('throttle:5,10');
-    }
-
     /**
      * Submit email for registration link.
      *
