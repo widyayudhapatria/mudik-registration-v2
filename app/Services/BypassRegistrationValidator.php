@@ -101,8 +101,8 @@ class BypassRegistrationValidator
             }
 
             // is_child_under_4 validation
-            $isChild = $row['is_child_under_4'] ?? '';
-            if (!in_array(strtolower($isChild), ['true', 'false', '1', '0', 'yes', 'no'])) {
+            $isChildNorm = $this->normalizeBoolean($row['is_child_under_4'] ?? null);
+            if ($isChildNorm === null) {
                 $this->errors[] = ['row' => $rn, 'column' => 'is_child_under_4', 'message' => 'is_child_under_4 harus true/false atau 1/0'];
             }
         }
@@ -302,7 +302,7 @@ class BypassRegistrationValidator
         foreach ($rows as $rowIndex => $row) {
             $rn = $rowIndex + 1;
             $dob = $row['participant_birth_date'] ?? '';
-            $isChild = strtolower($row['is_child_under_4'] ?? 'false');
+            $isChild = $this->normalizeBoolean($row['is_child_under_4'] ?? null) ?? 'false';
 
             if ($dob) {
                 $age = $this->calculateAge($dob);
@@ -376,6 +376,31 @@ class BypassRegistrationValidator
         $today = new \DateTime();
         return $today->diff($date)->y;
     }
+
+    /**
+     * Helper: Normalize boolean-like values from Excel (bool, numeric, or string)
+     * Returns 'true' or 'false' or null if not recognizable
+     */
+    protected function normalizeBoolean($value): ?string
+    {
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+        if (is_numeric($value)) {
+            return ((int)$value !== 0) ? 'true' : 'false';
+        }
+        if (is_string($value)) {
+            $v = mb_strtolower(trim($value));
+            if (in_array($v, ['true', 't', 'yes', 'y', '1'], true)) {
+                return 'true';
+            }
+            if (in_array($v, ['false', 'f', 'no', 'n', '0'], true)) {
+                return 'false';
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Helper: Group rows by representative NIK
