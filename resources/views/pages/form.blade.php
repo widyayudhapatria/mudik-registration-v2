@@ -488,7 +488,7 @@
                 }
             });
 
-            setupRepresentativeSyncListeners(); 
+            setupRepresentativeSyncListeners();
         }
 
         function formatNumber(e) {
@@ -909,16 +909,14 @@
             }
 
             if (jumlahPeserta !== jumlahAnggota) {
-                console.log(`Mismatch detected: jumlahPeserta (${jumlahPeserta}) != jumlahAnggota (${jumlahAnggota}). Auto-syncing...`);
-                if (jumlahPeserta > jumlahAnggota) {
-                    Swal.fire({
-                        title: "Peringatan!",
-                        text: `Jumlah peserta tidak boleh melebihi jumlah anggota keluarga. Silakan kurangi jumlah peserta atau sesuaikan jumlah anggota keluarga.`,
-                        icon: "warning",
-                        confirmButtonText: "Baik, saya akan periksa kembali.",
-                    });
-                    return;
-                }
+                console.log(`Mismatch detected: jumlahPeserta (${jumlahPeserta}) != jumlahAnggota (${jumlahAnggota}).`);
+                Swal.fire({
+                    title: "Peringatan!",
+                    text: `Jumlah peserta mudik yang diinput tidak sesuai. Harap samakan dengan jumlah peserta mudik.`,
+                    icon: "warning",
+                    confirmButtonText: "Baik, saya akan periksa kembali.",
+                });
+                return;
 
                 // CRITICAL: Auto-sync family_count with actual peserta count if mismatch
                 //document.getElementById("family_count").value = jumlahPeserta;
