@@ -463,8 +463,8 @@
                                       <td valign="top" class="mcnTextContent" style="padding: 0px 18px 18px; color: #333333; font-family: 'Roboto', Arial, Helvetica, sans-serif; font-size: 16px; line-height: 150%;">
                                         <p><strong>Kontak Bantuan</strong></p>
                                         <p>
-                                            📧 Email: <a href="mailto:{{ $mudikConfig['support']['email'] }}" style="color: #f58514; text-decoration: underline;">{{ $mudikConfig['support']['email'] }}</a><br>
-                                            📞 Telepon: {{ $mudikConfig['support']['phone'] }}<br>
+                                            📷 Instagram: <span style="color: #f58514; text-decoration: underline;">{{ $mudikConfig['support']['email'] }}</span><br>
+                                            💬 WA: {{ $mudikConfig['support']['phone'] }}<br>
                                             🕐 {{ $mudikConfig['support']['schedule'] }}
                                         </p>
                                       </td>

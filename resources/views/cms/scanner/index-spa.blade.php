@@ -691,7 +691,7 @@
                                         ${seat.participant_name} <span class="text-muted small">(${seat.participant_age} th)</span>
                                     </span>
                                     <span class="badge" style="background: linear-gradient(135deg, #2E7D32 0%, #1B5E20 100%); font-size: 13px; padding: 6px 12px; letter-spacing: 1px;">
-                                        ${seat.seat_code}
+                                        Bus${seat.bus_name} - ${seat.seat_label}
                                     </span>
                                 </li>
                             `).join('')}
@@ -790,7 +790,7 @@
             }
             if (d.valid_from) {
                 extra += `<p style="font-weight: 700; margin: 12px 0 4px 0; font-size: 14px; color: #333;">📆 Periode Berlaku:</p>`;
-                extra += `<small class="text-muted">${formatDate(d.valid_from)} – ${formatDate(d.valid_until)}</small>`;
+                extra += `<small class="text-muted">${formatDatetime(d.valid_from)} – ${formatDatetime(d.valid_until)}</small>`;
             }
             extra += `</div>`;
             return extra;
