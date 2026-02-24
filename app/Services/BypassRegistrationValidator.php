@@ -53,7 +53,7 @@ class BypassRegistrationValidator
     protected function validateDataTypes(array &$rows): void
     {
         foreach ($rows as $rowIndex => $row) {
-            $rn = $rowIndex + 1;
+            $rn = $rowIndex + 2; // +1 for 1-based index, +1 for header row
 
             // Text fields
             if (empty($row['representative_name']) || !is_string($row['representative_name'])) {
@@ -101,8 +101,8 @@ class BypassRegistrationValidator
             }
 
             // is_child_under_4 validation
-            $isChild = $row['is_child_under_4'] ?? '';
-            if (!in_array(strtolower($isChild), ['true', 'false', '1', '0', 'yes', 'no'])) {
+            $isChildNorm = $this->normalizeBoolean($row['is_child_under_4'] ?? null);
+            if ($isChildNorm === null) {
                 $this->errors[] = ['row' => $rn, 'column' => 'is_child_under_4', 'message' => 'is_child_under_4 harus true/false atau 1/0'];
             }
         }
@@ -136,7 +136,7 @@ class BypassRegistrationValidator
             $email = mb_strtolower(trim($row['representative_email'] ?? ''));
             if ($email && in_array($email, $existingEmails, true)) {
                 $this->errors[] = [
-                    'row' => $rowIndex + 1,
+                    'row' => $rowIndex + 2,
                     'email' => $row['representative_email'] ?? '',
                     'type' => 'duplicate_email_global',
                     'message' => "Email '{$row['representative_email']}' sudah terdaftar di sistem dengan status submitted/approved."
@@ -162,7 +162,7 @@ class BypassRegistrationValidator
                 // Same email but different representative
                 if ($this->seenEmails[$email] !== $repNik) {
                     $this->errors[] = [
-                        'row' => $rowIndex + 1,
+                        'row' => $rowIndex + 2,
                         'email' => $email,
                         'type' => 'duplicate_email_batch',
                         'message' => "Email '{$email}' muncul lebih dari sekali di file dengan representative berbeda."
@@ -190,7 +190,7 @@ class BypassRegistrationValidator
             $nik = (string)($row['representative_nik'] ?? '');
             if (in_array($nik, $existingNiks)) {
                 $this->warnings[] = [
-                    'row' => $rowIndex + 1,
+                    'row' => $rowIndex + 2,
                     'nik' => $nik,
                     'type' => 'duplicate_rep_nik',
                     'message' => "NIK representative '{$nik}' sudah pernah terdaftar."
@@ -216,7 +216,7 @@ class BypassRegistrationValidator
             $nik = (string)($row['participant_nik'] ?? '');
             if (in_array($nik, $existingNiks)) {
                 $this->errors[] = [
-                    'row' => $rowIndex + 1,
+                    'row' => $rowIndex + 2,
                     'nik' => $nik,
                     'type' => 'duplicate_participant_nik',
                     'message' => "NIK peserta '{$nik}' sudah terdaftar."
@@ -240,7 +240,7 @@ class BypassRegistrationValidator
                     $expectedCount = $familyCount;
                 } elseif ($familyCount !== $expectedCount) {
                     $this->errors[] = [
-                        'row' => $rowIndex + 1,
+                        'row' => $rowIndex + 2,
                         'type' => 'inconsistent_family_count',
                         'message' => "Family count harus konsisten untuk representative '{$repNik}'"
                     ];
@@ -266,7 +266,7 @@ class BypassRegistrationValidator
     protected function validateBirthDates(array $rows): void
     {
         foreach ($rows as $rowIndex => $row) {
-            $rn = $rowIndex + 1;
+            $rn = $rowIndex + 2;
 
             $repDob = trim((string)($row['representative_birth_date'] ?? ''));
             if ($repDob) {
@@ -300,9 +300,9 @@ class BypassRegistrationValidator
     protected function validateAgeConsistency(array $rows): void
     {
         foreach ($rows as $rowIndex => $row) {
-            $rn = $rowIndex + 1;
+            $rn = $rowIndex + 2;
             $dob = $row['participant_birth_date'] ?? '';
-            $isChild = strtolower($row['is_child_under_4'] ?? 'false');
+            $isChild = $this->normalizeBoolean($row['is_child_under_4'] ?? null) ?? 'false';
 
             if ($dob) {
                 $age = $this->calculateAge($dob);
@@ -376,6 +376,31 @@ class BypassRegistrationValidator
         $today = new \DateTime();
         return $today->diff($date)->y;
     }
+
+    /**
+     * Helper: Normalize boolean-like values from Excel (bool, numeric, or string)
+     * Returns 'true' or 'false' or null if not recognizable
+     */
+    protected function normalizeBoolean($value): ?string
+    {
+        if (is_bool($value)) {
+            return $value ? 'true' : 'false';
+        }
+        if (is_numeric($value)) {
+            return ((int)$value !== 0) ? 'true' : 'false';
+        }
+        if (is_string($value)) {
+            $v = mb_strtolower(trim($value));
+            if (in_array($v, ['true', 't', 'yes', 'y', '1'], true)) {
+                return 'true';
+            }
+            if (in_array($v, ['false', 'f', 'no', 'n', '0'], true)) {
+                return 'false';
+            }
+        }
+        return null;
+    }
+
 
     /**
      * Helper: Group rows by representative NIK
