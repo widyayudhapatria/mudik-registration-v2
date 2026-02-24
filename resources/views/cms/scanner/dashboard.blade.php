@@ -491,33 +491,33 @@
                                             <span class="badge bg-primary fs-6">${dest.total_peserta}</span>
                                             <small class="d-block text-muted" style="font-size: 11px;">
                                                 <i class="bi bi-person-standing"></i>
-                                                Dewasa: <span>${dest.total_peserta_dewasa}</span>
+                                                Dewasa: <span>${dest.total_peserta_adult}</span>
                                             </small>
                                             <small class="d-block text-muted" style="font-size: 11px;">
                                                 <i class="bi bi-stars"></i>
-                                                Anak (< 4th): <span>${dest.total_peserta_anak}</span>
+                                                Anak (< 4th): <span>${dest.total_peserta_child}</span>
                                             </small>
                                         </td>
                                         <td class="text-center">
                                             <span class="badge bg-success fs-6">${dest.sudah_scan}</span>
                                             <small class="d-block text-muted" style="font-size: 11px;">
                                                 <i class="bi bi-person-standing"></i>
-                                                Dewasa: <span>${dest.sudah_scan_dewasa}</span>
+                                                Dewasa: <span>${dest.sudah_scan_adult}</span>
                                             </small>
                                             <small class="d-block text-muted" style="font-size: 11px;">
                                                 <i class="bi bi-stars"></i>
-                                                Anak (< 4th): <span>${dest.sudah_scan_anak}</span>
+                                                Anak (< 4th): <span>${dest.sudah_scan_child}</span>
                                             </small>
                                         </td>
                                         <td class="text-center">
                                             <span class="badge bg-warning text-dark fs-6">${dest.belum_scan}</span>
                                             <small class="d-block text-muted" style="font-size: 11px;">
                                                 <i class="bi bi-person-standing"></i>
-                                                Dewasa: <span>${dest.belum_scan_dewasa}</span>
+                                                Dewasa: <span>${dest.belum_scan_adult}</span>
                                             </small>
                                             <small class="d-block text-muted" style="font-size: 11px;">
                                                 <i class="bi bi-stars"></i>
-                                                Anak (< 4th): <span>${dest.belum_scan_anak}</span>
+                                                Anak (< 4th): <span>${dest.belum_scan_child}</span>
                                             </small>
                                         </td>
                                         <td class="text-center">

@@ -160,7 +160,7 @@
                                 </td>
                                 <td class="fw-semibold">{{ $seat->participant->full_name }}</td>
                                 <td>
-                                    <span class="badge bg-dark">{{ $seat->seat_code }}</span>
+                                    <span class="badge bg-dark">{{ $seat->seat_label }}</span>
                                 </td>
                                 <td class="text-muted small">
                                     {{ $seat->registration->representative_name }}
