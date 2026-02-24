@@ -151,13 +151,15 @@
                     </a>
                 </li>
             @endif
-            <li class="sidebar-menu-item">
-                <a href="{{ route('cms.registrations.index') }}"
-                    class="sidebar-menu-link {{ request()->routeIs('cms.registrations.*') ? 'active' : '' }}">
-                    <i class="bi bi-file-text"></i>
-                    <span>Pendaftaran</span>
-                </a>
-            </li>
+            @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isValidator())
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('cms.registrations.index') }}"
+                        class="sidebar-menu-link {{ request()->routeIs('cms.registrations.*') ? 'active' : '' }}">
+                        <i class="bi bi-file-text"></i>
+                        <span>Pendaftaran</span>
+                    </a>
+                </li>
+            @endif
             <li class="sidebar-menu-item">
                 <a href="{{ route('cms.seat-manifest.index') }}"
                     class="sidebar-menu-link {{ request()->routeIs('cms.seat-manifest.*') ? 'active' : '' }}">
@@ -165,20 +167,24 @@
                     <span>Manifest Kursi</span>
                 </a>
             </li>
-            <li class="sidebar-menu-item">
-                <a href="{{ route('cms.destinations.index') }}"
-                    class="sidebar-menu-link {{ request()->routeIs('cms.destinations.*') ? 'active' : '' }}">
-                    <i class="bi bi-calendar3"></i>
-                    <span>Kuota Tujuan</span>
-                </a>
-            </li>
-            <li class="sidebar-menu-item">
-                <a href="{{ route('cms.quotas.index') }}"
-                    class="sidebar-menu-link {{ request()->routeIs('cms.quotas.*') ? 'active' : '' }}">
-                    <i class="bi bi-calendar3"></i>
-                    <span>Kuota Harian</span>
-                </a>
-            </li>
+            @if (auth('admin')->user()->isSuperAdmin())
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('cms.destinations.index') }}"
+                        class="sidebar-menu-link {{ request()->routeIs('cms.destinations.*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Kuota Tujuan</span>
+                    </a>
+                </li>
+            @endif
+            @if (auth('admin')->user()->isSuperAdmin())
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('cms.quotas.index') }}"
+                        class="sidebar-menu-link {{ request()->routeIs('cms.quotas.*') ? 'active' : '' }}">
+                        <i class="bi bi-calendar3"></i>
+                        <span>Kuota Harian</span>
+                    </a>
+                </li>
+            @endif
             @can('scan', App\Models\QrCode::class)
                 <li class="sidebar-menu-item">
                     <a href="{{ route('cms.scanner.index') }}"
@@ -188,20 +194,24 @@
                     </a>
                 </li>
             @endcan
-            <li class="sidebar-menu-item">
-                <a href="{{ route('cms.scanner.dashboard') }}"
-                    class="sidebar-menu-link {{ request()->routeIs('cms.scanner.dashboard') ? 'active' : '' }}">
-                    <i class="bi bi-bar-chart"></i>
-                    <span>Scan Dashboard</span>
-                </a>
-            </li>
-            <li class="sidebar-menu-item">
-                <a href="{{ route('cms.bypass-registrations.form') }}"
-                    class="sidebar-menu-link {{ request()->routeIs('cms.bypass-registrations.*') ? 'active' : '' }}">
-                    <i class="bi bi-person-plus"></i>
-                    <span>Bypass Registration</span>
-                </a>
-            </li>
+            @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isScanner())
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('cms.scanner.dashboard') }}"
+                        class="sidebar-menu-link {{ request()->routeIs('cms.scanner.dashboard') ? 'active' : '' }}">
+                        <i class="bi bi-bar-chart"></i>
+                        <span>Scan Dashboard</span>
+                    </a>
+                </li>
+            @endif
+            @if (auth('admin')->user()->isSuperAdmin())
+                <li class="sidebar-menu-item">
+                    <a href="{{ route('cms.bypass-registrations.form') }}"
+                        class="sidebar-menu-link {{ request()->routeIs('cms.bypass-registrations.*') ? 'active' : '' }}">
+                        <i class="bi bi-person-plus"></i>
+                        <span>Bypass Registration</span>
+                    </a>
+                </li>
+            @endif
         </ul>
     </aside>
 
