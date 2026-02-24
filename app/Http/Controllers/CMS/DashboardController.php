@@ -175,9 +175,7 @@ class DashboardController extends Controller
             ->get()
             ->map(function ($destination) {
                 // Count participants from approved registrations for this destination
-                $usedQuota = Participant::whereHas('registration', function ($query) use ($destination) {
-                    $query->approved()->where('destination_id', $destination->id);
-                })->count();
+                $usedQuota = $destination->used_quota;
 
                 $remaining = max(0, $destination->total_quota - $usedQuota);
                 $percentage = $destination->total_quota > 0
