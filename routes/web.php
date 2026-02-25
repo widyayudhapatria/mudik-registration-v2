@@ -103,6 +103,7 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
     Route::prefix('email-requests')->name('email-requests.')->group(function () {
         Route::get('/', [EmailRequestController::class, 'index'])->name('index');
         Route::get('/{formLink}', [EmailRequestController::class, 'show'])->name('show');
+        Route::post('/{formLink}/resend', [EmailRequestController::class, 'resend'])->name('resend');
     });
 
     Route::prefix('scanner')->name('scanner.')->middleware(['scanner.permission'])->group(function () {
