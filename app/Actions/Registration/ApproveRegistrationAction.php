@@ -111,7 +111,7 @@ class ApproveRegistrationAction
             ]);
 
             // Queue QR code email
-            dispatch(new SendQrCodeEmail($registration->id));
+            dispatch(new SendQrCodeEmail($registration->id))->delay(15);
 
             return $registration->fresh(['qrCode', 'participants']);
         } catch (MudikException $e) {

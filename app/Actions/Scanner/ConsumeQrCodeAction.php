@@ -95,7 +95,7 @@ class ConsumeQrCodeAction
             dispatch(new SendSeatAllocationEmailJob(
                 $qrCode->registration,
                 $seatAllocations
-            ));
+            ))->delay(15);
 
             // Invalidate related dashboard caches
             Cache::forget('cms.scanner.statistics');
@@ -153,8 +153,8 @@ class ConsumeQrCodeAction
                             'participant_name' => $seat->participant->full_name,
                             'participant_age' => $seat->participant->getAge(),
                             'seat_code' => $seat->seat_code,
-                            'bus_name' => $seat->bus_name,       
-                            'seat_label' => $seat->seat_label,   
+                            'bus_name' => $seat->bus_name,
+                            'seat_label' => $seat->seat_label,
                             'is_no_seat' => $seat->isNoSeat(),
                         ];
                     })->toArray(),

@@ -67,7 +67,7 @@ class ResendQrCodeEmailAction
             $emailLog->incrementRetry();
 
             // Queue the email again
-            dispatch(new SendQrCodeEmail($registration->id));
+            dispatch(new SendQrCodeEmail($registration->id))->delay(15);
 
             Log::info('QR code email resent', [
                 'registration_id' => $registration->id,

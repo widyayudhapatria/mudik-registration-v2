@@ -18,8 +18,11 @@ class SendRegistrationSubmittedEmail implements ShouldQueue
 {
     use Dispatchable, InteractsWithQueue, Queueable, SerializesModels;
 
-    public int $tries   = 3;
+    public int $tries = 3;
     public int $timeout = 60;
+    public $backoff = [60, 300, 600];
+
+
 
     /**
      * Create a new job instance.

@@ -23,20 +23,10 @@ class SendSeatAllocationEmailJob implements ShouldQueue
 
     public Registration $registration;
     public array $seatAllocationIds;
+    public int $tries = 3;
+    public int $timeout = 60;
+    public $backoff = [60, 300, 600];
 
-    /**
-     * The number of times the job may be attempted.
-     *
-     * @var int
-     */
-    public $tries = 3;
-
-    /**
-     * The number of seconds to wait before retrying the job.
-     *
-     * @var int
-     */
-    public $backoff = 60;
 
     /**
      * Create a new job instance.

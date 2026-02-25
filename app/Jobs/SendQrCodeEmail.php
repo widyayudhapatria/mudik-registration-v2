@@ -20,6 +20,8 @@ class SendQrCodeEmail implements ShouldQueue
 
     public int $tries = 3;
     public int $timeout = 60;
+    public $backoff = [60, 300, 600];
+
 
     /**
      * Pass registration ID instead of model instance
