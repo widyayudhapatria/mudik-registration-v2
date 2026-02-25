@@ -30,6 +30,7 @@ class EmailRequestController extends Controller
 
         $emailRequests = $query->latest('created_at')->paginate(25)->withQueryString();
 
+
         if ($request->wantsJson()) {
             return response()->json($emailRequests);
         }
@@ -148,6 +149,18 @@ class EmailRequestController extends Controller
             } elseif ($request->used === 'no') {
                 $query->whereNull('used_at');
             }
+        }
+
+        if ($request->filled('email_status')) {
+            $status = $request->email_status;
+            $sub = EmailLog::select('status')
+                ->whereColumn('form_link_id', 'form_links.id')
+                ->where('email_type', 'form_link')
+                ->orderBy('created_at', 'desc')
+                ->limit(1);
+
+            // embed subquery and pass bindings properly
+            $query->whereRaw("({$sub->toSql()}) = ?", array_merge($sub->getBindings(), [$status]));
         }
     }
 }

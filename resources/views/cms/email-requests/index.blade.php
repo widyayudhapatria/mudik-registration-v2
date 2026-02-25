@@ -25,6 +25,16 @@
                     </select>
                 </div>
 
+                <div class="col-md-3">
+                    <label class="form-label">Email Sending Status</label>
+                    <select name="email_status" class="form-select">
+                        <option value="">All</option>
+                        <option value="sent" {{ request('email_status') === 'sent' ? 'selected' : '' }}>Sent</option>
+                        <option value="failed" {{ request('email_status') === 'failed' ? 'selected' : '' }}>Failed</option>
+                        <option value="pending" {{ request('email_status') === 'pending' ? 'selected' : '' }}>Pending</option>
+                    </select>
+                </div>
+
                 <div class="col-md-2">
                     <label class="form-label">Used</label>
                     <select name="used" class="form-select">
@@ -44,7 +54,6 @@
                 </div>
 
                 <div class="col-md-3">
-                    <label class="form-label">&nbsp;</label>
                     <div class="d-flex gap-2">
                         <button type="submit" class="btn btn-primary">
                             <i class="bi bi-search me-1"></i>Filter
@@ -137,7 +146,6 @@
                                 <th>Email</th>
                                 <th>Status</th>
                                 <th>Email Status</th>
-                                <th>Token</th>
                                 <th>Request Time</th>
                                 <th>Used At</th>
                                 <th>Expired At</th>
@@ -153,7 +161,14 @@
                                 @endphp
                                 <tr>
                                     <td>
-                                        <strong>{{ $request->email }}</strong>
+                                        <div class="fw-semibold">{{ $request->email }}</div>
+                                        <div class="small text-muted">
+                                            @if($request->is_synthetic)
+                                                <span class="status-badge badge bg-info text-dark ms-1">
+                                                    <i class="bi bi-bookmark-check me-1"></i>Bypass
+                                                </span>
+                                            @endif
+                                        </div>
                                     </td>
                                     <td>
                                         @if($request->status === 'pending')
@@ -191,9 +206,6 @@
                                         @else
                                             <span class="text-muted">-</span>
                                         @endif
-                                    </td>
-                                    <td>
-                                        <code class="small">{{ substr($request->token, 0, 12) }}...</code>
                                     </td>
                                     <td>
                                         <small>{{ $request->created_at->format('d M Y H:i') }}</small>
@@ -236,7 +248,7 @@
                                                     class="btn btn-sm btn-outline-warning resend-email-btn"
                                                     data-form-link-id="{{ $request->id }}"
                                                     data-email="{{ $request->email }}">
-                                                    <i class="bi bi-arrow-clockwise"></i>
+                                                    <i class="bi bi-arrow-clockwise"></i> Resend
                                                 </button>
                                             @endif
                                         </div>
