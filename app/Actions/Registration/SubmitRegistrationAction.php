@@ -127,7 +127,7 @@ class SubmitRegistrationAction
             DB::commit();
 
             // 11. Dispatch email job (after commit)
-            SendRegistrationSubmittedEmail::dispatch($registration);
+            SendRegistrationSubmittedEmail::dispatch($registration)->delay(15);
 
             Log::info('Registration submitted successfully', [
                 'registration_id' => $registration->id,

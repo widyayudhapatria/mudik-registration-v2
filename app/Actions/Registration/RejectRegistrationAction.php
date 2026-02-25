@@ -43,7 +43,7 @@ class RejectRegistrationAction
             DB::commit();
 
             // Queue rejection email (use withTrashed to access soft-deleted data)
-            dispatch(new SendRejectionEmail($registration->fresh('formLink')));
+            dispatch(new SendRejectionEmail($registration->fresh('formLink')))->delay(15);
 
             Log::info('Registration rejected and soft deleted', [
                 'registration_id' => $registration->id,

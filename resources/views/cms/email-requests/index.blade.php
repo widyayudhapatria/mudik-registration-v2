@@ -13,7 +13,7 @@
                     <label class="form-label">Email</label>
                     <input type="text" name="email" class="form-control" placeholder="Search email..." value="{{ request('email') }}">
                 </div>
-                
+
                 <div class="col-md-2">
                     <label class="form-label">Status</label>
                     <select name="status" class="form-select">
@@ -24,7 +24,7 @@
                         <option value="submitted" {{ request('status') === 'submitted' ? 'selected' : '' }}>Submitted</option>
                     </select>
                 </div>
-                
+
                 <div class="col-md-2">
                     <label class="form-label">Used</label>
                     <select name="used" class="form-select">
@@ -33,7 +33,7 @@
                         <option value="no" {{ request('used') === 'no' ? 'selected' : '' }}>No</option>
                     </select>
                 </div>
-                
+
                 <div class="col-md-2">
                     <label class="form-label">Expired</label>
                     <select name="expired" class="form-select">
@@ -42,7 +42,7 @@
                         <option value="no" {{ request('expired') === 'no' ? 'selected' : '' }}>No</option>
                     </select>
                 </div>
-                
+
                 <div class="col-md-3">
                     <label class="form-label">&nbsp;</label>
                     <div class="d-flex gap-2">
@@ -73,7 +73,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3">
             <div class="card border-warning">
                 <div class="card-body">
@@ -87,7 +87,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3">
             <div class="card border-success">
                 <div class="card-body">
@@ -101,7 +101,7 @@
                 </div>
             </div>
         </div>
-        
+
         <div class="col-md-3">
             <div class="card border-danger">
                 <div class="card-body">
@@ -136,6 +136,7 @@
                             <tr>
                                 <th>Email</th>
                                 <th>Status</th>
+                                <th>Email Status</th>
                                 <th>Token</th>
                                 <th>Request Time</th>
                                 <th>Used At</th>
@@ -147,6 +148,9 @@
                         </thead>
                         <tbody>
                             @foreach($emailRequests as $request)
+                                @php
+                                    $latestEmailLog = $request->emailLogs->first();
+                                @endphp
                                 <tr>
                                     <td>
                                         <strong>{{ $request->email }}</strong>
@@ -161,9 +165,31 @@
                                         @elseif($request->status === 'submitted')
                                             <span class="badge bg-info">Submitted</span>
                                         @endif
-                                        
+
                                         @if($request->expired_at < now())
                                             <span class="badge bg-secondary">Expired</span>
+                                        @endif
+                                    </td>
+                                    <td>
+                                        @if($latestEmailLog)
+                                            @if($latestEmailLog->status === 'sent')
+                                                <span class="badge bg-success">
+                                                    <i class="bi bi-check-circle me-1"></i>Sent
+                                                </span>
+                                            @elseif($latestEmailLog->status === 'failed')
+                                                <span class="badge bg-danger">
+                                                    <i class="bi bi-x-circle me-1"></i>Failed
+                                                </span>
+                                                @if($latestEmailLog->retry_count > 0)
+                                                    <small class="text-muted d-block mt-1">Retry: {{ $latestEmailLog->retry_count }}</small>
+                                                @endif
+                                            @elseif($latestEmailLog->status === 'pending')
+                                                <span class="badge bg-warning">
+                                                    <i class="bi bi-hourglass-split me-1"></i>Pending
+                                                </span>
+                                            @endif
+                                        @else
+                                            <span class="text-muted">-</span>
                                         @endif
                                     </td>
                                     <td>
@@ -200,9 +226,20 @@
                                         @endif
                                     </td>
                                     <td>
-                                        <a href="{{ route('cms.email-requests.show', $request) }}" class="btn btn-sm btn-outline-primary">
-                                            <i class="bi bi-eye"></i> Detail
-                                        </a>
+                                        <div class="d-flex gap-1">
+                                            <a href="{{ route('cms.email-requests.show', $request) }}" class="btn btn-sm btn-outline-primary">
+                                                <i class="bi bi-eye"></i>
+                                            </a>
+
+                                            @if($latestEmailLog && $latestEmailLog->status === 'failed')
+                                                <button type="button"
+                                                    class="btn btn-sm btn-outline-warning resend-email-btn"
+                                                    data-form-link-id="{{ $request->id }}"
+                                                    data-email="{{ $request->email }}">
+                                                    <i class="bi bi-arrow-clockwise"></i>
+                                                </button>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach
@@ -211,7 +248,7 @@
                 </div>
             @endif
         </div>
-        
+
         @if($emailRequests->hasPages())
             <div class="card-footer bg-white">
                 <div class="d-flex justify-content-between align-items-center">
@@ -227,3 +264,58 @@
     </div>
 </div>
 @endsection
+
+@push('scripts')
+<script>
+document.addEventListener('DOMContentLoaded', function() {
+    // Handle resend email button click
+    document.querySelectorAll('.resend-email-btn').forEach(button => {
+        button.addEventListener('click', function() {
+            const formLinkId = this.dataset.formLinkId;
+            const email = this.dataset.email;
+
+            if (!confirm(`Apakah Anda yakin ingin mengirim ulang email ke ${email}?`)) {
+                return;
+            }
+
+            // Disable button and show loading
+            this.disabled = true;
+            const originalHtml = this.innerHTML;
+            this.innerHTML = '<i class="bi bi-hourglass-split"></i>';
+
+            // Send request
+            fetch(`{{ url('cms/email-requests') }}/${formLinkId}/resend`, {
+                method: 'POST',
+                headers: {
+                    'Content-Type': 'application/json',
+                    'X-CSRF-TOKEN': '{{ csrf_token() }}',
+                    'Accept': 'application/json'
+                }
+            })
+            .then(response => response.json())
+            .then(data => {
+                if (data.success) {
+                    // Show success message
+                    alert(data.message);
+                    // Reload page to update status
+                    window.location.reload();
+                } else {
+                    // Show error message
+                    alert(data.message || 'Gagal mengirim ulang email');
+                    // Re-enable button
+                    this.disabled = false;
+                    this.innerHTML = originalHtml;
+                }
+            })
+            .catch(error => {
+                console.error('Error:', error);
+                alert('Terjadi kesalahan saat mengirim ulang email');
+                // Re-enable button
+                this.disabled = false;
+                this.innerHTML = originalHtml;
+            });
+        });
+    });
+});
+</script>
+@endpush

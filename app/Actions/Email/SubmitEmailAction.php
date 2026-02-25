@@ -58,8 +58,8 @@ class SubmitEmailAction
                 'expired_at' => $formLink->expired_at,
             ]);
 
-            // Queue email job
-            dispatch(new SendFormLinkEmail($formLink));
+            // Queue email job with 15 seconds delay
+            dispatch(new SendFormLinkEmail($formLink))->delay(15);
 
             return $formLink;
         } catch (MudikException $e) {

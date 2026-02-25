@@ -23,7 +23,7 @@ Route::prefix('public')->name('public.')->group(function () {
     })->name('landing');
 
     Route::post('/submit-email', [EmailSubmissionController::class, 'submit'])
-        ->middleware('throttle:10,10', 'registration.period')
+        ->middleware('throttle:10,10', 'registration.period', 'email.hourly.limit')
         ->name('submit-email');
 
     Route::get('/register/{token}', [RegistrationController::class, 'show'])
@@ -103,6 +103,7 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
     Route::prefix('email-requests')->name('email-requests.')->group(function () {
         Route::get('/', [EmailRequestController::class, 'index'])->name('index');
         Route::get('/{formLink}', [EmailRequestController::class, 'show'])->name('show');
+        Route::post('/{formLink}/resend', [EmailRequestController::class, 'resend'])->name('resend');
     });
 
     Route::prefix('scanner')->name('scanner.')->middleware(['scanner.permission'])->group(function () {
