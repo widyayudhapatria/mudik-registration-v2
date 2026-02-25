@@ -23,7 +23,7 @@ class EmailRequestController extends Controller
 
         $this->applyFilters($query, $request);
 
-        $emailRequests = $query->latest('created_at')->paginate(25);
+        $emailRequests = $query->latest('created_at')->paginate(25)->withQueryString();
 
         if ($request->wantsJson()) {
             return response()->json($emailRequests);

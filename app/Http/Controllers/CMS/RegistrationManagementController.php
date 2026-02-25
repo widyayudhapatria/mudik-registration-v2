@@ -46,7 +46,7 @@ class RegistrationManagementController extends Controller
             ])
             ->useFilters(RegistrationFilters::class)
             ->latest('created_at')
-            ->paginate(20);
+            ->paginate(20)->withQueryString();
 
         $destinations = Destination::ordered()->get();
 
