@@ -23,7 +23,7 @@ Route::prefix('public')->name('public.')->group(function () {
     })->name('landing');
 
     Route::post('/submit-email', [EmailSubmissionController::class, 'submit'])
-        ->middleware('throttle:10,10', 'registration.period')
+        ->middleware('registration.period')
         ->name('submit-email');
 
     Route::get('/register/{token}', [RegistrationController::class, 'show'])
