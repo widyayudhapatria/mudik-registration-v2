@@ -15,6 +15,7 @@ use App\Http\Middleware\CheckScannerPermission;
 use App\Http\Middleware\SuperAdminMiddleware;
 use App\Http\Middleware\ValidateFormLinkSignature;
 use App\Http\Middleware\CheckRegistrationPeriod;
+use App\Http\Middleware\CheckEmailRequestLimit;
 use App\Exceptions\MudikException;
 
 return Application::configure(basePath: dirname(__DIR__))
@@ -39,6 +40,7 @@ return Application::configure(basePath: dirname(__DIR__))
             'scanner.permission' => CheckScannerPermission::class,
             'registration.period' => CheckRegistrationPeriod::class,
             'super.admin' => SuperAdminMiddleware::class,
+            'email.hourly.limit' => CheckEmailRequestLimit::class,
         ]);
 
         $middleware->api(prepend: [
