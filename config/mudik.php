@@ -50,6 +50,11 @@ return [
         'from_address' => env('MAIL_FROM_ADDRESS', 'noreply@mudiklebaran.id'),
         'from_name' => env('MAIL_FROM_NAME', 'Mudik Bersama Kabupaten Tangerang 2026'),
         'max_retry' => 3,
+
+        // Queue rate limit (emails per hour)
+        // Set buffer 10% from SMTP limit to prevent hitting limit
+        // Example: SMTP limit 100/hour -> set to 90
+        'queue_rate_limit_per_hour' => env('EMAIL_QUEUE_RATE_LIMIT_PER_HOUR', 90),
     ],
 
     /*

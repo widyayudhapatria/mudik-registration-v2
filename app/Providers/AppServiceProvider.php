@@ -2,6 +2,8 @@
 
 namespace App\Providers;
 
+use Illuminate\Cache\RateLimiting\Limit;
+use Illuminate\Support\Facades\RateLimiter;
 use Illuminate\Support\ServiceProvider;
 use Illuminate\Pagination\Paginator;
 use Illuminate\Support\Facades\URL;
@@ -33,5 +35,14 @@ class AppServiceProvider extends ServiceProvider
             URL::forceScheme('https');
             $this->app['url']->forceRootUrl($appUrl);
         }
+
+        // Email Queue Rate Limiter
+        // Shared across all queue workers (database cache)
+        // Configurable via EMAIL_QUEUE_RATE_LIMIT_PER_HOUR in .env
+        $emailRateLimitPerHour = config('mudik.email.queue_rate_limit_per_hour', 90);
+
+        RateLimiter::for('email-queue', function ($job) use ($emailRateLimitPerHour) {
+            return Limit::perHour($emailRateLimitPerHour)->by('email-sending-queue');
+        });
     }
 }
