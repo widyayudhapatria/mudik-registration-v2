@@ -351,6 +351,7 @@ function showErrorModal(data) {
 }
 
 function showPreviewModal(data) {
+    console.log('Preview data received:', data); // Debug log for preview data
     const previewTable = document.getElementById('previewTableBody');
     const previewRegCount = document.getElementById('previewRegCount');
     const previewPartCount = document.getElementById('previewPartCount');
@@ -382,15 +383,15 @@ function showPreviewModal(data) {
     const wouldUseVal = (wouldUseRaw === undefined || wouldUseRaw === null) ? null : Number(wouldUseRaw);
     const afterImportVal = (afterImportRaw === undefined || afterImportRaw === null) ? null : Number(afterImportRaw);
 
-    const canCalc = remainingVal !== null && !isNaN(remainingVal) && afterImportVal !== null && !isNaN(afterImportVal);
-    const quotaAfterCalc = canCalc ? (remainingVal - afterImportVal) : null;
+    const canCalc = remainingVal !== null && !isNaN(remainingVal) && wouldUseVal !== null && !isNaN(wouldUseVal);
+    const quotaAfterCalc = canCalc ? (remainingVal - wouldUseVal) : null;
 
     // Display quota info with subtraction expression when possible
     document.getElementById('quotaTotal').textContent = total || '-';
     document.getElementById('quotaUsed').textContent = used || '-';
     document.getElementById('quotaRemaining').textContent = (remainingRaw ?? '-');
     document.getElementById('quotaWouldUse').textContent = wouldUseRaw !== undefined ? wouldUseRaw : '-';
-    document.getElementById('quotaAfter').textContent = canCalc ? `${quotaAfterCalc} (${remainingVal} - ${afterImportVal})` : '-';
+    document.getElementById('quotaAfter').textContent = canCalc ? `${quotaAfterCalc} (${remainingVal} - ${wouldUseVal})` : '-';
 
     previewTable.innerHTML = '';
     (data.registrations || []).forEach(reg => {
@@ -412,7 +413,7 @@ function showPreviewModal(data) {
     if (canCalc && quotaAfterCalc < 0) {
         hasWarnings = true;
         existingWarnings.push({
-            message: `Quota insufficient: ${quotaAfterCalc} = (${remainingVal}-${afterImportVal})`
+            message: `Quota insufficient: ${quotaAfterCalc} = (${remainingVal}-${wouldUseVal})`
         });
     }
 
