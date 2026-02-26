@@ -162,8 +162,8 @@
             <div class="alert-period__inner">
                 <span class="alert-period__icon">🔴</span>
                 <div class="alert-period__text">
-                    <strong>Pendaftaran Telah Ditutup</strong>
-                    <span>Periode pendaftaran telah ditutup karena kuota sudah terpenuhi, terima kasih atas partisipasinya mengikuti mudik gratis Pemerintah Kabupaten Tangerang 2026.</span>
+                    <strong>Pendaftaran Sementara Ditutup</strong>
+                    <span>Pendaftaran sementara ditutup, saat ini sedang proses verifikasi antrian pendaftar yang telah masuk sebelumnya. Nantikan informasi kami selanjutnya.</span>
                 </div>
                 <button class="alert-period__close" onclick="closeAlert()">&times;</button>
             </div>
