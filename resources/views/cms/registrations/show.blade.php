@@ -419,16 +419,9 @@
                                 <strong>Percobaan:</strong> {{ $latestEmail->retry_count }}/3
                             </div>
 
-                            @if($latestEmail->canRetry(3))
-                                <button type="button" class="btn btn-warning w-100 btn-sm" onclick="resendQrCode({{ $registration->id }})">
-                                    <i class="bi bi-arrow-repeat me-1"></i>Kirim Ulang Email
-                                </button>
-                            @else
-                                <div class="alert alert-danger p-2 mb-0">
-                                    <i class="bi bi-exclamation-triangle-fill me-1"></i>
-                                    <small>Sudah mencapai batas maksimal percobaan (3x). Hubungi administrator.</small>
-                                </div>
-                            @endif
+                            <button type="button" class="btn btn-warning w-100 btn-sm" onclick="resendQrCode({{ $registration->id }})">
+                                <i class="bi bi-arrow-repeat me-1"></i>Kirim Ulang Email
+                            </button>
                         @endif
                     </div>
 
@@ -464,10 +457,13 @@
                         </div>
                     @endif
                 @else
-                    <div class="alert alert-info p-2 mb-0">
+                    <div class="alert alert-info p-2 mb-3">
                         <i class="bi bi-info-circle me-1"></i>
                         <small>Email QR code belum ada di sistem</small>
                     </div>
+                     <button type="button" class="btn btn-warning w-100 btn-sm" onclick="resendQrCode({{ $registration->id }})">
+                        <i class="bi bi-arrow-repeat me-1"></i>Kirim Ulang Email
+                    </button>
                 @endif
             </div>
         @endif

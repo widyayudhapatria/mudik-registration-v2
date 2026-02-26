@@ -86,7 +86,7 @@
             <h5 class="mb-0"><i class="bi bi-qr-code me-2"></i>QR Code</h5>
         </div>
         <div class="card-body text-center">
-            {!! QrCode::size(250)->generate($token) !!}
+            {!! QrCode::size(250)->generate($qrCode->qr_data) !!}
             <p class="text-muted mt-3 mb-0 small">Token: {{ substr($token, 0, 32) }}...</p>
         </div>
     </div>

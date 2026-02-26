@@ -40,31 +40,34 @@ class ResendQrCodeEmailAction
                 ->latest('created_at')
                 ->first();
 
+            // If no previous email log exists, create one so resend can proceed
             if (!$emailLog) {
-                throw new MudikException(
-                    ErrorCode::ServerError,
-                    'Email log tidak ditemukan'
+                $subject = 'QR Code Tiket - ' . config('app.name');
+                $emailLog = EmailLog::logQrCodeEmail(
+                    $registration->form_link_id,
+                    $registration->formLink->email,
+                    $subject
                 );
-            }
+            } else {
+                // Can only resend if email failed
+                if (!$emailLog->isFailed()) {
+                    throw new MudikException(
+                        ErrorCode::ServerError,
+                        'Email sudah terkirim atau masih pending'
+                    );
+                }
 
-            // Can only resend if email failed
-            if (!$emailLog->isFailed()) {
-                throw new MudikException(
-                    ErrorCode::ServerError,
-                    'Email sudah terkirim atau masih pending'
-                );
-            }
+                // Check if can retry (max 3 retries)
+                if (!$emailLog->canRetry(maxRetries: 3)) {
+                    throw new MudikException(
+                        ErrorCode::ServerError,
+                        'Sudah mencapai batas maksimal percobaan pengiriman ulang (3x)'
+                    );
+                }
 
-            // Check if can retry (max 3 retries)
-            if (!$emailLog->canRetry(maxRetries: 3)) {
-                throw new MudikException(
-                    ErrorCode::ServerError,
-                    'Sudah mencapai batas maksimal percobaan pengiriman ulang (3x)'
-                );
+                // Increment retry count for existing logs
+                $emailLog->incrementRetry();
             }
-
-            // Increment retry count and dispatch job
-            $emailLog->incrementRetry();
 
             // Queue the email again
             dispatch(new SendQrCodeEmail($registration->id))->delay(15);
