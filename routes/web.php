@@ -8,6 +8,7 @@ use App\Http\Controllers\CMS\QuotaManagementController;
 use App\Http\Controllers\CMS\RegistrationManagementController;
 use App\Http\Controllers\CMS\SeatManifestController;
 use App\Http\Controllers\CMS\BypassRegistrationController;
+use App\Http\Controllers\CMS\EmailLogFixController;
 use App\Http\Controllers\Public\EmailSubmissionController;
 use App\Http\Controllers\Public\QrViewController;
 use App\Http\Controllers\Public\RegistrationController;
@@ -81,6 +82,15 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
         Route::get('/results/{importId}', [BypassRegistrationController::class, 'showResults'])->name('results');
         Route::get('/history', [BypassRegistrationController::class, 'history'])->name('history');
         Route::get('/download-template', [BypassRegistrationController::class, 'downloadTemplate'])->name('download-template');
+    });
+
+    Route::prefix('email-log-fix')->name('email-log-fix.')->group(function () {
+        Route::get('/form', [EmailLogFixController::class, 'showForm'])->name('form');
+        Route::post('/validate', [EmailLogFixController::class, 'validateFile'])->name('validate');
+        Route::get('/preview', [EmailLogFixController::class, 'showPreview'])->name('preview');
+        Route::post('/confirm', [EmailLogFixController::class, 'confirmFix'])->name('confirm');
+        Route::get('/results', [EmailLogFixController::class, 'showResults'])->name('results');
+        Route::get('/download-template', [EmailLogFixController::class, 'downloadTemplate'])->name('download-template');
     });
 
     Route::prefix('destinations')->name('destinations.')->group(function () {
