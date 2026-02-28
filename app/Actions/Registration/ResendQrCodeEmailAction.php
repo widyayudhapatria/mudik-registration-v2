@@ -49,19 +49,12 @@ class ResendQrCodeEmailAction
                     $subject
                 );
             } else {
-                // Can only resend if email failed
-                if (!$emailLog->isFailed()) {
+                // Allow resend for any status (failed, sent, or pending)
+                // But check retry limit to prevent abuse
+                if ($emailLog->retry_count >= 10) {
                     throw new MudikException(
                         ErrorCode::ServerError,
-                        'Email sudah terkirim atau masih pending'
-                    );
-                }
-
-                // Check if can retry (max 3 retries)
-                if (!$emailLog->canRetry(maxRetries: 3)) {
-                    throw new MudikException(
-                        ErrorCode::ServerError,
-                        'Sudah mencapai batas maksimal percobaan pengiriman ulang (3x)'
+                        'Sudah mencapai batas maksimal percobaan pengiriman ulang (10x)'
                     );
                 }
 

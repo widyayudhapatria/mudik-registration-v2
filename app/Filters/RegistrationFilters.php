@@ -84,4 +84,31 @@ class RegistrationFilters extends QueryFilters
 
         $this->builder->where('has_child_under_4', filter_var($value, FILTER_VALIDATE_BOOLEAN));
     }
+
+    /**
+     * Filter by email status (latest QR code email).
+     */
+    protected function email_status(?string $value): void
+    {
+        if (blank($value)) {
+            return;
+        }
+
+        // Special case: filter registrations without any QR code email log
+        if ($value === 'none') {
+            $this->builder->whereDoesntHave('qrCodeEmails');
+            return;
+        }
+
+        // Filter by specific email status
+        $this->builder->whereHas('qrCodeEmails', function ($query) use ($value) {
+            $query->where('status', $value)
+                ->whereIn('id', function ($subQuery) {
+                    $subQuery->selectRaw('MAX(id)')
+                        ->from('email_logs')
+                        ->where('email_type', 'qr_code')
+                        ->groupBy('form_link_id');
+                });
+        });
+    }
 }

@@ -42,7 +42,8 @@ class RegistrationManagementController extends Controller
                 'destination',
                 'participants',
                 'approvedBy',
-                'rejectedBy'
+                'rejectedBy',
+                'qrCodeEmails' => fn($q) => $q->latest('created_at')->limit(1)
             ])
             ->useFilters(RegistrationFilters::class)
             ->latest('created_at')
