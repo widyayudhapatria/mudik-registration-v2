@@ -135,6 +135,7 @@
         ['label' => 'Persyaratan', 'href' => '#terms'],
         ['label' => 'Cara Daftar', 'href' => '#how-to'],
         ['label' => 'Daftar', 'href' => '#registration'],
+        ['label' => 'Daftar Pemudik', 'href' => route('public.daftar-pemudik')],
       ]
     ])
 @endsection
@@ -162,8 +163,8 @@
             <div class="alert-period__inner">
                 <span class="alert-period__icon">🔴</span>
                 <div class="alert-period__text">
-                    <strong>Pendaftaran Sementara Ditutup</strong>
-                    <span>Pendaftaran sementara ditutup, saat ini sedang proses verifikasi antrian pendaftar yang telah masuk sebelumnya. Nantikan informasi kami selanjutnya.</span>
+                    <strong>Pendaftaran Ditutup</strong>
+                    <span>Pendaftaran ditutup, kuota telah terpenuhi. Bagi peserta yang ingin melihat daftar pemudik, silakan <a href="{{ route('public.daftar-pemudik') }}" class="btn btn-sm btn-secondary px-2 py-1">klik di sini</a></span>
                 </div>
                 <button class="alert-period__close" onclick="closeAlert()">&times;</button>
             </div>
@@ -462,11 +463,21 @@
                     </div>
                 </div>
             </div>
+            @if($now->gt($regEnd))
             <div class="row justify-content-center">
-                <div class="col-lg-4 mt-5 text-center">
-                    <button type="button" id="btn-register" class="submitBnt btn btn-primary btn-custom" data-bs-toggle="modal" data-bs-target="#registrationModal">DAFTAR SEKARANG !</button>
+                <div class="col-lg-6 mt-4 text-center">
+                    <div class="alert alert-danger" role="alert">
+                        Pendaftaran <strong>Mudik Gratis Pemerintah Kabupaten Tangerang 2026</strong> resmi <strong>DITUTUP</strong> karena kuota peserta sudah terpenuhi.<br/> Terima kasih atas partisipasi Anda dan sampai jumpa di program mudik tahun depan.<br/> Bagi peserta yang ingin melihat daftar pemudik, silakan <a href="{{ route('public.daftar-pemudik') }}" class="btn btn-sm btn-secondary px-2 py-1">klik di sini</a>
+                    </div>
                 </div>
             </div>
+            @else
+            <div class="row justify-content-center">
+                <div class="col-lg-4 mt-5 text-center">
+                    <button type="button" id="btn-register" class="submitBnt btn btn-primary btn-custom" data-bs-toggle="modal" data-bs-target="#registrationModal" disabled>DAFTAR SEKARANG !</button>
+                </div>
+            </div>
+            @endif
         </div>
     </section>
 

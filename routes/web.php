@@ -12,6 +12,7 @@ use App\Http\Controllers\CMS\EmailLogFixController;
 use App\Http\Controllers\Public\EmailSubmissionController;
 use App\Http\Controllers\Public\QrViewController;
 use App\Http\Controllers\Public\RegistrationController;
+use App\Http\Controllers\Public\TravelerListController;
 use Illuminate\Support\Facades\Route;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Auth;
@@ -34,6 +35,9 @@ Route::prefix('public')->name('public.')->group(function () {
     Route::post('/register/{token}', [RegistrationController::class, 'submit'])
         ->middleware(['signed.form', 'form.link.valid'])
         ->name('registration.submit');
+
+    Route::get('/daftar-pemudik', [TravelerListController::class, 'index'])
+        ->name('daftar-pemudik');
 });
 
 Route::prefix('scan')->name('scan.')->group(function () {
