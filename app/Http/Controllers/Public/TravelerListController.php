@@ -27,11 +27,23 @@ class TravelerListController extends Controller
             ->get();
 
         // Build query for approved registrations
-        $query = Registration::query()
-            ->with(['destination', 'formLink', 'participants'])
-            ->whereHas('formLink', function ($q) {
-                $q->where('status', 'approved');
-            });
+        // Select only necessary registration columns to minimize payload
+        $query = Registration::select([
+            'id',
+            'destination_id',
+            'form_link_id',
+            'representative_name',
+            'kk_number',
+        ])->with([
+            'destination' => function ($q) {
+                $q->select('id', 'name');
+            },
+            'formLink' => function ($q) {
+                $q->select('id', 'email', 'status');
+            }
+        ])->whereHas('formLink', function ($q) {
+            $q->where('status', 'approved');
+        });
 
         // Apply destination filter with validated input
         if (!empty($validated['destination_id'])) {

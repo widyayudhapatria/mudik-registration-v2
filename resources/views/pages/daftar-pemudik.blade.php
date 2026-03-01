@@ -155,9 +155,9 @@
                             Jika nama Anda tercantum dalam daftar di bawah tetapi <strong>belum menerima QR Code
                                 keberangkatan</strong>
                             melalui email, silakan hubungi tim support kami di
-                            <strong>{{ config('mudik.support.email', 'support@mudikgratis.com') }}</strong>
-                            atau WhatsApp
                             <strong>{{ config('mudik.support.phone', '0812-3456-7890') }}</strong>
+                            atau Instagram
+                            <strong>{{ config('mudik.support.email', 'support@mudikgratis.com') }}</strong>
                             untuk bantuan lebih lanjut.
                         </p>
                     </div>
