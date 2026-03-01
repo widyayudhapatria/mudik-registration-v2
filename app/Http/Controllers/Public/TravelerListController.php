@@ -62,6 +62,7 @@ class TravelerListController extends Controller
         // Get travelers with participant count, ordered alphabetically by name
         $travelers = $query
             ->withCount('participants')
+            ->orderBy('destination_id', 'asc')
             ->orderBy('representative_name', 'asc')
             ->get();
 
