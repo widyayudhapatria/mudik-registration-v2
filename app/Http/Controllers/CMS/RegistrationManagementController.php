@@ -77,7 +77,9 @@ class RegistrationManagementController extends Controller
             'participants' => fn($q) => $q->withTrashed(),
             'approvedBy',
             'rejectedBy',
-            'qrCode'
+            'qrCode',
+            'qrCodeEmails' => fn($q) => $q->latest('created_at'),
+            'rejectionEmails' => fn($q) => $q->latest('created_at')
         ]);
 
         if (request()->wantsJson()) {

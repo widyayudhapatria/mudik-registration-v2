@@ -86,7 +86,7 @@ class RegistrationFilters extends QueryFilters
     }
 
     /**
-     * Filter by email status (latest QR code email).
+     * Filter by email status (QR code or rejection email based on registration status).
      */
     protected function email_status(?string $value): void
     {
@@ -94,20 +94,43 @@ class RegistrationFilters extends QueryFilters
             return;
         }
 
-        // Special case: filter registrations without any QR code email log
+        // Special case: filter registrations without any email log
         if ($value === 'none') {
-            $this->builder->whereDoesntHave('qrCodeEmails');
+            $this->builder->where(function ($query) {
+                // Approved registrations without QR code emails OR Rejected registrations without rejection emails
+                $query->whereHas('formLink', function ($q) {
+                    $q->where('status', 'approved');
+                })->whereDoesntHave('qrCodeEmails')
+                    ->orWhere(function ($q) {
+                        $q->whereHas('formLink', function ($subQ) {
+                            $subQ->where('status', 'rejected');
+                        })->whereDoesntHave('rejectionEmails');
+                    });
+            });
             return;
         }
 
-        // Filter by specific email status
-        $this->builder->whereHas('qrCodeEmails', function ($query) use ($value) {
-            $query->where('status', $value)
-                ->whereIn('id', function ($subQuery) {
-                    $subQuery->selectRaw('MAX(id)')
-                        ->from('email_logs')
-                        ->where('email_type', 'qr_code')
-                        ->groupBy('form_link_id');
+        // Filter by specific email status in both QR code and rejection emails
+        $this->builder->where(function ($query) use ($value) {
+            // Check in QR code emails (for approved registrations)
+            $query->whereHas('qrCodeEmails', function ($q) use ($value) {
+                $q->where('status', $value)
+                    ->whereIn('id', function ($subQuery) {
+                        $subQuery->selectRaw('MAX(id)')
+                            ->from('email_logs')
+                            ->where('email_type', 'qr_code')
+                            ->groupBy('form_link_id');
+                    });
+            })
+                // OR check in rejection emails (for rejected registrations)
+                ->orWhereHas('rejectionEmails', function ($q) use ($value) {
+                    $q->where('status', $value)
+                        ->whereIn('id', function ($subQuery) {
+                            $subQuery->selectRaw('MAX(id)')
+                                ->from('email_logs')
+                                ->where('email_type', 'rejection')
+                                ->groupBy('form_link_id');
+                        });
                 });
         });
     }

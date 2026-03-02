@@ -254,7 +254,7 @@
                 </div>
 
                 <div class="col-md-3 col-12">
-                    <label class="form-label fw-semibold small">Status Email QR</label>
+                    <label class="form-label fw-semibold small">Status Email QR / Rejection</label>
                     <select name="email_status" class="form-select">
                         <option value="">Semua Status Email</option>
                         <option value="pending" {{ request('email_status') == 'pending' ? 'selected' : '' }}>Pending
@@ -379,13 +379,13 @@
                                         </a>
                                         @if ($registration->isApproved())
                                             <button type="button" class="btn btn-sm btn-warning btn-action"
-                                                onclick="resendEmail({{ $registration->id }})" 
+                                                onclick="resendEmail({{ $registration->id }})"
                                                 title="Kirim Ulang Email QR">
                                                 <i class="bi bi-arrow-clockwise"></i> Re-Sent Email
                                             </button>
                                         @elseif ($registration->isRejected())
                                             <button type="button" class="btn btn-sm btn-secondary btn-action"
-                                                onclick="resendRejectionEmail({{ $registration->id }})" 
+                                                onclick="resendRejectionEmail({{ $registration->id }})"
                                                 title="Kirim Ulang Email Penolakan">
                                                 <i class="bi bi-arrow-clockwise"></i> Re-Sent Email
                                             </button>
