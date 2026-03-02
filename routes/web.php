@@ -24,6 +24,10 @@ Route::prefix('public')->name('public.')->group(function () {
         return view('pages.index');
     })->name('landing');
 
+    Route::get('/terms-privacy', function () {
+        return view('pages.terms-privacy');
+    })->name('terms-privacy');
+
     Route::post('/submit-email', [EmailSubmissionController::class, 'submit'])
         ->middleware('registration.period', 'email.hourly.limit')
         ->name('submit-email');
@@ -72,6 +76,7 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
         Route::post('/{registration}/approve', [RegistrationManagementController::class, 'approve'])->name('approve');
         Route::post('/{registration}/reject', [RegistrationManagementController::class, 'reject'])->name('reject');
         Route::post('/{registration}/resend-qr-code', [RegistrationManagementController::class, 'resendQrCode'])->name('resend-qr-code');
+        Route::post('/{registration}/resend-rejection', [RegistrationManagementController::class, 'resendRejection'])->name('resend-rejection')->withTrashed();
     });
 
     Route::prefix('seat-manifest')->name('seat-manifest.')->group(function () {

@@ -343,7 +343,9 @@
                                 </td>
                                 <td>
                                     @php
-                                        $latestEmail = $registration->qrCodeEmails->first();
+                                        $latestEmail = $registration->isApproved()
+                                            ? $registration->qrCodeEmails->first()
+                                            : ($registration->isRejected() ? $registration->rejectionEmails->first() : null);
                                     @endphp
                                     @if ($latestEmail)
                                         @if ($latestEmail->isSent())
@@ -360,7 +362,7 @@
                                             </span>
                                         @endif
                                     @else
-                                        @if ($registration->isApproved())
+                                        @if ($registration->isApproved() || $registration->isRejected())
                                             <span class="status-badge bg-secondary text-white fs-6">
                                                 <i class="bi bi-envelope-exclamation-fill me-1"></i>None
                                             </span>
@@ -377,8 +379,14 @@
                                         </a>
                                         @if ($registration->isApproved())
                                             <button type="button" class="btn btn-sm btn-warning btn-action"
-                                                onclick="resendEmail({{ $registration->id }})"
+                                                onclick="resendEmail({{ $registration->id }})" 
                                                 title="Kirim Ulang Email QR">
+                                                <i class="bi bi-arrow-clockwise"></i> Re-Sent Email
+                                            </button>
+                                        @elseif ($registration->isRejected())
+                                            <button type="button" class="btn btn-sm btn-secondary btn-action"
+                                                onclick="resendRejectionEmail({{ $registration->id }})" 
+                                                title="Kirim Ulang Email Penolakan">
                                                 <i class="bi bi-arrow-clockwise"></i> Re-Sent Email
                                             </button>
                                         @endif
@@ -474,9 +482,11 @@
                         </div>
 
                         @php
-                            $latestEmail = $registration->qrCodeEmails->first();
+                            $latestEmail = $registration->isApproved()
+                                ? $registration->qrCodeEmails->first()
+                                : ($registration->isRejected() ? $registration->rejectionEmails->first() : null);
                         @endphp
-                        @if ($registration->isApproved() && $latestEmail)
+                        @if ($latestEmail)
                             <div class="info-row">
                                 <span class="info-label">Status Email QR</span>
                                 <span class="info-value">
@@ -506,7 +516,12 @@
                         @if ($registration->isApproved())
                             <button type="button" class="btn btn-sm btn-info"
                                 onclick="resendEmail({{ $registration->id }})">
-                                <i class="bi bi-envelope-fill me-1"></i>Kirim Ulang
+                                <i class="bi bi-envelope-fill me-1"></i>Kirim Ulang QR
+                            </button>
+                        @elseif ($registration->isRejected())
+                            <button type="button" class="btn btn-sm btn-secondary"
+                                onclick="resendRejectionEmail({{ $registration->id }})">
+                                <i class="bi bi-envelope-fill me-1"></i>Kirim Ulang Penolakan
                             </button>
                         @endif
 
@@ -591,6 +606,20 @@
                 if (response.data.success) {
                     alert(response.data.message);
                     // Preserve GET parameters when reloading
+                    window.location.href = window.location.href;
+                }
+            } catch (error) {
+                alert('Gagal mengirim ulang email: ' + (error.response?.data?.message || error.message));
+            }
+        }
+
+        async function resendRejectionEmail(id) {
+            if (!confirm('Yakin ingin mengirim ulang email penolakan?')) return;
+
+            try {
+                const response = await axios.post(`/cms/registrations/${id}/resend-rejection`);
+                if (response.data.success) {
+                    alert(response.data.message);
                     window.location.href = window.location.href;
                 }
             } catch (error) {

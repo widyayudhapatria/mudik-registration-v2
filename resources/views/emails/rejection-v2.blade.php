@@ -362,30 +362,8 @@
                                                                                 keamanan, dan keadilan bagi seluruh peserta program.
                                                                             </p>
                                                                             <p>
-                                                                                Jika Anda merasa terdapat kekeliruan data atau membutuhkan informasi lebih lanjut,
-                                                                                silakan menghubungi kami melalui kontak di bawah ini.
+                                                                                Keputusan pantia adalah bersifat final dan tidak dapat di ganggu gugat. Namun, kami tetap terbuka untuk memberikan penjelasan lebih lanjut terkait proses seleksi dan kriteria yang digunakan.
                                                                             </p>
-                                                                            <p>
-                                                                                Selama kuota masih tersedia, Anda tetap dapat melakukan pendaftaran ulang melalui link resmi Program Mudik.
-                                                                            </p>
-                                                                        </td>
-                                                                    </tr>
-                                                                </tbody>
-                                                            </table>
-                                                        </td>
-                                                    </tr>
-                                                </tbody>
-                                            </table>
-                                            <!-- CTA Button -->
-                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" class="mcnButtonBlock" style="min-width: 100%;">
-                                                <tbody class="mcnButtonBlockOuter">
-                                                    <tr>
-                                                        <td style="padding: 18px;" valign="top" align="center" class="mcnButtonBlockInner">
-                                                            <table border="0" cellpadding="0" cellspacing="0" width="100%" style="min-width: 100%;" class="mcnButtonContentContainer">
-                                                                <tbody>
-                                                                    <tr>
-                                                                        <td align="center" valign="middle" class="mcnButtonContent" style="padding: 18px;">
-                                                                            <a class="cta-button" href="{{ $websiteUrl }}" target="_blank" style="font-weight: bold; letter-spacing: normal; line-height: 100%; text-align: center; text-decoration: none; color: #FFFFFF; background-color: #f59e0b; border-radius: 6px; display: inline-block; font-size: 16px; padding: 14px 28px;">Daftar Ulang Melalui Link Resmi</a>
                                                                         </td>
                                                                     </tr>
                                                                 </tbody>

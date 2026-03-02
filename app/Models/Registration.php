@@ -120,6 +120,12 @@ class Registration extends Model
             ->where('email_type', 'qr_code');
     }
 
+    public function rejectionEmails(): HasMany
+    {
+        return $this->hasMany(EmailLog::class, 'form_link_id', 'form_link_id')
+            ->where('email_type', 'rejection');
+    }
+
     /**
      * Get the status of the registration.
      */
