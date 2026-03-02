@@ -24,6 +24,10 @@ Route::prefix('public')->name('public.')->group(function () {
         return view('pages.index');
     })->name('landing');
 
+    Route::get('/terms-privacy', function () {
+        return view('pages.terms-privacy');
+    })->name('terms-privacy');
+
     Route::post('/submit-email', [EmailSubmissionController::class, 'submit'])
         ->middleware('registration.period', 'email.hourly.limit')
         ->name('submit-email');
