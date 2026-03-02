@@ -5,6 +5,7 @@ namespace App\Http\Controllers\CMS;
 use App\Actions\Registration\ApproveRegistrationAction;
 use App\Actions\Registration\RejectRegistrationAction;
 use App\Actions\Registration\ResendQrCodeEmailAction;
+use App\Actions\Registration\ResendRejectionEmailAction;
 use App\Data\ApproveRegistrationData;
 use App\Data\RejectRegistrationData;
 use App\Enums\Permissions\MudikPermissions;
@@ -43,7 +44,8 @@ class RegistrationManagementController extends Controller
                 'participants',
                 'approvedBy',
                 'rejectedBy',
-                'qrCodeEmails' => fn($q) => $q->latest('created_at')->limit(1)
+                'qrCodeEmails' => fn($q) => $q->latest('created_at')->limit(1),
+                'rejectionEmails' => fn($q) => $q->latest('created_at')->limit(1)
             ])
             ->useFilters(RegistrationFilters::class)
             ->latest('created_at')
@@ -135,6 +137,23 @@ class RegistrationManagementController extends Controller
                 'Pendaftaran berhasil ditolak',
                 $registration
             );
+        } catch (MudikException $e) {
+            return response()->json($e->toArray(), 400);
+        }
+    }
+
+    public function resendRejection(Registration $registration): JsonResponse
+    {
+        $this->authorize('view', $registration);
+
+        try {
+            $admin = auth('admin')->user();
+            $result = ResendRejectionEmailAction::run($registration, $admin);
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['message'],
+            ]);
         } catch (MudikException $e) {
             return response()->json($e->toArray(), 400);
         }

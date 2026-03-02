@@ -34,7 +34,8 @@ class SendRejectionEmail implements ShouldQueue
      * Create a new job instance.
      */
     public function __construct(
-        public Registration $registration
+        public Registration $registration,
+        public ?int $emailLogId = null
     ) {}
 
     /**
@@ -45,11 +46,13 @@ class SendRejectionEmail implements ShouldQueue
         $subject = 'Pemberitahuan Penolakan - ' . config('app.name');
 
         // Create email log
-        $emailLog = EmailLog::logRejectionEmail(
-            $this->registration->form_link_id,
-            $this->registration->formLink->email,
-            $subject
-        );
+        $emailLog = $this->emailLogId
+            ? EmailLog::findOrFail($this->emailLogId)
+            : EmailLog::logRejectionEmail(
+                $this->registration->form_link_id,
+                $this->registration->formLink->email,
+                $subject
+            );
 
         try {
             Mail::to($this->registration->formLink->email)
