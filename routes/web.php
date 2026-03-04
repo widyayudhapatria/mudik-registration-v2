@@ -9,6 +9,7 @@ use App\Http\Controllers\CMS\RegistrationManagementController;
 use App\Http\Controllers\CMS\SeatManifestController;
 use App\Http\Controllers\CMS\BypassRegistrationController;
 use App\Http\Controllers\CMS\EmailLogFixController;
+use App\Http\Controllers\CMS\ScanMonitoringController;
 use App\Http\Controllers\Public\EmailSubmissionController;
 use App\Http\Controllers\Public\QrViewController;
 use App\Http\Controllers\Public\RegistrationController;
@@ -81,6 +82,11 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
 
     Route::prefix('seat-manifest')->name('seat-manifest.')->group(function () {
         Route::get('/', [SeatManifestController::class, 'index'])->name('index');
+    });
+
+    Route::prefix('scan-monitoring')->name('scan-monitoring.')->group(function () {
+        Route::get('/', [ScanMonitoringController::class, 'index'])->name('index');
+        Route::get('/{registration}/detail', [ScanMonitoringController::class, 'detail'])->name('detail');
     });
 
     Route::prefix('bypass-registrations')->name('bypass-registrations.')->group(function () {

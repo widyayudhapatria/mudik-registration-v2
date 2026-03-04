@@ -203,6 +203,15 @@
                     </a>
                 </li>
             @endif
+            @if(auth('admin')->user()->isSuperAdmin() || auth('admin')->user()->isScanner())
+            <li class="sidebar-menu-item">
+                <a href="{{ route('cms.scan-monitoring.index') }}"
+                    class="sidebar-menu-link {{ request()->routeIs('cms.scan-monitoring.*') ? 'active' : '' }}">
+                    <i class="bi bi-clipboard-check"></i>
+                    <span>Scan Monitoring</span>
+                </a>
+            </li>
+            @endif
             @if (auth('admin')->user()->isSuperAdmin())
                 <li class="sidebar-menu-item">
                     <a href="{{ route('cms.bypass-registrations.form') }}"
