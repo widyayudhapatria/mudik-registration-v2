@@ -87,6 +87,7 @@ Route::prefix('cms')->name('cms.')->middleware(['auth:admin'])->group(function (
     Route::prefix('scan-monitoring')->name('scan-monitoring.')->group(function () {
         Route::get('/', [ScanMonitoringController::class, 'index'])->name('index');
         Route::get('/{registration}/detail', [ScanMonitoringController::class, 'detail'])->name('detail');
+        Route::post('/{registration}/resend-seat-allocation', [ScanMonitoringController::class, 'resendSeatAllocationEmail'])->name('resend-seat-allocation');
     });
 
     Route::prefix('bypass-registrations')->name('bypass-registrations.')->group(function () {

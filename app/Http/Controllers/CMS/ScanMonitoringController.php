@@ -2,7 +2,10 @@
 
 namespace App\Http\Controllers\CMS;
 
+use App\Actions\Registration\ResendSeatAllocationEmailAction;
+use App\Exceptions\MudikException;
 use App\Http\Controllers\Controller;
+use App\Models\EmailLog;
 use App\Models\Registration;
 use App\Models\Destination;
 use Illuminate\Http\Request;
@@ -51,6 +54,43 @@ class ScanMonitoringController extends Controller
             } elseif ($request->scan_status === 'not_scanned') {
                 $query->whereHas('qrCode', function ($q) {
                     $q->whereNull('scanned_at');
+                });
+            }
+        }
+
+        // Filter by email log status (only for scanned registrations)
+        if ($request->filled('email_status')) {
+            $query->whereHas('qrCode', function ($q) {
+                $q->whereNotNull('scanned_at');
+            });
+
+            if ($request->email_status === 'sent') {
+                $query->whereHas('seatAllocations.registration.formLink', function ($q) {
+                    $q->whereHas('emailLogs', function ($subQ) {
+                        $subQ->where('email_type', 'seat_allocation')
+                            ->where('status', 'sent');
+                    });
+                });
+            } elseif ($request->email_status === 'failed') {
+                $query->whereHas('seatAllocations.registration.formLink', function ($q) {
+                    $q->whereHas('emailLogs', function ($subQ) {
+                        $subQ->where('email_type', 'seat_allocation')
+                            ->where('status', 'failed');
+                    });
+                });
+            } elseif ($request->email_status === 'pending') {
+                $query->whereHas('seatAllocations.registration.formLink', function ($q) {
+                    $q->whereHas('emailLogs', function ($subQ) {
+                        $subQ->where('email_type', 'seat_allocation')
+                            ->where('status', 'pending');
+                    });
+                });
+            } elseif ($request->email_status === 'not_sent') {
+                // Registrations scanned but no email log for seat allocation
+                $query->whereHas('qrCode', function ($q) {
+                    $q->whereNotNull('scanned_at');
+                })->whereDoesntHave('formLink.emailLogs', function ($q) {
+                    $q->where('email_type', 'seat_allocation');
                 });
             }
         }
@@ -109,14 +149,33 @@ class ScanMonitoringController extends Controller
             ], 403);
         }
 
+        // Get email log info
+        $isScanned = $registration->qrCode && $registration->qrCode->scanned_at;
+        $emailLog = null;
+
+        if ($isScanned) {
+            $emailLog = EmailLog::where('form_link_id', $registration->form_link_id)
+                ->where('email_type', 'seat_allocation')
+                ->latest('created_at')
+                ->first();
+        }
+
         return response()->json([
             'success' => true,
             'data' => [
                 'registration' => $registration,
                 'scan_info' => [
-                    'is_scanned' => $registration->qrCode && $registration->qrCode->scanned_at,
+                    'is_scanned' => $isScanned,
                     'scanned_at' => $registration->qrCode?->scanned_at,
                     'scanned_by' => $registration->qrCode?->scannedBy?->name,
+                ],
+                'email_info' => [
+                    'is_scanned' => $isScanned,
+                    'status' => $emailLog?->status,
+                    'sent_at' => $emailLog?->sent_at,
+                    'failed_at' => $emailLog?->failed_at,
+                    'error_message' => $emailLog?->error_message,
+                    'retry_count' => $emailLog?->retry_count ?? 0,
                 ],
                 'participants' => $registration->participants->map(function ($participant) use ($registration) {
                     $seatAllocation = $registration->seatAllocations
@@ -139,5 +198,26 @@ class ScanMonitoringController extends Controller
                 })
             ]
         ]);
+    }
+
+    /**
+     * Resend seat allocation email.
+     *
+     * POST /cms/scan-monitoring/{registration}/resend-seat-allocation
+     */
+    public function resendSeatAllocationEmail(Registration $registration): JsonResponse
+    {
+        try {
+            $admin = auth('admin')->user();
+
+            $result = ResendSeatAllocationEmailAction::run($registration, $admin);
+
+            return response()->json([
+                'success' => true,
+                'message' => $result['message'],
+            ]);
+        } catch (MudikException $e) {
+            return response()->json($e->toArray(), 400);
+        }
     }
 }

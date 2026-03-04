@@ -550,7 +550,7 @@
                 if (json.success && json.data) {
                     const d = json.data;
                     const reg = d.registration;
-                    showResult('success', '✅ Scan Berhasil!', buildSuccessHTML(d, reg), true);
+                    showResult('success', 'Scan Berhasil!', buildSuccessHTML(d, reg), true);
                     // Inject successful scan to history
                     injectToHistory({
                         status: 'success',
@@ -641,7 +641,7 @@
                             <i class="bi bi-check2-circle me-1"></i> Konfirmasi Scan
                         </button>
                         <button class="btn btn-cancel-scan" onclick="cancelScan()">
-                            <i class="bi bi-x me-1"></i> Batal
+                            <i class="bi bi-x me-1"></i> Cancel Scan
                         </button>
                     </div>
                 </div>`;

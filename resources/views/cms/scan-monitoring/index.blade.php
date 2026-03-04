@@ -292,7 +292,7 @@
                     </select>
                 </div>
 
-                <div class="col-md-3 col-12">
+                <div class="col-md-2 col-12">
                     <label class="form-label fw-semibold small">Status Scan</label>
                     <select name="scan_status" class="form-select">
                         <option value="">Semua Status</option>
@@ -303,7 +303,18 @@
                     </select>
                 </div>
 
-                <div class="col-md-4 col-12">
+                <div class="col-md-2 col-12">
+                    <label class="form-label fw-semibold small">Status Email</label>
+                    <select name="email_status" class="form-select">
+                        <option value="">Semua Status</option>
+                        <option value="sent" {{ request('email_status') == 'sent' ? 'selected' : '' }}>Terkirim</option>
+                        <option value="failed" {{ request('email_status') == 'failed' ? 'selected' : '' }}>Gagal</option>
+                        <option value="pending" {{ request('email_status') == 'pending' ? 'selected' : '' }}>Pending</option>
+                        <option value="not_sent" {{ request('email_status') == 'not_sent' ? 'selected' : '' }}>Belum Terkirim</option>
+                    </select>
+                </div>
+
+                <div class="col-md-3 col-12">
                     <label class="form-label fw-semibold small">Cari</label>
                     <input type="text" name="search" class="form-control" placeholder="Nama/Email/NIK/KK"
                         value="{{ request('search') }}">
@@ -319,6 +330,10 @@
                 </div>
             </div>
         </form>
+    </div>
+
+    <!-- Alert container (placed between filters and data) -->
+    <div id="scanMonitoringAlertContainer" class="mb-3">
     </div>
 
     <!-- Table Card -->
@@ -340,7 +355,8 @@
                             <th>Tujuan</th>
                             <th>Jumlah</th>
                             <th>Status Scan</th>
-                            <th class="text-center">Detail</th>
+                            <th>Status Email</th>
+                            <th class="text-center">Aksi</th>
                         </tr>
                     </thead>
                     <tbody>
@@ -351,14 +367,21 @@
                                 </td>
                                 <td>
                                     <div>
-                                        <div class="fw-semibold">{{ $registration->representative_name }}</div>
+                                        <div class="fw-semibold">
+                                            {{ $registration->representative_name }}
+                                            @if ($registration->isBypass())
+                                                <span class="status-badge badge bg-info text-dark ms-2">
+                                                    <i class="bi bi-bookmark-check me-1"></i>Bypass
+                                                </span>
+                                            @endif
+                                        </div>
                                         <small class="text-muted d-block">{{ $registration->formLink->email }}</small>
                                         <small class="text-muted d-block">NIK: {{ $registration->representative_nik }}</small>
                                         <small class="text-muted d-block">KK: {{ $registration->kk_number }}</small>
                                     </div>
                                 </td>
                                 <td>
-                                    <span class="badge bg-info">{{ $registration->destination->name }}</span>
+                                    <span class="fw-semibold">{{ $registration->destination->name }}</span>
                                 </td>
                                 <td>
                                     <span class="fw-bold">{{ $registration->family_count }} orang</span>
@@ -377,15 +400,56 @@
                                         </span>
                                     @endif
                                 </td>
+                                <td>
+                                    @php
+                                        $emailLog = $registration->formLink->emailLogs()
+                                            ->where('email_type', 'seat_allocation')
+                                            ->latest('created_at')
+                                            ->first();
+                                        $isScanned = $registration->qrCode && $registration->qrCode->scanned_at;
+                                    @endphp
+                                    @if (!$isScanned)
+                                        <span class="badge bg-secondary">-</span>
+                                    @elseif (!$emailLog)
+                                        <span class="status-badge bg-secondary text-white">
+                                            <i class="bi bi-envelope-exclamation-fill me-1"></i>Belum terkirim
+                                        </span>
+                                    @elseif ($emailLog->status === 'sent')
+                                        <span class="status-badge bg-success text-white">
+                                            <i class="bi bi-envelope-check-fill me-1"></i> Terkirim
+                                        </span>
+                                        <small class="d-block mt-1 text-muted">
+                                            {{ $emailLog->sent_at->format('d/m/Y H:i') }}
+                                        </small>
+                                    @elseif ($emailLog->status === 'pending')
+                                        <span class="status-badge bg-warning text-dark">
+                                            <i class="bi bi-envelope-arrow-up-fill me-1"></i>Pending
+                                        </span>
+                                    @elseif ($emailLog->status === 'failed')
+                                        <span class="status-badge bg-danger text-white">
+                                            <i class="bi bi-envelope-x-fill me-1"></i> Gagal
+                                        </span>
+                                        <small class="d-block mt-1 text-muted">
+                                            {{ $emailLog->failed_at?->format('d/m/Y H:i') }}
+                                        </small>
+                                    @endif
+                                </td>
                                 <td class="text-center">
-                                    <button class="btn btn-sm btn-primary btn-action" onclick="showDetail({{ $registration->id }})">
-                                        <i class="bi bi-eye me-1"></i>Detail
-                                    </button>
+                                    <div class="btn-group btn-group-sm" role="group">
+                                        <button class="btn btn-primary btn-action" onclick="showDetail({{ $registration->id }})" title="Lihat Detail">
+                                            <i class="bi bi-eye"></i>
+                                        </button>
+                                        @if ($isScanned)
+                                            <button type="button" class="btn btn-warning btn-action" onclick="resendEmailSeatingQuick({{ $registration->id }})" title="Kirim Ulang Email Kursi">
+                                                <i class="bi bi-arrow-clockwise"></i> Re-sent Email
+                                            </button>
+                                        @endif
+                                    </div>
                                 </td>
                             </tr>
                         @empty
                             <tr>
-                                <td colspan="6" class="text-center py-4">
+                                <td colspan="7" class="text-center py-4">
                                     <div class="text-muted">
                                         <i class="bi bi-inbox fs-1 d-block mb-2"></i>
                                         Tidak ada data pendaftaran
@@ -401,14 +465,26 @@
         <!-- Mobile Card View -->
         <div class="mobile-cards">
             @forelse ($registrations as $registration)
+                @php
+                    $emailLog = $registration->formLink->emailLogs()
+                        ->where('email_type', 'seat_allocation')
+                        ->latest('created_at')
+                        ->first();
+                    $isScanned = $registration->qrCode && $registration->qrCode->scanned_at;
+                @endphp
                 <div class="registration-card">
                     <div class="registration-card-header">
                         <div>
                             <h6 class="fw-bold mb-1">#{{ $registration->id }} - {{ $registration->representative_name }}
+                                @if ($registration->isBypass())
+                                    <span class="status-badge badge bg-info text-dark ms-2">
+                                        <i class="bi bi-bookmark-check me-1"></i>Bypass
+                                    </span>
+                                @endif
                             </h6>
                             <small class="text-muted">{{ $registration->formLink->email }}</small>
                         </div>
-                        @if ($registration->qrCode && $registration->qrCode->scanned_at)
+                        @if ($isScanned)
                             <span class="status-badge badge-scanned">
                                 <i class="bi bi-check-circle"></i> Sudah
                             </span>
@@ -435,10 +511,24 @@
                             <span class="info-label">Jumlah</span>
                             <span class="info-value">{{ $registration->family_count }} orang</span>
                         </div>
-                        @if ($registration->qrCode && $registration->qrCode->scanned_at)
+                        @if ($isScanned)
                             <div class="info-row">
                                 <span class="info-label">Waktu Scan</span>
                                 <span class="info-value">{{ $registration->qrCode->scanned_at->format('d/m/Y H:i') }}</span>
+                            </div>
+                            <div class="info-row">
+                                <span class="info-label">Status Email</span>
+                                <span class="info-value">
+                                    @if (!$emailLog)
+                                        <span class="badge bg-warning">Belum</span>
+                                    @elseif ($emailLog->status === 'sent')
+                                        <span class="badge bg-success">Terkirim</span>
+                                    @elseif ($emailLog->status === 'pending')
+                                        <span class="badge bg-info">Pending</span>
+                                    @elseif ($emailLog->status === 'failed')
+                                        <span class="badge bg-danger">Gagal</span>
+                                    @endif
+                                </span>
                             </div>
                         @endif
                     </div>
@@ -446,6 +536,11 @@
                         <button class="btn btn-primary btn-sm" onclick="showDetail({{ $registration->id }})">
                             <i class="bi bi-eye me-1"></i>Detail
                         </button>
+                        @if ($isScanned)
+                            <button type="button" class="btn btn-warning btn-sm" onclick="resendEmailSeatingQuick({{ $registration->id }})">
+                                <i class="bi bi-arrow-clockwise me-1"></i>Re-sent Email
+                            </button>
+                        @endif
                     </div>
                 </div>
             @empty
@@ -530,6 +625,7 @@
         function renderModalContent(data) {
             const registration = data.registration;
             const scanInfo = data.scan_info;
+            const emailInfo = data.email_info;
             const participants = data.participants;
 
             let scanStatusHtml = '';
@@ -551,6 +647,72 @@
                 scanStatusHtml = `
                     <div class="alert alert-warning">
                         <strong><i class="bi bi-clock me-2"></i>Belum Discan</strong>
+                    </div>
+                `;
+            }
+
+            let emailStatusHtml = '';
+            if (!emailInfo.is_scanned) {
+                emailStatusHtml = `
+                    <div class="alert alert-secondary mb-3">
+                        <strong><i class="bi bi-dash-circle me-2"></i>Status Email: -</strong>
+                        <small class="d-block mt-1">Peserta belum discan, email belum terkirim</small>
+                    </div>
+                `;
+            } else if (!emailInfo.status) {
+                emailStatusHtml = `
+                    <div class="alert alert-warning mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong><i class="bi bi-clock me-2"></i>Status Email: Belum Terkirim</strong>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-warning" onclick="resendEmailSeating(${registration.id})">
+                                <i class="bi bi-send me-1"></i>Re-sent email
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (emailInfo.status === 'sent') {
+                emailStatusHtml = `
+                    <div class="alert alert-success mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong><i class="bi bi-check-circle me-2"></i>Status Email: Terkirim</strong>
+                                <small class="d-block mt-1">Waktu: ${formatDateTime(emailInfo.sent_at)}</small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-success" onclick="resendEmailSeating(${registration.id})">
+                                <i class="bi bi-send me-1"></i>Re-sent email
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (emailInfo.status === 'pending') {
+                emailStatusHtml = `
+                    <div class="alert alert-info mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong><i class="bi bi-hourglass-split me-2"></i>Status Email: Pending</strong>
+                                <small class="d-block mt-1">Email sedang dalam antrian pengiriman</small>
+                            </div>
+                            <button type="button" class="btn btn-sm btn-outline-info" onclick="resendEmailSeating(${registration.id})">
+                                <i class="bi bi-send me-1"></i>Re-sent email
+                            </button>
+                        </div>
+                    </div>
+                `;
+            } else if (emailInfo.status === 'failed') {
+                emailStatusHtml = `
+                    <div class="alert alert-danger mb-3">
+                        <div class="d-flex justify-content-between align-items-center">
+                            <div>
+                                <strong><i class="bi bi-exclamation-circle me-2"></i>Status Email: Gagal</strong>
+                                <small class="d-block mt-1">Waktu: ${formatDateTime(emailInfo.failed_at)}</small>
+                                ${emailInfo.error_message ? `<small class="d-block mt-2 text-danger">${emailInfo.error_message}</small>` : ''}
+                            </div>
+                            <button type="button" class="btn btn-sm btn-danger" onclick="resendEmailSeating(${registration.id})">
+                                <i class="bi bi-send me-1"></i>Re-sent email
+                            </button>
+                        </div>
                     </div>
                 `;
             }
@@ -612,61 +774,62 @@
 
             const html = `
                 ${scanStatusHtml}
+                ${emailStatusHtml}
 
                 <div class="mb-4">
                     <h6 class="fw-bold mb-3">Informasi Umum</h6>
                     <div class="row">
-                        <div class="col-md-3">
-                            <div class="modal-detail-row">
-                                <div class="modal-detail-label">ID Pendaftaran</div>
+                        <div class="col-md-3 mb-0">
+                            <div class="modal-detail-row pb-0">
+                                <div class="modal-detail-label mb-0">ID Pendaftaran</div>
                                 <div class="modal-detail-value">#${registration.id}</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="modal-detail-row">
-                                <div class="modal-detail-label">Nama Perwakilan</div>
+                        <div class="col-md-3 mb-0">
+                            <div class="modal-detail-row pb-0">
+                                <div class="modal-detail-label mb-0">Nama Perwakilan</div>
                                 <div class="modal-detail-value">${registration.representative_name}</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="modal-detail-row">
-                                <div class="modal-detail-label">Jumlah Peserta</div>
+                        <div class="col-md-3 mb-0">
+                            <div class="modal-detail-row pb-0">
+                                <div class="modal-detail-label mb-0">Jumlah Peserta</div>
                                 <div class="modal-detail-value">${registration.family_count} orang</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="modal-detail-row">
-                                <div class="modal-detail-label">NIK Perwakilan</div>
+                        <div class="col-md-3 mb-0">
+                            <div class="modal-detail-row pb-0">
+                                <div class="modal-detail-label mb-0">NIK Perwakilan</div>
                                 <div class="modal-detail-value">${registration.representative_nik}</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="modal-detail-row">
-                                <div class="modal-detail-label">Nomor KK</div>
+                        <div class="col-md-3 mb-0">
+                            <div class="modal-detail-row pb-0">
+                                <div class="modal-detail-label mb-0">Nomor KK</div>
                                 <div class="modal-detail-value">${registration.kk_number}</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="modal-detail-row">
-                                <div class="modal-detail-label">Tujuan</div>
+                        <div class="col-md-3 mb-0">
+                            <div class="modal-detail-row pb-0">
+                                <div class="modal-detail-label mb-0">Tujuan</div>
                                 <div class="modal-detail-value">${registration.destination.name}</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="modal-detail-row">
-                                <div class="modal-detail-label">Nomor KK</div>
+                        <div class="col-md-3 mb-0">
+                            <div class="modal-detail-row pb-0">
+                                <div class="modal-detail-label mb-0">Nomor KK</div>
                                 <div class="modal-detail-value">${registration.kk_number}</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="modal-detail-row">
-                                <div class="modal-detail-label">Tujuan</div>
+                        <div class="col-md-3 mb-0">
+                            <div class="modal-detail-row pb-0">
+                                <div class="modal-detail-label mb-0">Tujuan</div>
                                 <div class="modal-detail-value">${registration.destination.name}</div>
                             </div>
                         </div>
-                        <div class="col-md-3">
-                            <div class="modal-detail-row">
-                                <div class="modal-detail-label">Email</div>
+                        <div class="col-md-3 mb-0">
+                            <div class="modal-detail-row pb-0">
+                                <div class="modal-detail-label mb-0">Email</div>
                                 <div class="modal-detail-value">${registration.form_link.email}</div>
                             </div>
                         </div>
@@ -684,6 +847,75 @@
             document.getElementById('modalContent').innerHTML = html;
         }
 
+        function resendEmailSeating(registrationId) {
+            if (!confirm('Apakah Anda yakin ingin mengirim ulang email alokasi kursi?')) {
+                return;
+            }
+
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengirim...';
+
+            fetch(`/cms/scan-monitoring/${registrationId}/resend-seat-allocation`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Terkirim!';
+                        btn.classList.remove('btn-warning', 'btn-danger', 'btn-outline-success', 'btn-outline-info');
+                        btn.classList.add('btn-success');
+
+                        setTimeout(() => {
+                            // Reload detail
+                            showDetail(registrationId);
+                        }, 1500);
+
+                        showAlert('success', data.message);
+                    } else {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        showAlert('danger', data.message || 'Gagal mengirim ulang email');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showAlert('danger', 'Terjadi kesalahan saat mengirim ulang email');
+                });
+        }
+
+        function showAlert(type, message) {
+            // Create bootstrap alert
+            const alertHtml = `
+                <div class="alert alert-${type} alert-dismissible fade show" role="alert" style="margin-bottom: 0;">
+                    ${message}
+                    <button type="button" class="btn-close" data-bs-dismiss="alert" aria-label="Close"></button>
+                </div>
+            `;
+
+            // Insert into dedicated alert container (between filters and data)
+            const alertDiv = document.createElement('div');
+            alertDiv.innerHTML = alertHtml;
+            const container = document.getElementById('scanMonitoringAlertContainer') || document.body;
+            container.insertBefore(alertDiv.firstElementChild, container.firstChild);
+
+            // Auto dismiss after 5 seconds
+            setTimeout(() => {
+                    const container = document.getElementById('scanMonitoringAlertContainer') || document.body;
+                    const alert = container.querySelector('.alert');
+                    if (alert) {
+                        alert.remove();
+                    }
+            }, 5000);
+        }
+
         function formatDateTime(dateString) {
             if (!dateString) return '-';
             const date = new Date(dateString);
@@ -693,6 +925,50 @@
             const hours = String(date.getHours()).padStart(2, '0');
             const minutes = String(date.getMinutes()).padStart(2, '0');
             return `${day}/${month}/${year} ${hours}:${minutes}`;
+        }
+
+        function resendEmailSeatingQuick(registrationId) {
+            if (!confirm('Yakin ingin mengirim ulang email alokasi kursi?')) {
+                return;
+            }
+
+            const btn = event.target.closest('button');
+            const originalText = btn.innerHTML;
+            btn.disabled = true;
+            btn.innerHTML = '<span class="spinner-border spinner-border-sm me-2"></span>Mengirim...';
+
+            fetch(`/cms/scan-monitoring/${registrationId}/resend-seat-allocation`, {
+                method: 'POST',
+                headers: {
+                    'X-CSRF-TOKEN': document.querySelector('meta[name="csrf-token"]').content,
+                    'Content-Type': 'application/json',
+                },
+            })
+                .then(response => response.json())
+                .then(data => {
+                    if (data.success) {
+                        btn.innerHTML = '<i class="bi bi-check-circle me-1"></i>Terkirim!';
+                        btn.classList.remove('btn-warning');
+                        btn.classList.add('btn-success');
+
+                        setTimeout(() => {
+                            // Reload halaman dengan preserve query string
+                            window.location.href = window.location.href;
+                        }, 1500);
+
+                        showAlert('success', data.message);
+                    } else {
+                        btn.innerHTML = originalText;
+                        btn.disabled = false;
+                        showAlert('danger', data.message || 'Gagal mengirim ulang email');
+                    }
+                })
+                .catch(error => {
+                    console.error('Error:', error);
+                    btn.innerHTML = originalText;
+                    btn.disabled = false;
+                    showAlert('danger', 'Terjadi kesalahan saat mengirim ulang email');
+                });
         }
     </script>
 @endpush
