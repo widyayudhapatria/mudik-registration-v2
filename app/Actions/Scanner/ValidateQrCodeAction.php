@@ -18,23 +18,44 @@ class ValidateQrCodeAction
 
     public function handle(string $tokenQr, ?Admin $admin = null): array
     {
+        // Auto-detect: if input is 16-digit number, search by KK number, else search by token
+        $isKkNumber = $this->isKkNumber($tokenQr);
+
         // Find QR code
-        $qrCode = QrCode::where('token_qr', $tokenQr)
-            ->with([
-                'registration.formLink',
-                'registration.destination',
-                'registration.participants'
-            ])
-            ->first();
+        if ($isKkNumber) {
+            // Search by KK number through registration
+            $qrCode = QrCode::whereHas('registration', function ($query) use ($tokenQr) {
+                $query->where('kk_number', $tokenQr);
+            })
+                ->with([
+                    'registration.formLink',
+                    'registration.destination',
+                    'registration.participants'
+                ])
+                ->first();
+        } else {
+            // Search by token QR (camera scanner)
+            $qrCode = QrCode::where('token_qr', $tokenQr)
+                ->with([
+                    'registration.formLink',
+                    'registration.destination',
+                    'registration.participants'
+                ])
+                ->first();
+        }
 
         if (!$qrCode) {
             // Log not-found failure if admin provided
             if ($admin) {
                 try {
+                    $notFoundMsg = $isKkNumber
+                        ? sprintf('QR not found for KK: %s', $tokenQr)
+                        : sprintf('QR not found: %s', $tokenQr);
+
                     ScanLog::logFailure(
                         null,
                         $admin->id,
-                        sprintf('QR not found: %s', $tokenQr),
+                        $notFoundMsg,
                         request()->ip(),
                         request()->userAgent()
                     );
@@ -42,9 +63,14 @@ class ValidateQrCodeAction
                     Log::warning('Failed to log QR not-found attempt', ['error' => $e->getMessage()]);
                 }
             }
+
+            $errorMessage = $isKkNumber
+                ? 'QR Code dengan nomor KK tersebut tidak ditemukan'
+                : null;
+
             throw new MudikException(
                 ErrorCode::QrNotFound,
-                null,
+                $errorMessage,
                 [],
                 404
             );
@@ -187,5 +213,13 @@ class ValidateQrCodeAction
             'is_within_valid_period' => $isWithinValidPeriod,
             'has_been_scanned' => $hasBeenScanned,
         ];
+    }
+
+    /**
+     * Check if input is a KK number (16 digits).
+     */
+    protected function isKkNumber(string $input): bool
+    {
+        return preg_match('/^\d{16}$/', $input) === 1;
     }
 }

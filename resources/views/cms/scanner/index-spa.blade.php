@@ -329,19 +329,21 @@
             <div class="scanner-card">
                 <div class="scanner-header-bar" style="background: linear-gradient(135deg, #455a64 0%, #263238 100%);">
                     <i class="bi bi-keyboard fs-5"></i>
-                    <h5>Input Token Manual</h5>
+                    <h5>Input Manual (Nomor KK)</h5>
                 </div>
                 <div class="p-3">
                     <form id="manualForm" onsubmit="handleManualInput(event)">
                         <div class="input-group input-group-sm">
-                            <span class="input-group-text bg-light"><i class="bi bi-qr-code text-muted"></i></span>
+                            <span class="input-group-text bg-light"><i class="bi bi-credit-card-2-front text-muted"></i></span>
                             <input type="text" class="form-control" id="tokenInput"
-                                placeholder="Paste token QR (64 karakter)..." autocomplete="off" spellcheck="false">
+                                placeholder="Masukkan Nomor KK (16 digit)..." autocomplete="off" spellcheck="false" maxlength="16">
                             <button type="submit" class="btn btn-dark">
                                 <i class="bi bi-search me-1"></i>Cari
                             </button>
                         </div>
-                        <small class="text-muted d-block mt-1">Token berupa 64 karakter alfanumerik</small>
+                        <small class="text-muted d-block mt-1">
+                            <i class="bi bi-info-circle me-1"></i>Untuk peserta yang tidak membawa QR Code, masukkan Nomor KK mereka (16 digit)
+                        </small>
                     </form>
                 </div>
             </div>
@@ -469,11 +471,16 @@
             e.preventDefault();
             const token = document.getElementById('tokenInput').value.trim();
             if (!token) return;
-            if (!/^[a-zA-Z0-9]{64}$/.test(token)) {
-                showResult('error', '❌ Token Tidak Valid',
-                    `Token harus 64 karakter alfanumerik. Anda memasukkan ${token.length} karakter.`);
+
+            // Manual input ONLY accepts 16-digit KK Number
+            const isKkNumber = /^\d{16}$/.test(token);
+
+            if (!isKkNumber) {
+                showResult('error', '❌ Nomor KK Tidak Valid',
+                    `Nomor KK harus 16 digit angka. Anda memasukkan ${token.length} karakter.`);
                 return;
             }
+
             isProcessing = true;
             if (html5QrCode && isScanning) html5QrCode.pause(true);
             doValidate(token);

@@ -10,7 +10,7 @@ use Spatie\LaravelData\Data;
 class ScanQrData extends Data
 {
     public function __construct(
-        #[Required, StringType, Min(32)]
+        #[Required, StringType, Min(16)]
         public string $token_qr,
     ) {}
 }

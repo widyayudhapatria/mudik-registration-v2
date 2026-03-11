@@ -29,18 +29,39 @@ class ConsumeQrCodeAction
         try {
             DB::beginTransaction();
 
+            // Auto-detect: if input is 16-digit number, search by KK number, else search by token
+            $isKkNumber = $this->isKkNumber($data->token_qr);
+
             // Lock QR code FOR UPDATE
-            $qrCode = QrCode::where('token_qr', $data->token_qr)
-                ->lockForUpdate()
-                ->with([
-                    'registration.formLink',
-                    'registration.participants',
-                    'registration.destination'
-                ])
-                ->first();
+            if ($isKkNumber) {
+                // Search by KK number through registration
+                $qrCode = QrCode::whereHas('registration', function ($query) use ($data) {
+                    $query->where('kk_number', $data->token_qr);
+                })
+                    ->lockForUpdate()
+                    ->with([
+                        'registration.formLink',
+                        'registration.participants',
+                        'registration.destination'
+                    ])
+                    ->first();
+            } else {
+                // Search by token QR (camera scanner)
+                $qrCode = QrCode::where('token_qr', $data->token_qr)
+                    ->lockForUpdate()
+                    ->with([
+                        'registration.formLink',
+                        'registration.participants',
+                        'registration.destination'
+                    ])
+                    ->first();
+            }
 
             if (!$qrCode) {
-                throw new MudikException(ErrorCode::QrNotFound, null, [], 404);
+                $errorMessage = $isKkNumber
+                    ? 'QR Code dengan nomor KK tersebut tidak ditemukan'
+                    : null;
+                throw new MudikException(ErrorCode::QrNotFound, $errorMessage, [], 404);
             }
 
             // CRITICAL: Lock registration FOR UPDATE
@@ -279,5 +300,13 @@ class ConsumeQrCodeAction
                 'family_count' => $qrCode->registration->family_count,
             ],
         ];
+    }
+
+    /**
+     * Check if input is a KK number (16 digits).
+     */
+    protected function isKkNumber(string $input): bool
+    {
+        return preg_match('/^\d{16}$/', $input) === 1;
     }
 }
