@@ -306,7 +306,7 @@
                 </div>
                 <p class="text-muted small mb-0">
                     <i class="bi bi-info-circle me-1"></i>
-                    Jumlah formulir pendaftaran yang masuk (semua status)
+                    Jumlah formulir pendaftaran yang masuk (approved)
                 </p>
             </div>
         </div>
