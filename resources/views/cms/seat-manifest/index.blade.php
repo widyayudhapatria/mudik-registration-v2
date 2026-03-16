@@ -137,7 +137,7 @@
                     <span class="text-white fw-bold">
                         <i class="bi bi-truck-front me-2"></i>Bus {{ $busName }}
                     </span>
-                    <span class="badge bg-light text-dark">{{ $seats->count() }} / 50 kursi</span>
+                    <span class="badge bg-light text-dark">{{ $seats->count() }} / {{ config('mudik.counter_seat.bus_max_seats') }} kursi</span>
                 </div>
 
                 {{-- Seat Table --}}
